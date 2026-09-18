@@ -22,8 +22,12 @@ pub enum RustTokenKind {
     #[token(")")]
     CParen,
     #[token("{")]
-    OBrace,
+    OCurly,
     #[token("}")]
+    CCurly,
+    #[token("[")]
+    OBrace,
+    #[token("]")]
     CBrace,
     #[token(":")]
     Colon,

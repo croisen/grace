@@ -24,8 +24,12 @@ pub enum SQLTokenKind {
     #[token("\\")]
     BSlash,
     #[token("{")]
-    OBrace,
+    OCurly,
     #[token("}")]
+    CCurly,
+    #[token("[")]
+    OBrace,
+    #[token("]")]
     CBrace,
     #[token(":")]
     Colon,

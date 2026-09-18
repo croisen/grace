@@ -1,0 +1,15 @@
+[package]
+name = "rust_lib_grace"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+anyhow = { version = "1.0.104", default-features = false, features = ["std"] }
+flutter_rust_bridge = "=2.13.0"
+logos = { version = "0.16.1", default-features = false, features = ["export_derive", "logos-derive", "state_machine_codegen", "std"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

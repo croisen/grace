@@ -35,6 +35,8 @@ pub enum RustTokenKind {
     Semicolon,
     #[token(",")]
     Comma,
+    #[token("?")]
+    Question,
 
     #[token("fn")]
     Fn,
@@ -44,6 +46,22 @@ pub enum RustTokenKind {
     Mut,
     #[token("->")]
     Return,
+
+    #[regex("[a-zA-Z_][a-zA-Z0-9_]*!")]
+    Macro,
+    #[regex(r"'[a-zA-Z_][a-zA-Z0-9_]*")]
+    Lifetime,
+
+    #[token(">")]
+    CompGT,
+    #[token("<")]
+    CompLT,
+    #[token(">=")]
+    CompGE,
+    #[token("<=")]
+    CompLE,
+    #[token("==")]
+    CompEQ,
 
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*")]
     Identifier,

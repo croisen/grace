@@ -10,6 +10,7 @@ crate-type = ["cdylib", "staticlib"]
 anyhow = { version = "1.0.104", default-features = false, features = ["std"] }
 flutter_rust_bridge = "=2.13.0"
 logos = { version = "0.16.1", default-features = false, features = ["export_derive", "logos-derive", "state_machine_codegen", "std"] }
+rand = "0.10.2"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

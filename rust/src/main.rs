@@ -1,16 +1,16 @@
-mod api;
-mod frb_generated;
+mod rust_drill_generator;
 
-use api::comp_var;
+use crate::rust_drill_generator::generate_drill;
 
 fn main() {
-    let (variable, condition) = comp_var::var_gen::var_gen(1, 4);
-    println!("{}", condition);
+    let (answer, conditions, output) = generate_drill(2);
 
-    println!("\n{}\n", variable);
+    println!("===== ANSWER =====");
+    println!("{}", answer);
 
-    let (var_two, cond_two) = comp_var::var_gen::var_gen(0, 5);
+    println!("\n===== CONDITIONS =====");
+    println!("{}", conditions);
 
-    println!("{}", cond_two);
-    println!("\n{}", var_two);
+    println!("\n===== OUTPUT =====");
+    println!("{}", output);
 }

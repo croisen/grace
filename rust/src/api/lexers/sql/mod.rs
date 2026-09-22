@@ -4,6 +4,7 @@ use crate::api::lexers::{extras_newline, LexingError};
 
 #[derive(Debug, Clone, PartialEq, Logos)]
 #[logos(error = LexingError, extras = (usize, usize))]
+#[flutter_rust_bridge::frb(unignore)]
 pub enum SQLTokenKind {
     #[token("(")]
     OParen,
@@ -51,8 +52,8 @@ pub enum SQLTokenKind {
 
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*")]
     Identifier,
-    #[regex("-?[0-9]+", |lex| lex.slice().parse())]
-    Integer(i64),
+    #[regex("-?[0-9]+")]
+    Integer,
     #[regex(r#""([^"\\]|\\.)""#)]
     String,
     #[regex(r"\n|\r\n", extras_newline)]

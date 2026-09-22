@@ -19,11 +19,9 @@ pub fn indenter(code: &str, spaces: usize) -> String {
 fn callsign() -> String {
     let mut rng = rand::rng();
     let names = [
-        "alpha", "bravo", "charlie", "delta", "echo", "foxtrot",
-        "golf", "hotel", "india", "juliett", "kilo", "lima",
-        "mike", "november", "oscar", "papa", "quebec", "romeo",
-        "sierra", "tango", "uniform", "victor", "whiskey", "xray",
-        "yankee", "zulu",
+        "alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel", "india",
+        "juliett", "kilo", "lima", "mike", "november", "oscar", "papa", "quebec", "romeo",
+        "sierra", "tango", "uniform", "victor", "whiskey", "xray", "yankee", "zulu",
     ];
     names[rng.random_range(0..names.len())].to_string()
 }
@@ -65,10 +63,10 @@ pub fn generate_drill(difficulty: u8) -> (String, String, String) {
         features.push(3);
     }
 
-    let want_vars  = features.contains(&0);
-    let want_if    = features.contains(&1);
+    let want_vars = features.contains(&0);
+    let want_if = features.contains(&1);
     let want_while = features.contains(&2);
-    let want_fn    = features.contains(&3);
+    let want_fn = features.contains(&3);
 
     let mut code_parts: Vec<String> = Vec::new();
     let mut conditions: Vec<String> = Vec::new();
@@ -91,14 +89,14 @@ pub fn generate_drill(difficulty: u8) -> (String, String, String) {
     }
 
     let mut var1_name = String::new();
-    let mut var1_val  = 0;
+    let mut var1_val = 0;
     let mut var2_name = String::new();
-    let mut var2_val  = 0;
+    let mut var2_val = 0;
 
     if want_vars || want_if || want_while {
         let v1 = make_i32_var();
         var1_name = v1[0].clone();
-        var1_val  = v1[1].parse().unwrap_or(0);
+        var1_val = v1[1].parse().unwrap_or(0);
 
         code_parts.push(format!("let mut {} = {};", var1_name, var1_val));
         conditions.push(format!(
@@ -110,11 +108,11 @@ pub fn generate_drill(difficulty: u8) -> (String, String, String) {
         if want_if || rng.random_range(0..2) == 0 {
             let v2 = make_i32_var();
             var2_name = v2[0].clone();
-            var2_val  = v2[1].parse().unwrap_or(0);
+            var2_val = v2[1].parse().unwrap_or(0);
             while var2_name == var1_name {
                 let v2 = make_i32_var();
                 var2_name = v2[0].clone();
-                var2_val  = v2[1].parse().unwrap_or(0);
+                var2_val = v2[1].parse().unwrap_or(0);
             }
             code_parts.push(format!("let mut {} = {};", var2_name, var2_val));
             conditions.push(format!(

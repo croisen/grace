@@ -6,11 +6,20 @@ use std::ops::Range;
 use anyhow::Result;
 use logos::{Lexer, Logos, Skip};
 
+use crate::api::lexers::java::JavaTokenKind;
+use crate::api::lexers::rust::RustTokenKind;
+use crate::api::lexers::sql::SQLTokenKind;
+
 pub mod java;
 pub mod rust;
 pub mod sql;
 
+pub type JavaToken<'a> = Token<'a, JavaTokenKind>;
+pub type RustToken<'a> = Token<'a, RustTokenKind>;
+pub type SQLToken<'a> = Token<'a, SQLTokenKind>;
+
 #[derive(Default, Debug, Clone, PartialEq)]
+#[flutter_rust_bridge::frb(unignore)]
 pub enum LexingError {
     NumberParseError,
     #[default]
@@ -32,6 +41,7 @@ impl From<ParseIntError> for LexingError {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+#[flutter_rust_bridge::frb(unignore, non_opaque)]
 pub struct Token<'a, T>
 where
     T: Logos<'a, Source = str, Error = LexingError, Extras = (usize, usize)>,
@@ -47,6 +57,7 @@ impl<'a, T> Token<'a, T>
 where
     T: Logos<'a, Source = str, Error = LexingError, Extras = (usize, usize)>,
 {
+    #[flutter_rust_bridge::frb(unignore)]
     pub fn new(kind: T, source: &'a str, span: Range<usize>, line: usize, col: usize) -> Self {
         Self {
             kind,
@@ -57,6 +68,7 @@ where
         }
     }
 
+    #[flutter_rust_bridge::frb(unignore)]
     pub fn tokenize(source: &'a str) -> Result<Vec<Self>> {
         let mut lexer = T::lexer(source);
         lexer.extras = (1, 0);

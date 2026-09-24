@@ -47,6 +47,8 @@ pub enum RustTokenKind {
     Mut,
     #[token("->")]
     Return,
+    #[token("static")]
+    Static,
 
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*!")]
     Macro,

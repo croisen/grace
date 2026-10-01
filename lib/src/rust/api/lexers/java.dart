@@ -4,10 +4,64 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import '../../utils/lexer.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `eq`, `fmt`, `lex`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `lex`
+
+class JavaToken {
+  final JavaTokenKind kind;
+  final String text;
+  final (BigInt, BigInt) span;
+  final BigInt line;
+  final BigInt col;
+
+  const JavaToken({
+    required this.kind,
+    required this.text,
+    required this.span,
+    required this.line,
+    required this.col,
+  });
+
+  static Future<JavaToken> default_() =>
+      RustLib.instance.api.crateApiLexersJavaJavaTokenDefault();
+
+  static Future<JavaToken> nt({
+    required JavaTokenKind kind,
+    required String source,
+    required (BigInt, BigInt) span,
+    required LexerExtras extras,
+  }) => RustLib.instance.api.crateApiLexersJavaJavaTokenNt(
+    kind: kind,
+    source: source,
+    span: span,
+    extras: extras,
+  );
+
+  static Future<List<JavaToken>> tokenize({required String source}) =>
+      RustLib.instance.api.crateApiLexersJavaJavaTokenTokenize(source: source);
+
+  @override
+  int get hashCode =>
+      kind.hashCode ^
+      text.hashCode ^
+      span.hashCode ^
+      line.hashCode ^
+      col.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is JavaToken &&
+          runtimeType == other.runtimeType &&
+          kind == other.kind &&
+          text == other.text &&
+          span == other.span &&
+          line == other.line &&
+          col == other.col;
+}
 
 enum JavaTokenKind {
   equals,
@@ -60,5 +114,8 @@ enum JavaTokenKind {
   integer,
   string,
   newline,
-  whitespace,
+  whitespace;
+
+  static Future<JavaTokenKind> default_() =>
+      RustLib.instance.api.crateApiLexersJavaJavaTokenKindDefault();
 }

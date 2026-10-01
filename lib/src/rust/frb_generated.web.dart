@@ -6,7 +6,7 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
-import 'api/lexers.dart';
+import 'api/drills/rust.dart';
 import 'api/lexers/java.dart';
 import 'api/lexers/rust.dart';
 import 'api/lexers/sql.dart';
@@ -16,9 +16,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'frb_generated.dart';
-import 'lib.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
+
+import 'utils/lexer.dart';
 
 abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustLibApiImplPlatform({
@@ -28,74 +29,59 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     required super.portManager,
   });
 
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_RangeUsizePtr => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize;
-
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_TPtr => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT;
-
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_StrPtr => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr;
-
   @protected
-  RangeUsize
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    dynamic raw,
-  );
-
-  @protected
-  T
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    dynamic raw,
-  );
-
-  @protected
-  Str
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    dynamic raw,
-  );
-
-  @protected
-  RangeUsize
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    dynamic raw,
-  );
-
-  @protected
-  T dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    dynamic raw,
-  );
-
-  @protected
-  Str
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    dynamic raw,
-  );
+  AnyhowException dco_decode_AnyhowException(dynamic raw);
 
   @protected
   String dco_decode_String(dynamic raw);
 
   @protected
+  LexerExtras dco_decode_box_autoadd_lexer_extras(dynamic raw);
+
+  @protected
+  (BigInt, BigInt) dco_decode_box_autoadd_record_usize_usize(dynamic raw);
+
+  @protected
   int dco_decode_i_32(dynamic raw);
+
+  @protected
+  JavaToken dco_decode_java_token(dynamic raw);
 
   @protected
   JavaTokenKind dco_decode_java_token_kind(dynamic raw);
 
   @protected
-  LexingError dco_decode_lexing_error(dynamic raw);
+  LexerExtras dco_decode_lexer_extras(dynamic raw);
+
+  @protected
+  List<JavaToken> dco_decode_list_java_token(dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<RustToken> dco_decode_list_rust_token(dynamic raw);
+
+  @protected
+  List<SQLToken> dco_decode_list_sql_token(dynamic raw);
+
+  @protected
+  (String, String, String) dco_decode_record_string_string_string(dynamic raw);
+
+  @protected
+  (BigInt, BigInt) dco_decode_record_usize_usize(dynamic raw);
+
+  @protected
+  RustToken dco_decode_rust_token(dynamic raw);
+
+  @protected
   RustTokenKind dco_decode_rust_token_kind(dynamic raw);
 
   @protected
-  SQLTokenKind dco_decode_sql_token_kind(dynamic raw);
+  SQLToken dco_decode_sql_token(dynamic raw);
 
   @protected
-  Token dco_decode_token(dynamic raw);
+  SQLTokenKind dco_decode_sql_token_kind(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -107,63 +93,62 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_usize(dynamic raw);
 
   @protected
-  RangeUsize
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  T
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  Str
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  RangeUsize
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  T sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  Str
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    SseDeserializer deserializer,
-  );
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  LexerExtras sse_decode_box_autoadd_lexer_extras(SseDeserializer deserializer);
+
+  @protected
+  (BigInt, BigInt) sse_decode_box_autoadd_record_usize_usize(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
+  JavaToken sse_decode_java_token(SseDeserializer deserializer);
 
   @protected
   JavaTokenKind sse_decode_java_token_kind(SseDeserializer deserializer);
 
   @protected
-  LexingError sse_decode_lexing_error(SseDeserializer deserializer);
+  LexerExtras sse_decode_lexer_extras(SseDeserializer deserializer);
+
+  @protected
+  List<JavaToken> sse_decode_list_java_token(SseDeserializer deserializer);
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<RustToken> sse_decode_list_rust_token(SseDeserializer deserializer);
+
+  @protected
+  List<SQLToken> sse_decode_list_sql_token(SseDeserializer deserializer);
+
+  @protected
+  (String, String, String) sse_decode_record_string_string_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  (BigInt, BigInt) sse_decode_record_usize_usize(SseDeserializer deserializer);
+
+  @protected
+  RustToken sse_decode_rust_token(SseDeserializer deserializer);
+
+  @protected
   RustTokenKind sse_decode_rust_token_kind(SseDeserializer deserializer);
 
   @protected
-  SQLTokenKind sse_decode_sql_token_kind(SseDeserializer deserializer);
+  SQLToken sse_decode_sql_token(SseDeserializer deserializer);
 
   @protected
-  Token sse_decode_token(SseDeserializer deserializer);
+  SQLTokenKind sse_decode_sql_token_kind(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
@@ -178,44 +163,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    RangeUsize self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    T self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    Str self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    RangeUsize self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    T self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    Str self,
+  void sse_encode_AnyhowException(
+    AnyhowException self,
     SseSerializer serializer,
   );
 
@@ -223,13 +172,34 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_lexer_extras(
+    LexerExtras self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_record_usize_usize(
+    (BigInt, BigInt) self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_java_token(JavaToken self, SseSerializer serializer);
 
   @protected
   void sse_encode_java_token_kind(JavaTokenKind self, SseSerializer serializer);
 
   @protected
-  void sse_encode_lexing_error(LexingError self, SseSerializer serializer);
+  void sse_encode_lexer_extras(LexerExtras self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_java_token(
+    List<JavaToken> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_prim_u_8_strict(
@@ -238,13 +208,37 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_rust_token(
+    List<RustToken> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_sql_token(List<SQLToken> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_string_string_string(
+    (String, String, String) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_record_usize_usize(
+    (BigInt, BigInt) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_rust_token(RustToken self, SseSerializer serializer);
+
+  @protected
   void sse_encode_rust_token_kind(RustTokenKind self, SseSerializer serializer);
 
   @protected
-  void sse_encode_sql_token_kind(SQLTokenKind self, SseSerializer serializer);
+  void sse_encode_sql_token(SQLToken self, SseSerializer serializer);
 
   @protected
-  void sse_encode_token(Token self, SseSerializer serializer);
+  void sse_encode_sql_token_kind(SQLTokenKind self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
@@ -263,54 +257,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
 class RustLibWire implements BaseWire {
   RustLibWire.fromExternalLibrary(ExternalLibrary lib);
-
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-        ptr,
-      );
-
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-        ptr,
-      );
-
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-        ptr,
-      );
-
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-        ptr,
-      );
-
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-        ptr,
-      );
-
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-        ptr,
-      );
 }
 
 @JS('wasm_bindgen')
@@ -318,34 +264,4 @@ external RustLibWasmModule get wasmModule;
 
 @JS()
 @anonymous
-extension type RustLibWasmModule._(JSObject _) implements JSObject {
-  external void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    int ptr,
-  );
-
-  external void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    int ptr,
-  );
-
-  external void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    int ptr,
-  );
-
-  external void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    int ptr,
-  );
-
-  external void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    int ptr,
-  );
-
-  external void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    int ptr,
-  );
-}
+extension type RustLibWasmModule._(JSObject _) implements JSObject {}

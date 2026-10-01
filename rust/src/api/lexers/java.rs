@@ -1,10 +1,12 @@
+use anyhow::Result;
 use logos::Logos;
 
-use crate::api::lexers::{extras_newline, LexingError};
+use crate::utils::lexer::{
+    LexerExtras, LexingError, Token, extras_newline, tokenize,
+};
 
-#[derive(Debug, Clone, PartialEq, Logos)]
-#[logos(error = LexingError, extras = (usize, usize))]
-#[flutter_rust_bridge::frb(unignore)]
+#[derive(Default, Debug, Clone, PartialEq, Logos)]
+#[logos(error = LexingError, extras = LexerExtras)]
 pub enum JavaTokenKind {
     #[token("=")]
     Equals,
@@ -102,8 +104,9 @@ pub enum JavaTokenKind {
     CompEQ,
 
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*")]
+    #[default]
     Identifier,
-    #[regex("-?[0-9]+")]
+    #[regex("-?[0-9]{1,3}(_[0-9]{3})*")]
     Integer,
     #[regex(r#""([^"\\]|\\.)""#)]
     String,
@@ -111,4 +114,36 @@ pub enum JavaTokenKind {
     Newline,
     #[regex(r"[ \t]+", logos::skip)]
     Whitespace,
+}
+
+#[derive(Default, Debug, Clone, PartialEq)]
+pub struct JavaToken {
+    pub kind: JavaTokenKind,
+    pub text: String,
+    pub span: (usize, usize),
+    pub line: usize,
+    pub col: usize,
+}
+
+impl<'a> JavaToken {
+    pub fn tokenize(source: &'a str) -> Result<Vec<Self>> {
+        tokenize::<JavaToken, JavaTokenKind>(source)
+    }
+}
+
+impl Token<JavaTokenKind> for JavaToken {
+    fn nt(
+        kind: JavaTokenKind,
+        source: &str,
+        span: (usize, usize),
+        extras: LexerExtras,
+    ) -> Self {
+        Self {
+            kind,
+            text: source[span.0..span.1].to_string(),
+            span,
+            line: extras.line,
+            col: extras.col,
+        }
+    }
 }

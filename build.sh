@@ -106,6 +106,9 @@ case "${1:-}" in
             done
         fi
         ;;
+    "generate")
+        flutter_rust_bridge_codegen generate
+        ;;
     *)
         echo "Usage: $0 {linux,apk,run,clean,icon,deldb,rename,cat}"
         echo "linux    - build linux executable on release mode"
@@ -119,6 +122,7 @@ case "${1:-}" in
         echo "wc       - gets the line count of all dart files except licenses.g.dart"
         echo "licenses - generates the licenses of the dependencies used"
         echo "sign     - signs the apk if the apks exist and release.jks exists"
+        echo "generate - generates code for rust <-> flutter bridge"
         exit 1
         ;;
 esac

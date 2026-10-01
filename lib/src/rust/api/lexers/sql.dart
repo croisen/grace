@@ -4,10 +4,64 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import '../../utils/lexer.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `eq`, `fmt`, `lex`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `lex`
+
+class SQLToken {
+  final SQLTokenKind kind;
+  final String text;
+  final (BigInt, BigInt) span;
+  final BigInt line;
+  final BigInt col;
+
+  const SQLToken({
+    required this.kind,
+    required this.text,
+    required this.span,
+    required this.line,
+    required this.col,
+  });
+
+  static Future<SQLToken> default_() =>
+      RustLib.instance.api.crateApiLexersSqlSqlTokenDefault();
+
+  static Future<SQLToken> nt({
+    required SQLTokenKind kind,
+    required String source,
+    required (BigInt, BigInt) span,
+    required LexerExtras extras,
+  }) => RustLib.instance.api.crateApiLexersSqlSqlTokenNt(
+    kind: kind,
+    source: source,
+    span: span,
+    extras: extras,
+  );
+
+  static Future<List<SQLToken>> tokenize({required String source}) =>
+      RustLib.instance.api.crateApiLexersSqlSqlTokenTokenize(source: source);
+
+  @override
+  int get hashCode =>
+      kind.hashCode ^
+      text.hashCode ^
+      span.hashCode ^
+      line.hashCode ^
+      col.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SQLToken &&
+          runtimeType == other.runtimeType &&
+          kind == other.kind &&
+          text == other.text &&
+          span == other.span &&
+          line == other.line &&
+          col == other.col;
+}
 
 enum SQLTokenKind {
   oParen,
@@ -35,5 +89,8 @@ enum SQLTokenKind {
   integer,
   string,
   newline,
-  whitespace,
+  whitespace;
+
+  static Future<SQLTokenKind> default_() =>
+      RustLib.instance.api.crateApiLexersSqlSqlTokenKindDefault();
 }

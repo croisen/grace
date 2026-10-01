@@ -27,10 +27,15 @@
 
 // Section: imports
 
-use crate::*;
-use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
-use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
+use flutter_rust_bridge::for_generated::byteorder::{
+    NativeEndian, ReadBytesExt, WriteBytesExt,
+};
+use flutter_rust_bridge::for_generated::{
+    Lifetimeable, Lockable, transform_result_dco,
+};
 use flutter_rust_bridge::{Handler, IntoIntoDart};
+
+use crate::utils::lexer::Token;
 
 // Section: boilerplate
 
@@ -40,7 +45,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1406908580;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1751281055;
 
 // Section: executor
 
@@ -48,35 +53,49 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
+fn wire__crate__api__drills__rust__generate_drill_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "generate_drill", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_difficulty = <u8>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::drills::rust::generate_drill(api_difficulty))?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
 fn wire__crate__api__simple__greet_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "greet",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_name = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Ok::<_, ()>(crate::api::simple::greet(api_name))?;
-                std::result::Result::Ok(output_ok)
-            })())
-        },
-    )
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "greet", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_name = <String>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Ok::<_, ()>(crate::api::simple::greet(api_name))?;   std::result::Result::Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__drills__rust__indenter_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "indenter", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_code = <String>::sse_decode(&mut deserializer);
+let api_spaces = <usize>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::drills::rust::indenter(&api_code, api_spaces))?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
 }
 fn wire__crate__api__simple__init_app_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
@@ -84,131 +103,224 @@ fn wire__crate__api__simple__init_app_impl(
     rust_vec_len_: i32,
     data_len_: i32,
 ) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "init_app",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok = Ok::<_, ()>({
-                        crate::api::simple::init_app();
-                    })?;
-                    std::result::Result::Ok(output_ok)
-                })())
-            }
-        },
-    )
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "init_app", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>({ crate::api::simple::init_app(); })?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
 }
-fn wire__crate__api__lexers__lexing_error_default_impl(
+fn wire__crate__api__lexers__java__java_token_default_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "lexing_error_default",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok = Ok::<_, ()>(crate::api::lexers::LexingError::default())?;
-                    std::result::Result::Ok(output_ok)
-                })())
-            }
-        },
-    )
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "java_token_default", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::lexers::java::JavaToken::default())?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
 }
-
-// Section: related_funcs
-
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Range<usize>>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<T>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<str>
-);
+fn wire__crate__api__lexers__java__java_token_kind_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "java_token_kind_default", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::lexers::java::JavaTokenKind::default())?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__java__java_token_nt_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "java_token_nt", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_kind = <crate::api::lexers::java::JavaTokenKind>::sse_decode(&mut deserializer);
+let api_source = <String>::sse_decode(&mut deserializer);
+let api_span = <(usize,usize,)>::sse_decode(&mut deserializer);
+let api_extras = <crate::utils::lexer::LexerExtras>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::lexers::java::JavaToken::nt(api_kind, &api_source, api_span, api_extras))?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__java__java_token_tokenize_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "java_token_tokenize", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_source = <String>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>((move ||  {
+                         let output_ok = crate::api::lexers::java::JavaToken::tokenize(&api_source)?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__rust__rust_token_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "rust_token_default", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::lexers::rust::RustToken::default())?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__rust__rust_token_kind_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "rust_token_kind_default", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::lexers::rust::RustTokenKind::default())?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__rust__rust_token_nt_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "rust_token_nt", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_kind = <crate::api::lexers::rust::RustTokenKind>::sse_decode(&mut deserializer);
+let api_source = <String>::sse_decode(&mut deserializer);
+let api_span = <(usize,usize,)>::sse_decode(&mut deserializer);
+let api_extras = <crate::utils::lexer::LexerExtras>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::lexers::rust::RustToken::nt(api_kind, &api_source, api_span, api_extras))?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__rust__rust_token_tokenize_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "rust_token_tokenize", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_source = <String>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>((move ||  {
+                         let output_ok = crate::api::lexers::rust::RustToken::tokenize(&api_source)?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__sql__sql_token_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "sql_token_default", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::lexers::sql::SQLToken::default())?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__sql__sql_token_kind_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "sql_token_kind_default", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::lexers::sql::SQLTokenKind::default())?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__sql__sql_token_nt_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "sql_token_nt", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_kind = <crate::api::lexers::sql::SQLTokenKind>::sse_decode(&mut deserializer);
+let api_source = <String>::sse_decode(&mut deserializer);
+let api_span = <(usize,usize,)>::sse_decode(&mut deserializer);
+let api_extras = <crate::utils::lexer::LexerExtras>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::lexers::sql::SQLToken::nt(api_kind, &api_source, api_span, api_extras))?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__lexers__sql__sql_token_tokenize_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "sql_token_tokenize", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_source = <String>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>((move ||  {
+                         let output_ok = crate::api::lexers::sql::SQLToken::tokenize(&api_source)?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
 
 // Section: dart2rust
 
-impl SseDecode for Range<usize> {
+impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Range<usize>>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
-impl SseDecode for T {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner =
-            <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<T>>>::sse_decode(
-                deserializer,
-            );
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
-impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Range<usize>>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
-impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<T>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
-impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<str>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut inner = <String>::sse_decode(deserializer);
+        return flutter_rust_bridge::for_generated::anyhow::anyhow!(
+            "{}", inner
+        );
     }
 }
 
 impl SseDecode for String {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
         let mut inner = <Vec<u8>>::sse_decode(deserializer);
         return String::from_utf8(inner).unwrap();
     }
@@ -216,14 +328,39 @@ impl SseDecode for String {
 
 impl SseDecode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
         deserializer.cursor.read_i32::<NativeEndian>().unwrap()
+    }
+}
+
+impl SseDecode for crate::api::lexers::java::JavaToken {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_kind =
+            <crate::api::lexers::java::JavaTokenKind>::sse_decode(deserializer);
+        let mut var_text = <String>::sse_decode(deserializer);
+        let mut var_span = <(usize, usize)>::sse_decode(deserializer);
+        let mut var_line = <usize>::sse_decode(deserializer);
+        let mut var_col = <usize>::sse_decode(deserializer);
+        return crate::api::lexers::java::JavaToken {
+            kind: var_kind,
+            text: var_text,
+            span: var_span,
+            line: var_line,
+            col: var_col,
+        };
     }
 }
 
 impl SseDecode for crate::api::lexers::java::JavaTokenKind {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
         let mut inner = <i32>::sse_decode(deserializer);
         return match inner {
             0 => crate::api::lexers::java::JavaTokenKind::Equals,
@@ -282,21 +419,41 @@ impl SseDecode for crate::api::lexers::java::JavaTokenKind {
     }
 }
 
-impl SseDecode for crate::api::lexers::LexingError {
+impl SseDecode for crate::utils::lexer::LexerExtras {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
-        return match inner {
-            0 => crate::api::lexers::LexingError::NumberParseError,
-            1 => crate::api::lexers::LexingError::Other,
-            _ => unreachable!("Invalid variant for LexingError: {}", inner),
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_line = <usize>::sse_decode(deserializer);
+        let mut var_col = <usize>::sse_decode(deserializer);
+        return crate::utils::lexer::LexerExtras {
+            line: var_line,
+            col: var_col,
         };
+    }
+}
+
+impl SseDecode for Vec<crate::api::lexers::java::JavaToken> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::lexers::java::JavaToken>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
     }
 }
 
 impl SseDecode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
@@ -306,9 +463,87 @@ impl SseDecode for Vec<u8> {
     }
 }
 
+impl SseDecode for Vec<crate::api::lexers::rust::RustToken> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::lexers::rust::RustToken>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::lexers::sql::SQLToken> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::lexers::sql::SQLToken>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for (String, String, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_field0 = <String>::sse_decode(deserializer);
+        let mut var_field1 = <String>::sse_decode(deserializer);
+        let mut var_field2 = <String>::sse_decode(deserializer);
+        return (var_field0, var_field1, var_field2);
+    }
+}
+
+impl SseDecode for (usize, usize) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_field0 = <usize>::sse_decode(deserializer);
+        let mut var_field1 = <usize>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode for crate::api::lexers::rust::RustToken {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_kind =
+            <crate::api::lexers::rust::RustTokenKind>::sse_decode(deserializer);
+        let mut var_text = <String>::sse_decode(deserializer);
+        let mut var_span = <(usize, usize)>::sse_decode(deserializer);
+        let mut var_line = <usize>::sse_decode(deserializer);
+        let mut var_col = <usize>::sse_decode(deserializer);
+        return crate::api::lexers::rust::RustToken {
+            kind: var_kind,
+            text: var_text,
+            span: var_span,
+            line: var_line,
+            col: var_col,
+        };
+    }
+}
+
 impl SseDecode for crate::api::lexers::rust::RustTokenKind {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
         let mut inner = <i32>::sse_decode(deserializer);
         return match inner {
             0 => crate::api::lexers::rust::RustTokenKind::Equals,
@@ -327,30 +562,55 @@ impl SseDecode for crate::api::lexers::rust::RustTokenKind {
             13 => crate::api::lexers::rust::RustTokenKind::Semicolon,
             14 => crate::api::lexers::rust::RustTokenKind::Comma,
             15 => crate::api::lexers::rust::RustTokenKind::Question,
-            16 => crate::api::lexers::rust::RustTokenKind::Fn,
-            17 => crate::api::lexers::rust::RustTokenKind::Let,
-            18 => crate::api::lexers::rust::RustTokenKind::Mut,
-            19 => crate::api::lexers::rust::RustTokenKind::Return,
-            20 => crate::api::lexers::rust::RustTokenKind::Macro,
-            21 => crate::api::lexers::rust::RustTokenKind::Lifetime,
-            22 => crate::api::lexers::rust::RustTokenKind::CompGT,
-            23 => crate::api::lexers::rust::RustTokenKind::CompLT,
-            24 => crate::api::lexers::rust::RustTokenKind::CompGE,
-            25 => crate::api::lexers::rust::RustTokenKind::CompLE,
-            26 => crate::api::lexers::rust::RustTokenKind::CompEQ,
-            27 => crate::api::lexers::rust::RustTokenKind::Identifier,
-            28 => crate::api::lexers::rust::RustTokenKind::Integer,
-            29 => crate::api::lexers::rust::RustTokenKind::String,
-            30 => crate::api::lexers::rust::RustTokenKind::Newline,
-            31 => crate::api::lexers::rust::RustTokenKind::Whitespace,
+            16 => crate::api::lexers::rust::RustTokenKind::Use,
+            17 => crate::api::lexers::rust::RustTokenKind::Fn,
+            18 => crate::api::lexers::rust::RustTokenKind::Let,
+            19 => crate::api::lexers::rust::RustTokenKind::Mut,
+            20 => crate::api::lexers::rust::RustTokenKind::Return,
+            21 => crate::api::lexers::rust::RustTokenKind::Static,
+            22 => crate::api::lexers::rust::RustTokenKind::Macro,
+            23 => crate::api::lexers::rust::RustTokenKind::Lifetime,
+            24 => crate::api::lexers::rust::RustTokenKind::CompGT,
+            25 => crate::api::lexers::rust::RustTokenKind::CompLT,
+            26 => crate::api::lexers::rust::RustTokenKind::CompGE,
+            27 => crate::api::lexers::rust::RustTokenKind::CompLE,
+            28 => crate::api::lexers::rust::RustTokenKind::CompEQ,
+            29 => crate::api::lexers::rust::RustTokenKind::Identifier,
+            30 => crate::api::lexers::rust::RustTokenKind::Integer,
+            31 => crate::api::lexers::rust::RustTokenKind::String,
+            32 => crate::api::lexers::rust::RustTokenKind::Newline,
+            33 => crate::api::lexers::rust::RustTokenKind::Whitespace,
             _ => unreachable!("Invalid variant for RustTokenKind: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::api::lexers::sql::SQLToken {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_kind =
+            <crate::api::lexers::sql::SQLTokenKind>::sse_decode(deserializer);
+        let mut var_text = <String>::sse_decode(deserializer);
+        let mut var_span = <(usize, usize)>::sse_decode(deserializer);
+        let mut var_line = <usize>::sse_decode(deserializer);
+        let mut var_col = <usize>::sse_decode(deserializer);
+        return crate::api::lexers::sql::SQLToken {
+            kind: var_kind,
+            text: var_text,
+            span: var_span,
+            line: var_line,
+            col: var_col,
         };
     }
 }
 
 impl SseDecode for crate::api::lexers::sql::SQLTokenKind {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
         let mut inner = <i32>::sse_decode(deserializer);
         return match inner {
             0 => crate::api::lexers::sql::SQLTokenKind::OParen,
@@ -384,48 +644,37 @@ impl SseDecode for crate::api::lexers::sql::SQLTokenKind {
     }
 }
 
-impl SseDecode for crate::api::lexers::Token {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_kind = <T>::sse_decode(deserializer);
-        let mut var_text = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<str>,
-        >>::sse_decode(deserializer);
-        let mut var_span = <Range<usize>>::sse_decode(deserializer);
-        let mut var_line = <usize>::sse_decode(deserializer);
-        let mut var_col = <usize>::sse_decode(deserializer);
-        return crate::api::lexers::Token {
-            kind: var_kind,
-            text: var_text,
-            span: var_span,
-            line: var_line,
-            col: var_col,
-        };
-    }
-}
-
 impl SseDecode for u8 {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
         deserializer.cursor.read_u8().unwrap()
     }
 }
 
 impl SseDecode for () {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {}
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+    }
 }
 
 impl SseDecode for usize {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
         deserializer.cursor.read_u64::<NativeEndian>().unwrap() as _
     }
 }
 
 impl SseDecode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
         deserializer.cursor.read_u8().unwrap() != 0
     }
 }
@@ -439,8 +688,96 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        2 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        3 => wire__crate__api__lexers__lexing_error_default_impl(port, ptr, rust_vec_len, data_len),
+        1 => wire__crate__api__drills__rust__generate_drill_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        3 => wire__crate__api__drills__rust__indenter_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        4 => wire__crate__api__simple__init_app_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        5 => wire__crate__api__lexers__java__java_token_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        6 => wire__crate__api__lexers__java__java_token_kind_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        7 => wire__crate__api__lexers__java__java_token_nt_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        8 => wire__crate__api__lexers__java__java_token_tokenize_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        9 => wire__crate__api__lexers__rust__rust_token_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        10 => wire__crate__api__lexers__rust__rust_token_kind_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        11 => wire__crate__api__lexers__rust__rust_token_nt_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        12 => wire__crate__api__lexers__rust__rust_token_tokenize_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        13 => wire__crate__api__lexers__sql__sql_token_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        14 => wire__crate__api__lexers__sql__sql_token_kind_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        15 => wire__crate__api__lexers__sql__sql_token_nt_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        16 => wire__crate__api__lexers__sql__sql_token_tokenize_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
         _ => unreachable!(),
     }
 }
@@ -453,7 +790,7 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
+        2 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -461,35 +798,29 @@ fn pde_ffi_dispatcher_sync_impl(
 // Section: rust2dart
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<Range<usize>> {
+impl flutter_rust_bridge::IntoDart for crate::api::lexers::java::JavaToken {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
+        [
+            self.kind.into_into_dart().into_dart(),
+            self.text.into_into_dart().into_dart(),
+            self.span.into_into_dart().into_dart(),
+            self.line.into_into_dart().into_dart(),
+            self.col.into_into_dart().into_dart(),
+        ]
+        .into_dart()
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<Range<usize>> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Range<usize>>> for Range<usize> {
-    fn into_into_dart(self) -> FrbWrapper<Range<usize>> {
-        self.into()
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::lexers::java::JavaToken
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::lexers::java::JavaToken>
+    for crate::api::lexers::java::JavaToken
+{
+    fn into_into_dart(self) -> crate::api::lexers::java::JavaToken {
+        self
     }
 }
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<T> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<T> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<T>> for T {
-    fn into_into_dart(self) -> FrbWrapper<T> {
-        self.into()
-    }
-}
-
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::lexers::java::JavaTokenKind {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
@@ -561,23 +892,47 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::lexers::java::JavaTokenKind>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::lexers::LexingError {
+impl flutter_rust_bridge::IntoDart for crate::utils::lexer::LexerExtras {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self {
-            Self::NumberParseError => 0.into_dart(),
-            Self::Other => 1.into_dart(),
-            _ => unreachable!(),
-        }
+        [
+            self.line.into_into_dart().into_dart(),
+            self.col.into_into_dart().into_dart(),
+        ]
+        .into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::lexers::LexingError
+    for crate::utils::lexer::LexerExtras
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::lexers::LexingError>
-    for crate::api::lexers::LexingError
+impl flutter_rust_bridge::IntoIntoDart<crate::utils::lexer::LexerExtras>
+    for crate::utils::lexer::LexerExtras
 {
-    fn into_into_dart(self) -> crate::api::lexers::LexingError {
+    fn into_into_dart(self) -> crate::utils::lexer::LexerExtras {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::lexers::rust::RustToken {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.kind.into_into_dart().into_dart(),
+            self.text.into_into_dart().into_dart(),
+            self.span.into_into_dart().into_dart(),
+            self.line.into_into_dart().into_dart(),
+            self.col.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::lexers::rust::RustToken
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::lexers::rust::RustToken>
+    for crate::api::lexers::rust::RustToken
+{
+    fn into_into_dart(self) -> crate::api::lexers::rust::RustToken {
         self
     }
 }
@@ -601,22 +956,24 @@ impl flutter_rust_bridge::IntoDart for crate::api::lexers::rust::RustTokenKind {
             Self::Semicolon => 13.into_dart(),
             Self::Comma => 14.into_dart(),
             Self::Question => 15.into_dart(),
-            Self::Fn => 16.into_dart(),
-            Self::Let => 17.into_dart(),
-            Self::Mut => 18.into_dart(),
-            Self::Return => 19.into_dart(),
-            Self::Macro => 20.into_dart(),
-            Self::Lifetime => 21.into_dart(),
-            Self::CompGT => 22.into_dart(),
-            Self::CompLT => 23.into_dart(),
-            Self::CompGE => 24.into_dart(),
-            Self::CompLE => 25.into_dart(),
-            Self::CompEQ => 26.into_dart(),
-            Self::Identifier => 27.into_dart(),
-            Self::Integer => 28.into_dart(),
-            Self::String => 29.into_dart(),
-            Self::Newline => 30.into_dart(),
-            Self::Whitespace => 31.into_dart(),
+            Self::Use => 16.into_dart(),
+            Self::Fn => 17.into_dart(),
+            Self::Let => 18.into_dart(),
+            Self::Mut => 19.into_dart(),
+            Self::Return => 20.into_dart(),
+            Self::Static => 21.into_dart(),
+            Self::Macro => 22.into_dart(),
+            Self::Lifetime => 23.into_dart(),
+            Self::CompGT => 24.into_dart(),
+            Self::CompLT => 25.into_dart(),
+            Self::CompGE => 26.into_dart(),
+            Self::CompLE => 27.into_dart(),
+            Self::CompEQ => 28.into_dart(),
+            Self::Identifier => 29.into_dart(),
+            Self::Integer => 30.into_dart(),
+            Self::String => 31.into_dart(),
+            Self::Newline => 32.into_dart(),
+            Self::Whitespace => 33.into_dart(),
             _ => unreachable!(),
         }
     }
@@ -629,6 +986,30 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::lexers::rust::RustTokenKind>
     for crate::api::lexers::rust::RustTokenKind
 {
     fn into_into_dart(self) -> crate::api::lexers::rust::RustTokenKind {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::lexers::sql::SQLToken {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.kind.into_into_dart().into_dart(),
+            self.text.into_into_dart().into_dart(),
+            self.span.into_into_dart().into_dart(),
+            self.line.into_into_dart().into_dart(),
+            self.col.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::lexers::sql::SQLToken
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::lexers::sql::SQLToken>
+    for crate::api::lexers::sql::SQLToken
+{
+    fn into_into_dart(self) -> crate::api::lexers::sql::SQLToken {
         self
     }
 }
@@ -677,89 +1058,59 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::lexers::sql::SQLTokenKind>
         self
     }
 }
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::lexers::Token {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.kind.into_into_dart().into_dart(),
-            self.text.into_into_dart().into_dart(),
-            self.span.into_into_dart().into_dart(),
-            self.line.into_into_dart().into_dart(),
-            self.col.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::lexers::Token {}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::lexers::Token> for crate::api::lexers::Token {
-    fn into_into_dart(self) -> crate::api::lexers::Token {
-        self
-    }
-}
 
-impl SseEncode for Range<usize> {
+impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Range < usize >>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
-    }
-}
-
-impl SseEncode for T {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<T>>>::sse_encode(
-            flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self),
-            serializer,
-        );
-    }
-}
-
-impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Range<usize>>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
-impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<T>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
-impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<str>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <String>::sse_encode(format!("{:?}", self), serializer);
     }
 }
 
 impl SseEncode for String {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <Vec<u8>>::sse_encode(self.into_bytes(), serializer);
     }
 }
 
 impl SseEncode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
+    }
+}
+
+impl SseEncode for crate::api::lexers::java::JavaToken {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <crate::api::lexers::java::JavaTokenKind>::sse_encode(
+            self.kind, serializer,
+        );
+        <String>::sse_encode(self.text, serializer);
+        <(usize, usize)>::sse_encode(self.span, serializer);
+        <usize>::sse_encode(self.line, serializer);
+        <usize>::sse_encode(self.col, serializer);
     }
 }
 
 impl SseEncode for crate::api::lexers::java::JavaTokenKind {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <i32>::sse_encode(
             match self {
                 crate::api::lexers::java::JavaTokenKind::Equals => 0,
@@ -822,25 +1173,36 @@ impl SseEncode for crate::api::lexers::java::JavaTokenKind {
     }
 }
 
-impl SseEncode for crate::api::lexers::LexingError {
+impl SseEncode for crate::utils::lexer::LexerExtras {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                crate::api::lexers::LexingError::NumberParseError => 0,
-                crate::api::lexers::LexingError::Other => 1,
-                _ => {
-                    unimplemented!("");
-                }
-            },
-            serializer,
-        );
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <usize>::sse_encode(self.line, serializer);
+        <usize>::sse_encode(self.col, serializer);
+    }
+}
+
+impl SseEncode for Vec<crate::api::lexers::java::JavaToken> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::lexers::java::JavaToken>::sse_encode(item, serializer);
+        }
     }
 }
 
 impl SseEncode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <u8>::sse_encode(item, serializer);
@@ -848,9 +1210,77 @@ impl SseEncode for Vec<u8> {
     }
 }
 
+impl SseEncode for Vec<crate::api::lexers::rust::RustToken> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::lexers::rust::RustToken>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::lexers::sql::SQLToken> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::lexers::sql::SQLToken>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for (String, String, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <String>::sse_encode(self.0, serializer);
+        <String>::sse_encode(self.1, serializer);
+        <String>::sse_encode(self.2, serializer);
+    }
+}
+
+impl SseEncode for (usize, usize) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <usize>::sse_encode(self.0, serializer);
+        <usize>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for crate::api::lexers::rust::RustToken {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <crate::api::lexers::rust::RustTokenKind>::sse_encode(
+            self.kind, serializer,
+        );
+        <String>::sse_encode(self.text, serializer);
+        <(usize, usize)>::sse_encode(self.span, serializer);
+        <usize>::sse_encode(self.line, serializer);
+        <usize>::sse_encode(self.col, serializer);
+    }
+}
+
 impl SseEncode for crate::api::lexers::rust::RustTokenKind {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <i32>::sse_encode(
             match self {
                 crate::api::lexers::rust::RustTokenKind::Equals => 0,
@@ -869,22 +1299,24 @@ impl SseEncode for crate::api::lexers::rust::RustTokenKind {
                 crate::api::lexers::rust::RustTokenKind::Semicolon => 13,
                 crate::api::lexers::rust::RustTokenKind::Comma => 14,
                 crate::api::lexers::rust::RustTokenKind::Question => 15,
-                crate::api::lexers::rust::RustTokenKind::Fn => 16,
-                crate::api::lexers::rust::RustTokenKind::Let => 17,
-                crate::api::lexers::rust::RustTokenKind::Mut => 18,
-                crate::api::lexers::rust::RustTokenKind::Return => 19,
-                crate::api::lexers::rust::RustTokenKind::Macro => 20,
-                crate::api::lexers::rust::RustTokenKind::Lifetime => 21,
-                crate::api::lexers::rust::RustTokenKind::CompGT => 22,
-                crate::api::lexers::rust::RustTokenKind::CompLT => 23,
-                crate::api::lexers::rust::RustTokenKind::CompGE => 24,
-                crate::api::lexers::rust::RustTokenKind::CompLE => 25,
-                crate::api::lexers::rust::RustTokenKind::CompEQ => 26,
-                crate::api::lexers::rust::RustTokenKind::Identifier => 27,
-                crate::api::lexers::rust::RustTokenKind::Integer => 28,
-                crate::api::lexers::rust::RustTokenKind::String => 29,
-                crate::api::lexers::rust::RustTokenKind::Newline => 30,
-                crate::api::lexers::rust::RustTokenKind::Whitespace => 31,
+                crate::api::lexers::rust::RustTokenKind::Use => 16,
+                crate::api::lexers::rust::RustTokenKind::Fn => 17,
+                crate::api::lexers::rust::RustTokenKind::Let => 18,
+                crate::api::lexers::rust::RustTokenKind::Mut => 19,
+                crate::api::lexers::rust::RustTokenKind::Return => 20,
+                crate::api::lexers::rust::RustTokenKind::Static => 21,
+                crate::api::lexers::rust::RustTokenKind::Macro => 22,
+                crate::api::lexers::rust::RustTokenKind::Lifetime => 23,
+                crate::api::lexers::rust::RustTokenKind::CompGT => 24,
+                crate::api::lexers::rust::RustTokenKind::CompLT => 25,
+                crate::api::lexers::rust::RustTokenKind::CompGE => 26,
+                crate::api::lexers::rust::RustTokenKind::CompLE => 27,
+                crate::api::lexers::rust::RustTokenKind::CompEQ => 28,
+                crate::api::lexers::rust::RustTokenKind::Identifier => 29,
+                crate::api::lexers::rust::RustTokenKind::Integer => 30,
+                crate::api::lexers::rust::RustTokenKind::String => 31,
+                crate::api::lexers::rust::RustTokenKind::Newline => 32,
+                crate::api::lexers::rust::RustTokenKind::Whitespace => 33,
                 _ => {
                     unimplemented!("");
                 }
@@ -894,9 +1326,28 @@ impl SseEncode for crate::api::lexers::rust::RustTokenKind {
     }
 }
 
+impl SseEncode for crate::api::lexers::sql::SQLToken {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <crate::api::lexers::sql::SQLTokenKind>::sse_encode(
+            self.kind, serializer,
+        );
+        <String>::sse_encode(self.text, serializer);
+        <(usize, usize)>::sse_encode(self.span, serializer);
+        <usize>::sse_encode(self.line, serializer);
+        <usize>::sse_encode(self.col, serializer);
+    }
+}
+
 impl SseEncode for crate::api::lexers::sql::SQLTokenKind {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <i32>::sse_encode(
             match self {
                 crate::api::lexers::sql::SQLTokenKind::OParen => 0,
@@ -934,44 +1385,41 @@ impl SseEncode for crate::api::lexers::sql::SQLTokenKind {
     }
 }
 
-impl SseEncode for crate::api::lexers::Token {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <T>::sse_encode(self.kind, serializer);
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<str>>>::sse_encode(
-            self.text, serializer,
-        );
-        <Range<usize>>::sse_encode(self.span, serializer);
-        <usize>::sse_encode(self.line, serializer);
-        <usize>::sse_encode(self.col, serializer);
-    }
-}
-
 impl SseEncode for u8 {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         serializer.cursor.write_u8(self).unwrap();
     }
 }
 
 impl SseEncode for () {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+    }
 }
 
 impl SseEncode for usize {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer
-            .cursor
-            .write_u64::<NativeEndian>(self as _)
-            .unwrap();
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        serializer.cursor.write_u64::<NativeEndian>(self as _).unwrap();
     }
 }
 
 impl SseEncode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         serializer.cursor.write_u8(self as _).unwrap();
     }
 }
@@ -983,59 +1431,20 @@ mod io {
 
     // Section: imports
 
-    use super::*;
-    use crate::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
-    use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
+    use flutter_rust_bridge::for_generated::{
+        Lifetimeable, Lockable, transform_result_dco,
+    };
     use flutter_rust_bridge::{Handler, IntoIntoDart};
+
+    use super::*;
+    use crate::utils::lexer::Token;
 
     // Section: boilerplate
 
     flutter_rust_bridge::frb_generated_boilerplate_io!();
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_grace_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Range < usize >>>::increment_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_grace_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Range < usize >>>::decrement_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_grace_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<T>>::increment_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_grace_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<T>>::decrement_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_grace_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<str>>::increment_strong_count(ptr as _);
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_grace_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<str>>::decrement_strong_count(ptr as _);
-    }
 }
 #[cfg(not(target_family = "wasm"))]
 pub use io::*;
@@ -1048,61 +1457,21 @@ mod web {
 
     // Section: imports
 
-    use super::*;
-    use crate::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
-    use flutter_rust_bridge::for_generated::wasm_bindgen;
     use flutter_rust_bridge::for_generated::wasm_bindgen::prelude::*;
-    use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
+    use flutter_rust_bridge::for_generated::{
+        Lifetimeable, Lockable, transform_result_dco, wasm_bindgen,
+    };
     use flutter_rust_bridge::{Handler, IntoIntoDart};
+
+    use super::*;
+    use crate::utils::lexer::Token;
 
     // Section: boilerplate
 
     flutter_rust_bridge::frb_generated_boilerplate_web!();
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Range < usize >>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Range < usize >>>::decrement_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<T>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<T>>::decrement_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<str>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<str>>::decrement_strong_count(ptr as _);
-    }
 }
 #[cfg(target_family = "wasm")]
 pub use web::*;

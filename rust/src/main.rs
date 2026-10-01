@@ -1,16 +1,13 @@
-mod rust_drill_generator;
+mod api;
+mod utils;
 
-use crate::rust_drill_generator::generate_drill;
+use crate::api::lexers::rust::RustToken;
 
 fn main() {
-    let (answer, conditions, output) = generate_drill(2);
+    let source = r#"
+        let x: i64 = 9_999;
+    "#;
 
-    println!("===== ANSWER =====");
-    println!("{}", answer);
-
-    println!("\n===== CONDITIONS =====");
-    println!("{}", conditions);
-
-    println!("\n===== OUTPUT =====");
-    println!("{}", output);
+    let a = RustToken::tokenize(source).unwrap();
+    println!("{a:#?}");
 }

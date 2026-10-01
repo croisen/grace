@@ -3,7 +3,7 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
-import 'api/lexers.dart';
+import 'api/drills/rust.dart';
 import 'api/lexers/java.dart';
 import 'api/lexers/rust.dart';
 import 'api/lexers/sql.dart';
@@ -15,9 +15,10 @@ import 'dart:convert';
 import 'frb_generated.dart';
 import 'frb_generated.io.dart'
     if (dart.library.js_interop) 'frb_generated.web.dart';
-import 'lib.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+
+import 'utils/lexer.dart';
 
 /// Main entrypoint of the Rust API
 class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
@@ -74,7 +75,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => 1406908580;
+  int get rustContentHash => -1751281055;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -86,31 +87,63 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<(String, String, String)> crateApiDrillsRustGenerateDrill({
+    required int difficulty,
+  });
+
   String crateApiSimpleGreet({required String name});
+
+  Future<String> crateApiDrillsRustIndenter({
+    required String code,
+    required BigInt spaces,
+  });
 
   Future<void> crateApiSimpleInitApp();
 
-  Future<LexingError> crateApiLexersLexingErrorDefault();
+  Future<JavaToken> crateApiLexersJavaJavaTokenDefault();
 
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_RangeUsize;
+  Future<JavaTokenKind> crateApiLexersJavaJavaTokenKindDefault();
 
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_RangeUsize;
+  Future<JavaToken> crateApiLexersJavaJavaTokenNt({
+    required JavaTokenKind kind,
+    required String source,
+    required (BigInt, BigInt) span,
+    required LexerExtras extras,
+  });
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_RangeUsizePtr;
+  Future<List<JavaToken>> crateApiLexersJavaJavaTokenTokenize({
+    required String source,
+  });
 
-  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_T;
+  Future<RustToken> crateApiLexersRustRustTokenDefault();
 
-  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_T;
+  Future<RustTokenKind> crateApiLexersRustRustTokenKindDefault();
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_TPtr;
+  Future<RustToken> crateApiLexersRustRustTokenNt({
+    required RustTokenKind kind,
+    required String source,
+    required (BigInt, BigInt) span,
+    required LexerExtras extras,
+  });
 
-  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Str;
+  Future<List<RustToken>> crateApiLexersRustRustTokenTokenize({
+    required String source,
+  });
 
-  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Str;
+  Future<SQLToken> crateApiLexersSqlSqlTokenDefault();
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_StrPtr;
+  Future<SQLTokenKind> crateApiLexersSqlSqlTokenKindDefault();
+
+  Future<SQLToken> crateApiLexersSqlSqlTokenNt({
+    required SQLTokenKind kind,
+    required String source,
+    required (BigInt, BigInt) span,
+    required LexerExtras extras,
+  });
+
+  Future<List<SQLToken>> crateApiLexersSqlSqlTokenTokenize({
+    required String source,
+  });
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -122,13 +155,46 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  Future<(String, String, String)> crateApiDrillsRustGenerateDrill({
+    required int difficulty,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_u_8(difficulty, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_record_string_string_string,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDrillsRustGenerateDrillConstMeta,
+        argValues: [difficulty],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDrillsRustGenerateDrillConstMeta =>
+      const TaskConstMeta(
+        debugName: "generate_drill",
+        argNames: ["difficulty"],
+      );
+
+  @override
   String crateApiSimpleGreet({required String name}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -145,6 +211,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "greet", argNames: ["name"]);
 
   @override
+  Future<String> crateApiDrillsRustIndenter({
+    required String code,
+    required BigInt spaces,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(code, serializer);
+          sse_encode_usize(spaces, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDrillsRustIndenterConstMeta,
+        argValues: [code, spaces],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDrillsRustIndenterConstMeta =>
+      const TaskConstMeta(debugName: "indenter", argNames: ["code", "spaces"]);
+
+  @override
   Future<void> crateApiSimpleInitApp() {
     return handler.executeNormal(
       NormalTask(
@@ -153,7 +251,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 4,
             port: port_,
           );
         },
@@ -172,7 +270,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "init_app", argNames: []);
 
   @override
-  Future<LexingError> crateApiLexersLexingErrorDefault() {
+  Future<JavaToken> crateApiLexersJavaJavaTokenDefault() {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -180,99 +278,379 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 3,
+            funcId: 5,
             port: port_,
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_lexing_error,
+          decodeSuccessData: sse_decode_java_token,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiLexersLexingErrorDefaultConstMeta,
+        constMeta: kCrateApiLexersJavaJavaTokenDefaultConstMeta,
         argValues: [],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiLexersLexingErrorDefaultConstMeta =>
-      const TaskConstMeta(debugName: "lexing_error_default", argNames: []);
+  TaskConstMeta get kCrateApiLexersJavaJavaTokenDefaultConstMeta =>
+      const TaskConstMeta(debugName: "java_token_default", argNames: []);
 
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_RangeUsize => wire
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize;
-
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_RangeUsize => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize;
-
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_T => wire
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT;
-
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_T => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT;
-
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_Str => wire
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr;
-
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_Str => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr;
-
-  @protected
-  RangeUsize
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return RangeUsizeImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  @override
+  Future<JavaTokenKind> crateApiLexersJavaJavaTokenKindDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_java_token_kind,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersJavaJavaTokenKindDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
   }
 
-  @protected
-  T
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return TImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  TaskConstMeta get kCrateApiLexersJavaJavaTokenKindDefaultConstMeta =>
+      const TaskConstMeta(debugName: "java_token_kind_default", argNames: []);
+
+  @override
+  Future<JavaToken> crateApiLexersJavaJavaTokenNt({
+    required JavaTokenKind kind,
+    required String source,
+    required (BigInt, BigInt) span,
+    required LexerExtras extras,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_java_token_kind(kind, serializer);
+          sse_encode_String(source, serializer);
+          sse_encode_box_autoadd_record_usize_usize(span, serializer);
+          sse_encode_box_autoadd_lexer_extras(extras, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_java_token,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersJavaJavaTokenNtConstMeta,
+        argValues: [kind, source, span, extras],
+        apiImpl: this,
+      ),
+    );
   }
 
-  @protected
-  Str
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return StrImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  TaskConstMeta get kCrateApiLexersJavaJavaTokenNtConstMeta =>
+      const TaskConstMeta(
+        debugName: "java_token_nt",
+        argNames: ["kind", "source", "span", "extras"],
+      );
+
+  @override
+  Future<List<JavaToken>> crateApiLexersJavaJavaTokenTokenize({
+    required String source,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(source, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 8,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_java_token,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiLexersJavaJavaTokenTokenizeConstMeta,
+        argValues: [source],
+        apiImpl: this,
+      ),
+    );
   }
 
-  @protected
-  RangeUsize
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return RangeUsizeImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  TaskConstMeta get kCrateApiLexersJavaJavaTokenTokenizeConstMeta =>
+      const TaskConstMeta(
+        debugName: "java_token_tokenize",
+        argNames: ["source"],
+      );
+
+  @override
+  Future<RustToken> crateApiLexersRustRustTokenDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 9,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_rust_token,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersRustRustTokenDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
   }
 
-  @protected
-  T dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return TImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  TaskConstMeta get kCrateApiLexersRustRustTokenDefaultConstMeta =>
+      const TaskConstMeta(debugName: "rust_token_default", argNames: []);
+
+  @override
+  Future<RustTokenKind> crateApiLexersRustRustTokenKindDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_rust_token_kind,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersRustRustTokenKindDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
   }
 
+  TaskConstMeta get kCrateApiLexersRustRustTokenKindDefaultConstMeta =>
+      const TaskConstMeta(debugName: "rust_token_kind_default", argNames: []);
+
+  @override
+  Future<RustToken> crateApiLexersRustRustTokenNt({
+    required RustTokenKind kind,
+    required String source,
+    required (BigInt, BigInt) span,
+    required LexerExtras extras,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_rust_token_kind(kind, serializer);
+          sse_encode_String(source, serializer);
+          sse_encode_box_autoadd_record_usize_usize(span, serializer);
+          sse_encode_box_autoadd_lexer_extras(extras, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 11,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_rust_token,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersRustRustTokenNtConstMeta,
+        argValues: [kind, source, span, extras],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLexersRustRustTokenNtConstMeta =>
+      const TaskConstMeta(
+        debugName: "rust_token_nt",
+        argNames: ["kind", "source", "span", "extras"],
+      );
+
+  @override
+  Future<List<RustToken>> crateApiLexersRustRustTokenTokenize({
+    required String source,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(source, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 12,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_rust_token,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiLexersRustRustTokenTokenizeConstMeta,
+        argValues: [source],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLexersRustRustTokenTokenizeConstMeta =>
+      const TaskConstMeta(
+        debugName: "rust_token_tokenize",
+        argNames: ["source"],
+      );
+
+  @override
+  Future<SQLToken> crateApiLexersSqlSqlTokenDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 13,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_sql_token,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersSqlSqlTokenDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLexersSqlSqlTokenDefaultConstMeta =>
+      const TaskConstMeta(debugName: "sql_token_default", argNames: []);
+
+  @override
+  Future<SQLTokenKind> crateApiLexersSqlSqlTokenKindDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 14,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_sql_token_kind,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersSqlSqlTokenKindDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLexersSqlSqlTokenKindDefaultConstMeta =>
+      const TaskConstMeta(debugName: "sql_token_kind_default", argNames: []);
+
+  @override
+  Future<SQLToken> crateApiLexersSqlSqlTokenNt({
+    required SQLTokenKind kind,
+    required String source,
+    required (BigInt, BigInt) span,
+    required LexerExtras extras,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_sql_token_kind(kind, serializer);
+          sse_encode_String(source, serializer);
+          sse_encode_box_autoadd_record_usize_usize(span, serializer);
+          sse_encode_box_autoadd_lexer_extras(extras, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_sql_token,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersSqlSqlTokenNtConstMeta,
+        argValues: [kind, source, span, extras],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLexersSqlSqlTokenNtConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_token_nt",
+        argNames: ["kind", "source", "span", "extras"],
+      );
+
+  @override
+  Future<List<SQLToken>> crateApiLexersSqlSqlTokenTokenize({
+    required String source,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(source, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 16,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_sql_token,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiLexersSqlSqlTokenTokenizeConstMeta,
+        argValues: [source],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLexersSqlSqlTokenTokenizeConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_token_tokenize",
+        argNames: ["source"],
+      );
+
   @protected
-  Str
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    dynamic raw,
-  ) {
+  AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return StrImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return AnyhowException(raw as String);
   }
 
   @protected
@@ -282,9 +660,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LexerExtras dco_decode_box_autoadd_lexer_extras(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_lexer_extras(raw);
+  }
+
+  @protected
+  (BigInt, BigInt) dco_decode_box_autoadd_record_usize_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_record_usize_usize(raw);
+  }
+
+  @protected
   int dco_decode_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
+  }
+
+  @protected
+  JavaToken dco_decode_java_token(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return JavaToken(
+      kind: dco_decode_java_token_kind(arr[0]),
+      text: dco_decode_String(arr[1]),
+      span: dco_decode_record_usize_usize(arr[2]),
+      line: dco_decode_usize(arr[3]),
+      col: dco_decode_usize(arr[4]),
+    );
   }
 
   @protected
@@ -294,9 +699,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  LexingError dco_decode_lexing_error(dynamic raw) {
+  LexerExtras dco_decode_lexer_extras(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return LexingError.values[raw as int];
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return LexerExtras(
+      line: dco_decode_usize(arr[0]),
+      col: dco_decode_usize(arr[1]),
+    );
+  }
+
+  @protected
+  List<JavaToken> dco_decode_list_java_token(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_java_token).toList();
   }
 
   @protected
@@ -306,39 +723,81 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<RustToken> dco_decode_list_rust_token(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_rust_token).toList();
+  }
+
+  @protected
+  List<SQLToken> dco_decode_list_sql_token(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_sql_token).toList();
+  }
+
+  @protected
+  (String, String, String) dco_decode_record_string_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3) {
+      throw Exception('Expected 3 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_String(arr[0]),
+      dco_decode_String(arr[1]),
+      dco_decode_String(arr[2]),
+    );
+  }
+
+  @protected
+  (BigInt, BigInt) dco_decode_record_usize_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_usize(arr[0]), dco_decode_usize(arr[1]));
+  }
+
+  @protected
+  RustToken dco_decode_rust_token(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return RustToken(
+      kind: dco_decode_rust_token_kind(arr[0]),
+      text: dco_decode_String(arr[1]),
+      span: dco_decode_record_usize_usize(arr[2]),
+      line: dco_decode_usize(arr[3]),
+      col: dco_decode_usize(arr[4]),
+    );
+  }
+
+  @protected
   RustTokenKind dco_decode_rust_token_kind(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return RustTokenKind.values[raw as int];
   }
 
   @protected
-  SQLTokenKind dco_decode_sql_token_kind(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SQLTokenKind.values[raw as int];
-  }
-
-  @protected
-  Token dco_decode_token(dynamic raw) {
+  SQLToken dco_decode_sql_token(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 5)
       throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return Token(
-      kind:
-          dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-            arr[0],
-          ),
-      text:
-          dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-            arr[1],
-          ),
-      span:
-          dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-            arr[2],
-          ),
+    return SQLToken(
+      kind: dco_decode_sql_token_kind(arr[0]),
+      text: dco_decode_String(arr[1]),
+      span: dco_decode_record_usize_usize(arr[2]),
       line: dco_decode_usize(arr[3]),
       col: dco_decode_usize(arr[4]),
     );
+  }
+
+  @protected
+  SQLTokenKind dco_decode_sql_token_kind(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SQLTokenKind.values[raw as int];
   }
 
   @protected
@@ -360,74 +819,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RangeUsize
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    SseDeserializer deserializer,
-  ) {
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return RangeUsizeImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
-  T
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return TImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
-  Str
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return StrImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
-  RangeUsize
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return RangeUsizeImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
-  T sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return TImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
-  Str
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return StrImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
+    var inner = sse_decode_String(deserializer);
+    return AnyhowException(inner);
   }
 
   @protected
@@ -438,9 +833,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LexerExtras sse_decode_box_autoadd_lexer_extras(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_lexer_extras(deserializer));
+  }
+
+  @protected
+  (BigInt, BigInt) sse_decode_box_autoadd_record_usize_usize(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_record_usize_usize(deserializer));
+  }
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  JavaToken sse_decode_java_token(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_kind = sse_decode_java_token_kind(deserializer);
+    var var_text = sse_decode_String(deserializer);
+    var var_span = sse_decode_record_usize_usize(deserializer);
+    var var_line = sse_decode_usize(deserializer);
+    var var_col = sse_decode_usize(deserializer);
+    return JavaToken(
+      kind: var_kind,
+      text: var_text,
+      span: var_span,
+      line: var_line,
+      col: var_col,
+    );
   }
 
   @protected
@@ -451,10 +879,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  LexingError sse_decode_lexing_error(SseDeserializer deserializer) {
+  LexerExtras sse_decode_lexer_extras(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return LexingError.values[inner];
+    var var_line = sse_decode_usize(deserializer);
+    var var_col = sse_decode_usize(deserializer);
+    return LexerExtras(line: var_line, col: var_col);
+  }
+
+  @protected
+  List<JavaToken> sse_decode_list_java_token(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <JavaToken>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_java_token(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -465,6 +906,66 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<RustToken> sse_decode_list_rust_token(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <RustToken>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_rust_token(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<SQLToken> sse_decode_list_sql_token(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <SQLToken>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_sql_token(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  (String, String, String) sse_decode_record_string_string_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    var var_field2 = sse_decode_String(deserializer);
+    return (var_field0, var_field1, var_field2);
+  }
+
+  @protected
+  (BigInt, BigInt) sse_decode_record_usize_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_usize(deserializer);
+    var var_field1 = sse_decode_usize(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  RustToken sse_decode_rust_token(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_kind = sse_decode_rust_token_kind(deserializer);
+    var var_text = sse_decode_String(deserializer);
+    var var_span = sse_decode_record_usize_usize(deserializer);
+    var var_line = sse_decode_usize(deserializer);
+    var var_col = sse_decode_usize(deserializer);
+    return RustToken(
+      kind: var_kind,
+      text: var_text,
+      span: var_span,
+      line: var_line,
+      col: var_col,
+    );
+  }
+
+  @protected
   RustTokenKind sse_decode_rust_token_kind(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
@@ -472,36 +973,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  SQLTokenKind sse_decode_sql_token_kind(SseDeserializer deserializer) {
+  SQLToken sse_decode_sql_token(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return SQLTokenKind.values[inner];
-  }
-
-  @protected
-  Token sse_decode_token(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_kind =
-        sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-          deserializer,
-        );
-    var var_text =
-        sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-          deserializer,
-        );
-    var var_span =
-        sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-          deserializer,
-        );
+    var var_kind = sse_decode_sql_token_kind(deserializer);
+    var var_text = sse_decode_String(deserializer);
+    var var_span = sse_decode_record_usize_usize(deserializer);
     var var_line = sse_decode_usize(deserializer);
     var var_col = sse_decode_usize(deserializer);
-    return Token(
+    return SQLToken(
       kind: var_kind,
       text: var_text,
       span: var_span,
       line: var_line,
       col: var_col,
     );
+  }
+
+  @protected
+  SQLTokenKind sse_decode_sql_token_kind(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return SQLTokenKind.values[inner];
   }
 
   @protected
@@ -528,81 +1020,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    RangeUsize self,
+  void sse_encode_AnyhowException(
+    AnyhowException self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as RangeUsizeImpl).frbInternalSseEncode(move: true),
-      serializer,
-    );
-  }
-
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    T self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as TImpl).frbInternalSseEncode(move: true),
-      serializer,
-    );
-  }
-
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    Str self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as StrImpl).frbInternalSseEncode(move: false),
-      serializer,
-    );
-  }
-
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-    RangeUsize self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as RangeUsizeImpl).frbInternalSseEncode(move: null),
-      serializer,
-    );
-  }
-
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-    T self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as TImpl).frbInternalSseEncode(move: null),
-      serializer,
-    );
-  }
-
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-    Str self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as StrImpl).frbInternalSseEncode(move: null),
-      serializer,
-    );
+    sse_encode_String(self.message, serializer);
   }
 
   @protected
@@ -612,9 +1035,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_lexer_extras(
+    LexerExtras self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_lexer_extras(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_record_usize_usize(
+    (BigInt, BigInt) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_record_usize_usize(self, serializer);
+  }
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_java_token(JavaToken self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_java_token_kind(self.kind, serializer);
+    sse_encode_String(self.text, serializer);
+    sse_encode_record_usize_usize(self.span, serializer);
+    sse_encode_usize(self.line, serializer);
+    sse_encode_usize(self.col, serializer);
   }
 
   @protected
@@ -627,9 +1078,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_lexing_error(LexingError self, SseSerializer serializer) {
+  void sse_encode_lexer_extras(LexerExtras self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
+    sse_encode_usize(self.line, serializer);
+    sse_encode_usize(self.col, serializer);
+  }
+
+  @protected
+  void sse_encode_list_java_token(
+    List<JavaToken> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_java_token(item, serializer);
+    }
   }
 
   @protected
@@ -643,6 +1107,61 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_rust_token(
+    List<RustToken> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_rust_token(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_sql_token(
+    List<SQLToken> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_sql_token(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_record_string_string_string(
+    (String, String, String) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
+    sse_encode_String(self.$3, serializer);
+  }
+
+  @protected
+  void sse_encode_record_usize_usize(
+    (BigInt, BigInt) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.$1, serializer);
+    sse_encode_usize(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_rust_token(RustToken self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_rust_token_kind(self.kind, serializer);
+    sse_encode_String(self.text, serializer);
+    sse_encode_record_usize_usize(self.span, serializer);
+    sse_encode_usize(self.line, serializer);
+    sse_encode_usize(self.col, serializer);
+  }
+
+  @protected
   void sse_encode_rust_token_kind(
     RustTokenKind self,
     SseSerializer serializer,
@@ -652,28 +1171,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_sql_token_kind(SQLTokenKind self, SseSerializer serializer) {
+  void sse_encode_sql_token(SQLToken self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
+    sse_encode_sql_token_kind(self.kind, serializer);
+    sse_encode_String(self.text, serializer);
+    sse_encode_record_usize_usize(self.span, serializer);
+    sse_encode_usize(self.line, serializer);
+    sse_encode_usize(self.col, serializer);
   }
 
   @protected
-  void sse_encode_token(Token self, SseSerializer serializer) {
+  void sse_encode_sql_token_kind(SQLTokenKind self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerT(
-      self.kind,
-      serializer,
-    );
-    sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerstr(
-      self.text,
-      serializer,
-    );
-    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRangeusize(
-      self.span,
-      serializer,
-    );
-    sse_encode_usize(self.line, serializer);
-    sse_encode_usize(self.col, serializer);
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -698,64 +1208,4 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
   }
-}
-
-@sealed
-class RangeUsizeImpl extends RustOpaque implements RangeUsize {
-  // Not to be used by end users
-  RangeUsizeImpl.frbInternalDcoDecode(List<dynamic> wire)
-    : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  RangeUsizeImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_RangeUsize,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_RangeUsize,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_RangeUsizePtr,
-  );
-}
-
-@sealed
-class StrImpl extends RustOpaque implements Str {
-  // Not to be used by end users
-  StrImpl.frbInternalDcoDecode(List<dynamic> wire)
-    : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  StrImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_Str,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_Str,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_StrPtr,
-  );
-}
-
-@sealed
-class TImpl extends RustOpaque implements T {
-  // Not to be used by end users
-  TImpl.frbInternalDcoDecode(List<dynamic> wire)
-    : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  TImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_T,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_T,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_TPtr,
-  );
 }

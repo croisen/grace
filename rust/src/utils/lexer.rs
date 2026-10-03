@@ -1,28 +1,7 @@
-use std::error::Error;
-use std::fmt::{Display, Formatter, Result as FResult};
-
 use anyhow::Result;
 use logos::{Lexer, Logos, Skip};
 
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct LexerExtras {
-    pub line: usize,
-    pub col: usize,
-}
-
-#[derive(Default, Debug, Clone, PartialEq)]
-pub enum LexingError {
-    #[default]
-    Unknown,
-}
-
-impl Display for LexingError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FResult {
-        write!(f, "{self:?}")
-    }
-}
-
-impl Error for LexingError {}
+use crate::api::lexers::{GraceError, LexerExtras, LexingError};
 
 pub trait Token<TokenKind> {
     fn nt(
@@ -33,7 +12,6 @@ pub trait Token<TokenKind> {
     ) -> Self;
 }
 
-#[flutter_rust_bridge::frb(ignore)]
 pub fn extras_newline<'a, T>(lex: &mut Lexer<'a, T>) -> Skip
 where
     T: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>,
@@ -43,21 +21,101 @@ where
     Skip
 }
 
-#[flutter_rust_bridge::frb(ignore)]
-pub fn tokenize<'a, T, TK>(source: &'a str) -> Result<Vec<T>>
+pub fn tokenize<'a, T, TK>(source: &'a str) -> Result<Vec<T>, Vec<GraceError>>
 where
-    T: Token<TK>,
+    T: Token<TK> + Clone,
     TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
         + 'static,
 {
     let mut lexer = TK::lexer(source);
     lexer.extras = LexerExtras { line: 1, col: 0 };
     let mut tokens = vec![];
+    let mut errors = vec![];
+    let mut pairs = vec![];
+
     while let Some(t) = lexer.next() {
-        let (token, span) = (t?, lexer.span());
+        let span = lexer.span();
         lexer.extras.col = span.start - lexer.extras.col + 1;
-        tokens.push(T::nt(token, source, (span.start, span.end), lexer.extras))
+        match t {
+            Ok(token) => {
+                let t =
+                    T::nt(token, source, (span.start, span.end), lexer.extras);
+
+                tokens.push(t.clone());
+                parse_pair(
+                    lexer.extras,
+                    &source[span.start..span.end],
+                    &mut pairs,
+                );
+            }
+            Err(kind) => {
+                errors.push(GraceError {
+                    kind,
+                    text: source[span.start..span.end].to_string(),
+                    reason: String::new(),
+                    line: lexer.extras.line,
+                    col: lexer.extras.col,
+                });
+            }
+        }
     }
 
-    Ok(tokens)
+    for (token, text) in pairs {
+        match text {
+            "{" | "(" | "[" => {
+                errors.push(GraceError {
+                    kind: LexingError::MissingClosingPair,
+                    text: text.to_string(),
+                    reason: String::new(),
+                    line: token.line,
+                    col: token.col,
+                });
+            }
+
+            "}" | ")" | "]" => {
+                errors.push(GraceError {
+                    kind: LexingError::UnexpectedToken,
+                    text: text.to_string(),
+                    reason: String::new(),
+                    line: token.line,
+                    col: token.col,
+                });
+            }
+
+            _ => {}
+        }
+    }
+
+    if errors.is_empty() { Ok(tokens) } else { Err(errors) }
+}
+
+fn parse_pair<'a>(
+    token: LexerExtras,
+    text: &'a str,
+    pairs: &mut Vec<(LexerExtras, &'a str)>,
+) {
+    match text {
+        "{" | "(" | "[" => pairs.push((token, text)),
+
+        "}" => {
+            pairs.pop_if(|(_, t)| *t == "{").or_else(|| {
+                pairs.push((token, text));
+                None
+            });
+        }
+        ")" => {
+            pairs.pop_if(|(_, t)| *t == "(").or_else(|| {
+                pairs.push((token, text));
+                None
+            });
+        }
+        "]" => {
+            pairs.pop_if(|(_, t)| *t == "[").or_else(|| {
+                pairs.push((token, text));
+                None
+            });
+        }
+
+        _ => {}
+    };
 }

@@ -4,6 +4,7 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/drills/rust.dart';
+import 'api/lexers.dart';
 import 'api/lexers/java.dart';
 import 'api/lexers/rust.dart';
 import 'api/lexers/sql.dart';
@@ -17,8 +18,6 @@ import 'frb_generated.io.dart'
     if (dart.library.js_interop) 'frb_generated.web.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-
-import 'utils/lexer.dart';
 
 /// Main entrypoint of the Rust API
 class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
@@ -75,7 +74,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -1751281055;
+  int get rustContentHash => 1499809352;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -90,6 +89,8 @@ abstract class RustLibApi extends BaseApi {
   Future<(String, String, String)> crateApiDrillsRustGenerateDrill({
     required int difficulty,
   });
+
+  Future<GraceError> crateApiLexersGraceErrorDefault();
 
   String crateApiSimpleGreet({required String name});
 
@@ -114,6 +115,10 @@ abstract class RustLibApi extends BaseApi {
   Future<List<JavaToken>> crateApiLexersJavaJavaTokenTokenize({
     required String source,
   });
+
+  Future<LexerExtras> crateApiLexersLexerExtrasDefault();
+
+  Future<LexingError> crateApiLexersLexingErrorDefault();
 
   Future<RustToken> crateApiLexersRustRustTokenDefault();
 
@@ -188,13 +193,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<GraceError> crateApiLexersGraceErrorDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_grace_error,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersGraceErrorDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLexersGraceErrorDefaultConstMeta =>
+      const TaskConstMeta(debugName: "grace_error_default", argNames: []);
+
+  @override
   String crateApiSimpleGreet({required String name}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -224,7 +256,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 3,
+            funcId: 4,
             port: port_,
           );
         },
@@ -251,7 +283,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 4,
+            funcId: 5,
             port: port_,
           );
         },
@@ -278,7 +310,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 6,
             port: port_,
           );
         },
@@ -305,7 +337,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 7,
             port: port_,
           );
         },
@@ -341,7 +373,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 8,
             port: port_,
           );
         },
@@ -374,13 +406,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 8,
+            funcId: 9,
             port: port_,
           );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_java_token,
-          decodeErrorData: sse_decode_AnyhowException,
+          decodeErrorData: sse_decode_list_grace_error,
         ),
         constMeta: kCrateApiLexersJavaJavaTokenTokenizeConstMeta,
         argValues: [source],
@@ -396,6 +428,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<LexerExtras> crateApiLexersLexerExtrasDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_lexer_extras,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersLexerExtrasDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLexersLexerExtrasDefaultConstMeta =>
+      const TaskConstMeta(debugName: "lexer_extras_default", argNames: []);
+
+  @override
+  Future<LexingError> crateApiLexersLexingErrorDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 11,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_lexing_error,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiLexersLexingErrorDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLexersLexingErrorDefaultConstMeta =>
+      const TaskConstMeta(debugName: "lexing_error_default", argNames: []);
+
+  @override
   Future<RustToken> crateApiLexersRustRustTokenDefault() {
     return handler.executeNormal(
       NormalTask(
@@ -404,7 +490,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 9,
+            funcId: 12,
             port: port_,
           );
         },
@@ -431,7 +517,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 10,
+            funcId: 13,
             port: port_,
           );
         },
@@ -467,7 +553,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 11,
+            funcId: 14,
             port: port_,
           );
         },
@@ -500,13 +586,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 15,
             port: port_,
           );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_rust_token,
-          decodeErrorData: sse_decode_AnyhowException,
+          decodeErrorData: sse_decode_list_grace_error,
         ),
         constMeta: kCrateApiLexersRustRustTokenTokenizeConstMeta,
         argValues: [source],
@@ -530,7 +616,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 13,
+            funcId: 16,
             port: port_,
           );
         },
@@ -557,7 +643,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 14,
+            funcId: 17,
             port: port_,
           );
         },
@@ -593,7 +679,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 18,
             port: port_,
           );
         },
@@ -626,13 +712,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 16,
+            funcId: 19,
             port: port_,
           );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_sql_token,
-          decodeErrorData: sse_decode_AnyhowException,
+          decodeErrorData: sse_decode_list_grace_error,
         ),
         constMeta: kCrateApiLexersSqlSqlTokenTokenizeConstMeta,
         argValues: [source],
@@ -646,12 +732,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         debugName: "sql_token_tokenize",
         argNames: ["source"],
       );
-
-  @protected
-  AnyhowException dco_decode_AnyhowException(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return AnyhowException(raw as String);
-  }
 
   @protected
   String dco_decode_String(dynamic raw) {
@@ -669,6 +749,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   (BigInt, BigInt) dco_decode_box_autoadd_record_usize_usize(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_record_usize_usize(raw);
+  }
+
+  @protected
+  GraceError dco_decode_grace_error(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return GraceError(
+      kind: dco_decode_lexing_error(arr[0]),
+      text: dco_decode_String(arr[1]),
+      reason: dco_decode_String(arr[2]),
+      line: dco_decode_usize(arr[3]),
+      col: dco_decode_usize(arr[4]),
+    );
   }
 
   @protected
@@ -708,6 +803,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       line: dco_decode_usize(arr[0]),
       col: dco_decode_usize(arr[1]),
     );
+  }
+
+  @protected
+  LexingError dco_decode_lexing_error(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return LexingError.values[raw as int];
+  }
+
+  @protected
+  List<GraceError> dco_decode_list_grace_error(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_grace_error).toList();
   }
 
   @protected
@@ -819,13 +926,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_String(deserializer);
-    return AnyhowException(inner);
-  }
-
-  @protected
   String sse_decode_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
@@ -846,6 +946,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_record_usize_usize(deserializer));
+  }
+
+  @protected
+  GraceError sse_decode_grace_error(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_kind = sse_decode_lexing_error(deserializer);
+    var var_text = sse_decode_String(deserializer);
+    var var_reason = sse_decode_String(deserializer);
+    var var_line = sse_decode_usize(deserializer);
+    var var_col = sse_decode_usize(deserializer);
+    return GraceError(
+      kind: var_kind,
+      text: var_text,
+      reason: var_reason,
+      line: var_line,
+      col: var_col,
+    );
   }
 
   @protected
@@ -884,6 +1001,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_line = sse_decode_usize(deserializer);
     var var_col = sse_decode_usize(deserializer);
     return LexerExtras(line: var_line, col: var_col);
+  }
+
+  @protected
+  LexingError sse_decode_lexing_error(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return LexingError.values[inner];
+  }
+
+  @protected
+  List<GraceError> sse_decode_list_grace_error(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <GraceError>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_grace_error(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -1020,15 +1156,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_AnyhowException(
-    AnyhowException self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.message, serializer);
-  }
-
-  @protected
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
@@ -1050,6 +1177,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_record_usize_usize(self, serializer);
+  }
+
+  @protected
+  void sse_encode_grace_error(GraceError self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_lexing_error(self.kind, serializer);
+    sse_encode_String(self.text, serializer);
+    sse_encode_String(self.reason, serializer);
+    sse_encode_usize(self.line, serializer);
+    sse_encode_usize(self.col, serializer);
   }
 
   @protected
@@ -1082,6 +1219,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(self.line, serializer);
     sse_encode_usize(self.col, serializer);
+  }
+
+  @protected
+  void sse_encode_lexing_error(LexingError self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_list_grace_error(
+    List<GraceError> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_grace_error(item, serializer);
+    }
   }
 
   @protected

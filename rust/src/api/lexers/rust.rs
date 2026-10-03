@@ -1,9 +1,8 @@
 use anyhow::Result;
 use logos::Logos;
 
-use crate::utils::lexer::{
-    LexerExtras, LexingError, Token, extras_newline, tokenize,
-};
+use crate::api::lexers::{GraceError, LexerExtras, LexingError};
+use crate::utils::lexer::{Token, extras_newline, tokenize};
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = LexingError, extras = LexerExtras)]
@@ -53,6 +52,25 @@ pub enum RustTokenKind {
     Return,
     #[token("static")]
     Static,
+    #[token("pub")]
+    Pub,
+    #[token("trait")]
+    Trait,
+    #[token("impl")]
+    Impl,
+    #[token("in")]
+    In,
+
+    #[token("for")]
+    For,
+    #[token("loop")]
+    Loop,
+    #[token("while")]
+    While,
+    #[token("if")]
+    If,
+    #[token("else")]
+    Else,
 
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*!")]
     Macro,
@@ -93,7 +111,7 @@ pub struct RustToken {
 }
 
 impl<'a> RustToken {
-    pub fn tokenize(source: &'a str) -> Result<Vec<Self>> {
+    pub fn tokenize(source: &'a str) -> Result<Vec<Self>, Vec<GraceError>> {
         tokenize::<RustToken, RustTokenKind>(source)
     }
 }

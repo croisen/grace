@@ -7,6 +7,7 @@
 // ignore_for_file: argument_type_not_assignable
 
 import 'api/drills/rust.dart';
+import 'api/lexers.dart';
 import 'api/lexers/java.dart';
 import 'api/lexers/rust.dart';
 import 'api/lexers/sql.dart';
@@ -19,8 +20,6 @@ import 'frb_generated.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
-import 'utils/lexer.dart';
-
 abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustLibApiImplPlatform({
     required super.handler,
@@ -30,9 +29,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   });
 
   @protected
-  AnyhowException dco_decode_AnyhowException(dynamic raw);
-
-  @protected
   String dco_decode_String(dynamic raw);
 
   @protected
@@ -40,6 +36,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (BigInt, BigInt) dco_decode_box_autoadd_record_usize_usize(dynamic raw);
+
+  @protected
+  GraceError dco_decode_grace_error(dynamic raw);
 
   @protected
   int dco_decode_i_32(dynamic raw);
@@ -52,6 +51,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LexerExtras dco_decode_lexer_extras(dynamic raw);
+
+  @protected
+  LexingError dco_decode_lexing_error(dynamic raw);
+
+  @protected
+  List<GraceError> dco_decode_list_grace_error(dynamic raw);
 
   @protected
   List<JavaToken> dco_decode_list_java_token(dynamic raw);
@@ -93,9 +98,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_usize(dynamic raw);
 
   @protected
-  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
-
-  @protected
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
@@ -105,6 +107,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (BigInt, BigInt) sse_decode_box_autoadd_record_usize_usize(
     SseDeserializer deserializer,
   );
+
+  @protected
+  GraceError sse_decode_grace_error(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
@@ -117,6 +122,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LexerExtras sse_decode_lexer_extras(SseDeserializer deserializer);
+
+  @protected
+  LexingError sse_decode_lexing_error(SseDeserializer deserializer);
+
+  @protected
+  List<GraceError> sse_decode_list_grace_error(SseDeserializer deserializer);
 
   @protected
   List<JavaToken> sse_decode_list_java_token(SseDeserializer deserializer);
@@ -163,12 +174,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
-  void sse_encode_AnyhowException(
-    AnyhowException self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
@@ -184,6 +189,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_grace_error(GraceError self, SseSerializer serializer);
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
@@ -194,6 +202,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_lexer_extras(LexerExtras self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_lexing_error(LexingError self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_grace_error(
+    List<GraceError> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_java_token(

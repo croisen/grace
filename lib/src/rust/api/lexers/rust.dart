@@ -4,7 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
-import '../../utils/lexer.dart';
+import '../lexers.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -86,6 +86,15 @@ enum RustTokenKind {
   mut,
   return_,
   static_,
+  pub,
+  trait,
+  impl,
+  in_,
+  for_,
+  loop,
+  while_,
+  if_,
+  else_,
   macro,
   lifetime,
   compGt,

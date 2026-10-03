@@ -109,6 +109,11 @@ case "${1:-}" in
     "generate")
         flutter_rust_bridge_codegen generate
         ;;
+    "run-rust")
+        pushd "${SCRIPT_PATH}"/rust
+        cargo run --release
+        popd
+        ;;
     *)
         echo "Usage: $0 {linux,apk,run,clean,icon,deldb,rename,cat}"
         echo "linux    - build linux executable on release mode"

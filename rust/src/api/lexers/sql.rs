@@ -1,9 +1,8 @@
 use anyhow::Result;
 use logos::Logos;
 
-use crate::utils::lexer::{
-    LexerExtras, LexingError, Token, extras_newline, tokenize,
-};
+use crate::api::lexers::{GraceError, LexerExtras, LexingError};
+use crate::utils::lexer::{Token, extras_newline, tokenize};
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = LexingError, extras = LexerExtras)]
@@ -55,7 +54,7 @@ pub enum SQLTokenKind {
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*")]
     #[default]
     Identifier,
-    #[regex("-?[0-9]{1,3}(_[0-9]{3})*")]
+    #[regex("-?[0-9]+")]
     Integer,
     #[regex(r#""([^"\\]|\\.)""#)]
     String,
@@ -75,7 +74,7 @@ pub struct SQLToken {
 }
 
 impl<'a> SQLToken {
-    pub fn tokenize(source: &'a str) -> Result<Vec<Self>> {
+    pub fn tokenize(source: &'a str) -> Result<Vec<Self>, Vec<GraceError>> {
         tokenize::<SQLToken, SQLTokenKind>(source)
     }
 }

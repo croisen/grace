@@ -5,9 +5,16 @@ use crate::api::lexers::rust::RustToken;
 
 fn main() {
     let source = r#"
-        let x: i64 = 9_999;
+        pub fn square(i: i32) -> i32 {
+            i * i
+        }
+
+        }{
     "#;
 
-    let a = RustToken::tokenize(source).unwrap();
-    println!("{a:#?}");
+    let a = RustToken::tokenize(source);
+    match a {
+        Ok(a) => println!("{a:#?}"),
+        Err(a) => println!("{a:#?}"),
+    }
 }

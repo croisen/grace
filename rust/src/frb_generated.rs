@@ -45,7 +45,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1499809352;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 268570211;
 
 // Section: executor
 
@@ -220,6 +220,36 @@ fn wire__crate__api__lexers__lexing_error_default_impl(
                     })())
                 } })
 }
+fn wire__crate__api__ast__rust__rust_ast_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "rust_ast_default", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::ast::rust::RustAst::default())?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
+fn wire__crate__api__ast__rust__rust_ast_new_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "rust_ast_new", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_tokens = <Vec<crate::api::lexers::rust::RustToken>>::sse_decode(&mut deserializer);deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Ok::<_, ()>(crate::api::ast::rust::RustAst::new(api_tokens))?;   std::result::Result::Ok(output_ok)
+                    })())
+                } })
+}
 fn wire__crate__api__lexers__rust__rust_token_default_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -356,6 +386,26 @@ impl SseDecode for String {
     ) -> Self {
         let mut inner = <Vec<u8>>::sse_decode(deserializer);
         return String::from_utf8(inner).unwrap();
+    }
+}
+
+impl SseDecode for bool {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        deserializer.cursor.read_u8().unwrap() != 0
+    }
+}
+
+impl SseDecode for Box<crate::api::ast::rust::RustAst> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        return Box::new(<crate::api::ast::rust::RustAst>::sse_decode(
+            deserializer,
+        ));
     }
 }
 
@@ -509,6 +559,20 @@ impl SseDecode for crate::api::lexers::LexingError {
     }
 }
 
+impl SseDecode for Vec<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<String>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::api::lexers::GraceError> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -555,6 +619,80 @@ impl SseDecode for Vec<u8> {
     }
 }
 
+impl SseDecode for Vec<(String, Vec<(String, String)>)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<(String, Vec<(String, String)>)>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<(String, Vec<String>)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<(String, Vec<String>)>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<(String, Option<String>)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<(String, Option<String>)>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<(String, String)>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::ast::rust::RustAst> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::ast::rust::RustAst>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::api::lexers::rust::RustToken> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -587,6 +725,91 @@ impl SseDecode for Vec<crate::api::lexers::sql::SQLToken> {
     }
 }
 
+impl SseDecode for Option<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<String>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<Vec<String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<Vec<String>>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<Vec<(String, Option<String>)>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<Vec<(String, Option<String>)>>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for (String, Vec<(String, String)>) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_field0 = <String>::sse_decode(deserializer);
+        let mut var_field1 = <Vec<(String, String)>>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode for (String, Vec<String>) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_field0 = <String>::sse_decode(deserializer);
+        let mut var_field1 = <Vec<String>>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode for (String, Option<String>) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_field0 = <String>::sse_decode(deserializer);
+        let mut var_field1 = <Option<String>>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode for (String, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_field0 = <String>::sse_decode(deserializer);
+        let mut var_field1 = <String>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
 impl SseDecode for (String, String, String) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -607,6 +830,229 @@ impl SseDecode for (usize, usize) {
         let mut var_field0 = <usize>::sse_decode(deserializer);
         let mut var_field1 = <usize>::sse_decode(deserializer);
         return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode for crate::api::ast::rust::RustAst {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_main = <Vec<String>>::sse_decode(deserializer);
+                let mut var_final_ = <Vec<String>>::sse_decode(deserializer);
+                return crate::api::ast::rust::RustAst::Import {
+                    main: var_main,
+                    _final: var_final_,
+                };
+            }
+            1 => {
+                let mut var_static_ = <bool>::sse_decode(deserializer);
+                let mut var_const_ = <bool>::sse_decode(deserializer);
+                let mut var_pub = <bool>::sse_decode(deserializer);
+                let mut var_name = <String>::sse_decode(deserializer);
+                let mut var_type = <Option<String>>::sse_decode(deserializer);
+                let mut var_value =
+                    <Vec<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::VariableDecl {
+                    _static: var_static_,
+                    _const: var_const_,
+                    _pub: var_pub,
+                    name: var_name,
+                    _type: var_type,
+                    value: var_value,
+                };
+            }
+            2 => {
+                let mut var_pub = <bool>::sse_decode(deserializer);
+                let mut var_name = <String>::sse_decode(deserializer);
+                let mut var_params =
+                    <Vec<(String, Option<String>)>>::sse_decode(deserializer);
+                let mut var_return_ = <String>::sse_decode(deserializer);
+                return crate::api::ast::rust::RustAst::FunctionDecl {
+                    _pub: var_pub,
+                    name: var_name,
+                    params: var_params,
+                    _return: var_return_,
+                };
+            }
+            3 => {
+                let mut var_pub = <bool>::sse_decode(deserializer);
+                let mut var_name = <String>::sse_decode(deserializer);
+                let mut var_params =
+                    <Vec<(String, Option<String>)>>::sse_decode(deserializer);
+                let mut var_return_ = <String>::sse_decode(deserializer);
+                let mut var_children =
+                    <Vec<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::FunctionImpl {
+                    _pub: var_pub,
+                    name: var_name,
+                    params: var_params,
+                    _return: var_return_,
+                    children: var_children,
+                };
+            }
+            4 => {
+                let mut var_name = <String>::sse_decode(deserializer);
+                let mut var_params = <Vec<String>>::sse_decode(deserializer);
+                return crate::api::ast::rust::RustAst::FunctionCall {
+                    name: var_name,
+                    params: var_params,
+                };
+            }
+            5 => {
+                let mut var_name = <String>::sse_decode(deserializer);
+                let mut var_chidlren =
+                    <Vec<(String, String)>>::sse_decode(deserializer);
+                return crate::api::ast::rust::RustAst::StructDecl {
+                    name: var_name,
+                    chidlren: var_chidlren,
+                };
+            }
+            6 => {
+                let mut var_name = <String>::sse_decode(deserializer);
+                let mut var_chidlren =
+                    <Vec<(String, Option<String>)>>::sse_decode(deserializer);
+                return crate::api::ast::rust::RustAst::RawStruct {
+                    name: var_name,
+                    chidlren: var_chidlren,
+                };
+            }
+            7 => {
+                let mut var_enumValue = <Vec<String>>::sse_decode(deserializer);
+                let mut var_tupleTagged =
+                    <Vec<(String, Vec<String>)>>::sse_decode(deserializer);
+                let mut var_structTagged =
+                    <Vec<(String, Vec<(String, String)>)>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::EnumDecl {
+                    enum_value: var_enumValue,
+                    tuple_tagged: var_tupleTagged,
+                    struct_tagged: var_structTagged,
+                };
+            }
+            8 => {
+                let mut var_name = <String>::sse_decode(deserializer);
+                let mut var_tupleTagged =
+                    <Option<Vec<String>>>::sse_decode(deserializer);
+                let mut var_structTagged =
+                    <Option<Vec<(String, Option<String>)>>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::RawEnum {
+                    name: var_name,
+                    tuple_tagged: var_tupleTagged,
+                    struct_tagged: var_structTagged,
+                };
+            }
+            9 => {
+                let mut var_name = <String>::sse_decode(deserializer);
+                let mut var_for_ = <Option<String>>::sse_decode(deserializer);
+                let mut var_children =
+                    <Vec<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::ZeImpl {
+                    name: var_name,
+                    _for: var_for_,
+                    children: var_children,
+                };
+            }
+            10 => {
+                let mut var_condition = <Vec<String>>::sse_decode(deserializer);
+                let mut var_children =
+                    <Vec<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                let mut var_else_ =
+                    <Box<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::IfConditional {
+                    condition: var_condition,
+                    children: var_children,
+                    _else: var_else_,
+                };
+            }
+            11 => {
+                let mut var_variant = <String>::sse_decode(deserializer);
+                let mut var_variable = <String>::sse_decode(deserializer);
+                let mut var_enum_ = <String>::sse_decode(deserializer);
+                let mut var_children =
+                    <Vec<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                let mut var_else_ =
+                    <Box<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::IfLet {
+                    variant: var_variant,
+                    variable: var_variable,
+                    _enum: var_enum_,
+                    children: var_children,
+                    _else: var_else_,
+                };
+            }
+            12 => {
+                let mut var_variables = <Vec<String>>::sse_decode(deserializer);
+                let mut var_source = <Vec<String>>::sse_decode(deserializer);
+                return crate::api::ast::rust::RustAst::ForLoop {
+                    variables: var_variables,
+                    source: var_source,
+                };
+            }
+            13 => {
+                let mut var_condition = <Vec<String>>::sse_decode(deserializer);
+                let mut var_children =
+                    <Vec<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::WhileLoop {
+                    condition: var_condition,
+                    children: var_children,
+                };
+            }
+            14 => {
+                let mut var_variant = <String>::sse_decode(deserializer);
+                let mut var_variable = <String>::sse_decode(deserializer);
+                let mut var_enum_ = <String>::sse_decode(deserializer);
+                let mut var_children =
+                    <Vec<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::WhileLet {
+                    variant: var_variant,
+                    variable: var_variable,
+                    _enum: var_enum_,
+                    children: var_children,
+                };
+            }
+            15 => {
+                let mut var_pub = <bool>::sse_decode(deserializer);
+                let mut var_declarations =
+                    <Vec<crate::api::ast::rust::RustAst>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::api::ast::rust::RustAst::TraitDecl {
+                    _pub: var_pub,
+                    declarations: var_declarations,
+                };
+            }
+            16 => {
+                return crate::api::ast::rust::RustAst::Unknown;
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -771,15 +1217,6 @@ impl SseDecode for usize {
     }
 }
 
-impl SseDecode for bool {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(
-        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
-    ) -> Self {
-        deserializer.cursor.read_u8().unwrap() != 0
-    }
-}
-
 fn pde_ffi_dispatcher_primary_impl(
     func_id: i32,
     port: flutter_rust_bridge::for_generated::MessagePort,
@@ -849,49 +1286,61 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        12 => wire__crate__api__lexers__rust__rust_token_default_impl(
+        12 => wire__crate__api__ast__rust__rust_ast_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        13 => wire__crate__api__lexers__rust__rust_token_kind_default_impl(
+        13 => wire__crate__api__ast__rust__rust_ast_new_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        14 => wire__crate__api__lexers__rust__rust_token_nt_impl(
+        14 => wire__crate__api__lexers__rust__rust_token_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        15 => wire__crate__api__lexers__rust__rust_token_tokenize_impl(
+        15 => wire__crate__api__lexers__rust__rust_token_kind_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        16 => wire__crate__api__lexers__sql__sql_token_default_impl(
+        16 => wire__crate__api__lexers__rust__rust_token_nt_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        17 => wire__crate__api__lexers__sql__sql_token_kind_default_impl(
+        17 => wire__crate__api__lexers__rust__rust_token_tokenize_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        18 => wire__crate__api__lexers__sql__sql_token_nt_impl(
+        18 => wire__crate__api__lexers__sql__sql_token_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        19 => wire__crate__api__lexers__sql__sql_token_tokenize_impl(
+        19 => wire__crate__api__lexers__sql__sql_token_kind_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        20 => wire__crate__api__lexers__sql__sql_token_nt_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        21 => wire__crate__api__lexers__sql__sql_token_tokenize_impl(
             port,
             ptr,
             rust_vec_len,
@@ -1085,6 +1534,193 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::lexers::LexingError>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::ast::rust::RustAst {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::api::ast::rust::RustAst::Import { main, _final } => [
+                0.into_dart(),
+                main.into_into_dart().into_dart(),
+                _final.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::VariableDecl {
+                _static,
+                _const,
+                _pub,
+                name,
+                _type,
+                value,
+            } => [
+                1.into_dart(),
+                _static.into_into_dart().into_dart(),
+                _const.into_into_dart().into_dart(),
+                _pub.into_into_dart().into_dart(),
+                name.into_into_dart().into_dart(),
+                _type.into_into_dart().into_dart(),
+                value.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::FunctionDecl {
+                _pub,
+                name,
+                params,
+                _return,
+            } => [
+                2.into_dart(),
+                _pub.into_into_dart().into_dart(),
+                name.into_into_dart().into_dart(),
+                params.into_into_dart().into_dart(),
+                _return.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::FunctionImpl {
+                _pub,
+                name,
+                params,
+                _return,
+                children,
+            } => [
+                3.into_dart(),
+                _pub.into_into_dart().into_dart(),
+                name.into_into_dart().into_dart(),
+                params.into_into_dart().into_dart(),
+                _return.into_into_dart().into_dart(),
+                children.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::FunctionCall { name, params } => [
+                4.into_dart(),
+                name.into_into_dart().into_dart(),
+                params.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::StructDecl { name, chidlren } => [
+                5.into_dart(),
+                name.into_into_dart().into_dart(),
+                chidlren.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::RawStruct { name, chidlren } => [
+                6.into_dart(),
+                name.into_into_dart().into_dart(),
+                chidlren.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::EnumDecl {
+                enum_value,
+                tuple_tagged,
+                struct_tagged,
+            } => [
+                7.into_dart(),
+                enum_value.into_into_dart().into_dart(),
+                tuple_tagged.into_into_dart().into_dart(),
+                struct_tagged.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::RawEnum {
+                name,
+                tuple_tagged,
+                struct_tagged,
+            } => [
+                8.into_dart(),
+                name.into_into_dart().into_dart(),
+                tuple_tagged.into_into_dart().into_dart(),
+                struct_tagged.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::ZeImpl { name, _for, children } => {
+                [
+                    9.into_dart(),
+                    name.into_into_dart().into_dart(),
+                    _for.into_into_dart().into_dart(),
+                    children.into_into_dart().into_dart(),
+                ]
+                .into_dart()
+            }
+            crate::api::ast::rust::RustAst::IfConditional {
+                condition,
+                children,
+                _else,
+            } => [
+                10.into_dart(),
+                condition.into_into_dart().into_dart(),
+                children.into_into_dart().into_dart(),
+                _else.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::IfLet {
+                variant,
+                variable,
+                _enum,
+                children,
+                _else,
+            } => [
+                11.into_dart(),
+                variant.into_into_dart().into_dart(),
+                variable.into_into_dart().into_dart(),
+                _enum.into_into_dart().into_dart(),
+                children.into_into_dart().into_dart(),
+                _else.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::ForLoop { variables, source } => [
+                12.into_dart(),
+                variables.into_into_dart().into_dart(),
+                source.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::WhileLoop {
+                condition,
+                children,
+            } => [
+                13.into_dart(),
+                condition.into_into_dart().into_dart(),
+                children.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::WhileLet {
+                variant,
+                variable,
+                _enum,
+                children,
+            } => [
+                14.into_dart(),
+                variant.into_into_dart().into_dart(),
+                variable.into_into_dart().into_dart(),
+                _enum.into_into_dart().into_dart(),
+                children.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::TraitDecl {
+                _pub,
+                declarations,
+            } => [
+                15.into_dart(),
+                _pub.into_into_dart().into_dart(),
+                declarations.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::api::ast::rust::RustAst::Unknown => {
+                [16.into_dart()].into_dart()
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::ast::rust::RustAst
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::ast::rust::RustAst>
+    for crate::api::ast::rust::RustAst
+{
+    fn into_into_dart(self) -> crate::api::ast::rust::RustAst {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::lexers::rust::RustToken {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -1250,6 +1886,26 @@ impl SseEncode for String {
     }
 }
 
+impl SseEncode for bool {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        serializer.cursor.write_u8(self as _).unwrap();
+    }
+}
+
+impl SseEncode for Box<crate::api::ast::rust::RustAst> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <crate::api::ast::rust::RustAst>::sse_encode(*self, serializer);
+    }
+}
+
 impl SseEncode for crate::api::lexers::GraceError {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
@@ -1396,6 +2052,19 @@ impl SseEncode for crate::api::lexers::LexingError {
     }
 }
 
+impl SseEncode for Vec<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <String>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::api::lexers::GraceError> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
@@ -1435,6 +2104,71 @@ impl SseEncode for Vec<u8> {
     }
 }
 
+impl SseEncode for Vec<(String, Vec<(String, String)>)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(String, Vec<(String, String)>)>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<(String, Vec<String>)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(String, Vec<String>)>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<(String, Option<String>)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(String, Option<String>)>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(String, String)>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::ast::rust::RustAst> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::ast::rust::RustAst>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::api::lexers::rust::RustToken> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
@@ -1461,6 +2195,89 @@ impl SseEncode for Vec<crate::api::lexers::sql::SQLToken> {
     }
 }
 
+impl SseEncode for Option<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <String>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<Vec<String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <Vec<String>>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<Vec<(String, Option<String>)>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <Vec<(String, Option<String>)>>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for (String, Vec<(String, String)>) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <String>::sse_encode(self.0, serializer);
+        <Vec<(String, String)>>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for (String, Vec<String>) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <String>::sse_encode(self.0, serializer);
+        <Vec<String>>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for (String, Option<String>) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <String>::sse_encode(self.0, serializer);
+        <Option<String>>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for (String, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <String>::sse_encode(self.0, serializer);
+        <String>::sse_encode(self.1, serializer);
+    }
+}
+
 impl SseEncode for (String, String, String) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
@@ -1481,6 +2298,200 @@ impl SseEncode for (usize, usize) {
     ) {
         <usize>::sse_encode(self.0, serializer);
         <usize>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for crate::api::ast::rust::RustAst {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        match self {
+            crate::api::ast::rust::RustAst::Import { main, _final } => {
+                <i32>::sse_encode(0, serializer);
+                <Vec<String>>::sse_encode(main, serializer);
+                <Vec<String>>::sse_encode(_final, serializer);
+            }
+            crate::api::ast::rust::RustAst::VariableDecl {
+                _static,
+                _const,
+                _pub,
+                name,
+                _type,
+                value,
+            } => {
+                <i32>::sse_encode(1, serializer);
+                <bool>::sse_encode(_static, serializer);
+                <bool>::sse_encode(_const, serializer);
+                <bool>::sse_encode(_pub, serializer);
+                <String>::sse_encode(name, serializer);
+                <Option<String>>::sse_encode(_type, serializer);
+                <Vec<crate::api::ast::rust::RustAst>>::sse_encode(
+                    value, serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::FunctionDecl {
+                _pub,
+                name,
+                params,
+                _return,
+            } => {
+                <i32>::sse_encode(2, serializer);
+                <bool>::sse_encode(_pub, serializer);
+                <String>::sse_encode(name, serializer);
+                <Vec<(String, Option<String>)>>::sse_encode(params, serializer);
+                <String>::sse_encode(_return, serializer);
+            }
+            crate::api::ast::rust::RustAst::FunctionImpl {
+                _pub,
+                name,
+                params,
+                _return,
+                children,
+            } => {
+                <i32>::sse_encode(3, serializer);
+                <bool>::sse_encode(_pub, serializer);
+                <String>::sse_encode(name, serializer);
+                <Vec<(String, Option<String>)>>::sse_encode(params, serializer);
+                <String>::sse_encode(_return, serializer);
+                <Vec<crate::api::ast::rust::RustAst>>::sse_encode(
+                    children, serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::FunctionCall { name, params } => {
+                <i32>::sse_encode(4, serializer);
+                <String>::sse_encode(name, serializer);
+                <Vec<String>>::sse_encode(params, serializer);
+            }
+            crate::api::ast::rust::RustAst::StructDecl { name, chidlren } => {
+                <i32>::sse_encode(5, serializer);
+                <String>::sse_encode(name, serializer);
+                <Vec<(String, String)>>::sse_encode(chidlren, serializer);
+            }
+            crate::api::ast::rust::RustAst::RawStruct { name, chidlren } => {
+                <i32>::sse_encode(6, serializer);
+                <String>::sse_encode(name, serializer);
+                <Vec<(String, Option<String>)>>::sse_encode(
+                    chidlren, serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::EnumDecl {
+                enum_value,
+                tuple_tagged,
+                struct_tagged,
+            } => {
+                <i32>::sse_encode(7, serializer);
+                <Vec<String>>::sse_encode(enum_value, serializer);
+                <Vec<(String, Vec<String>)>>::sse_encode(
+                    tuple_tagged,
+                    serializer,
+                );
+                <Vec<(String, Vec<(String, String)>)>>::sse_encode(
+                    struct_tagged,
+                    serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::RawEnum {
+                name,
+                tuple_tagged,
+                struct_tagged,
+            } => {
+                <i32>::sse_encode(8, serializer);
+                <String>::sse_encode(name, serializer);
+                <Option<Vec<String>>>::sse_encode(tuple_tagged, serializer);
+                <Option<Vec<(String, Option<String>)>>>::sse_encode(
+                    struct_tagged,
+                    serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::ZeImpl { name, _for, children } => {
+                <i32>::sse_encode(9, serializer);
+                <String>::sse_encode(name, serializer);
+                <Option<String>>::sse_encode(_for, serializer);
+                <Vec<crate::api::ast::rust::RustAst>>::sse_encode(
+                    children, serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::IfConditional {
+                condition,
+                children,
+                _else,
+            } => {
+                <i32>::sse_encode(10, serializer);
+                <Vec<String>>::sse_encode(condition, serializer);
+                <Vec<crate::api::ast::rust::RustAst>>::sse_encode(
+                    children, serializer,
+                );
+                <Box<crate::api::ast::rust::RustAst>>::sse_encode(
+                    _else, serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::IfLet {
+                variant,
+                variable,
+                _enum,
+                children,
+                _else,
+            } => {
+                <i32>::sse_encode(11, serializer);
+                <String>::sse_encode(variant, serializer);
+                <String>::sse_encode(variable, serializer);
+                <String>::sse_encode(_enum, serializer);
+                <Vec<crate::api::ast::rust::RustAst>>::sse_encode(
+                    children, serializer,
+                );
+                <Box<crate::api::ast::rust::RustAst>>::sse_encode(
+                    _else, serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::ForLoop { variables, source } => {
+                <i32>::sse_encode(12, serializer);
+                <Vec<String>>::sse_encode(variables, serializer);
+                <Vec<String>>::sse_encode(source, serializer);
+            }
+            crate::api::ast::rust::RustAst::WhileLoop {
+                condition,
+                children,
+            } => {
+                <i32>::sse_encode(13, serializer);
+                <Vec<String>>::sse_encode(condition, serializer);
+                <Vec<crate::api::ast::rust::RustAst>>::sse_encode(
+                    children, serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::WhileLet {
+                variant,
+                variable,
+                _enum,
+                children,
+            } => {
+                <i32>::sse_encode(14, serializer);
+                <String>::sse_encode(variant, serializer);
+                <String>::sse_encode(variable, serializer);
+                <String>::sse_encode(_enum, serializer);
+                <Vec<crate::api::ast::rust::RustAst>>::sse_encode(
+                    children, serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::TraitDecl {
+                _pub,
+                declarations,
+            } => {
+                <i32>::sse_encode(15, serializer);
+                <bool>::sse_encode(_pub, serializer);
+                <Vec<crate::api::ast::rust::RustAst>>::sse_encode(
+                    declarations,
+                    serializer,
+                );
+            }
+            crate::api::ast::rust::RustAst::Unknown => {
+                <i32>::sse_encode(16, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -1645,16 +2656,6 @@ impl SseEncode for usize {
         serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
     ) {
         serializer.cursor.write_u64::<NativeEndian>(self as _).unwrap();
-    }
-}
-
-impl SseEncode for bool {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(
-        self,
-        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
-    ) {
-        serializer.cursor.write_u8(self as _).unwrap();
     }
 }
 

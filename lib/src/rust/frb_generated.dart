@@ -3,6 +3,7 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/ast/rust.dart';
 import 'api/drills/rust.dart';
 import 'api/lexers.dart';
 import 'api/lexers/java.dart';
@@ -74,7 +75,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => 1499809352;
+  int get rustContentHash => 268570211;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -119,6 +120,12 @@ abstract class RustLibApi extends BaseApi {
   Future<LexerExtras> crateApiLexersLexerExtrasDefault();
 
   Future<LexingError> crateApiLexersLexingErrorDefault();
+
+  Future<RustAst> crateApiAstRustRustAstDefault();
+
+  Future<List<RustAst>> crateApiAstRustRustAstNew({
+    required List<RustToken> tokens,
+  });
 
   Future<RustToken> crateApiLexersRustRustTokenDefault();
 
@@ -482,7 +489,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "lexing_error_default", argNames: []);
 
   @override
-  Future<RustToken> crateApiLexersRustRustTokenDefault() {
+  Future<RustAst> crateApiAstRustRustAstDefault() {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -491,6 +498,63 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             generalizedFrbRustBinding,
             serializer,
             funcId: 12,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_rust_ast,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiAstRustRustAstDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAstRustRustAstDefaultConstMeta =>
+      const TaskConstMeta(debugName: "rust_ast_default", argNames: []);
+
+  @override
+  Future<List<RustAst>> crateApiAstRustRustAstNew({
+    required List<RustToken> tokens,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_rust_token(tokens, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 13,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_rust_ast,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiAstRustRustAstNewConstMeta,
+        argValues: [tokens],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAstRustRustAstNewConstMeta =>
+      const TaskConstMeta(debugName: "rust_ast_new", argNames: ["tokens"]);
+
+  @override
+  Future<RustToken> crateApiLexersRustRustTokenDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 14,
             port: port_,
           );
         },
@@ -517,7 +581,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 13,
+            funcId: 15,
             port: port_,
           );
         },
@@ -553,7 +617,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 14,
+            funcId: 16,
             port: port_,
           );
         },
@@ -586,7 +650,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 17,
             port: port_,
           );
         },
@@ -616,7 +680,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 16,
+            funcId: 18,
             port: port_,
           );
         },
@@ -643,7 +707,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 17,
+            funcId: 19,
             port: port_,
           );
         },
@@ -679,7 +743,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 18,
+            funcId: 20,
             port: port_,
           );
         },
@@ -712,7 +776,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 19,
+            funcId: 21,
             port: port_,
           );
         },
@@ -740,6 +804,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
   LexerExtras dco_decode_box_autoadd_lexer_extras(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_lexer_extras(raw);
@@ -749,6 +819,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   (BigInt, BigInt) dco_decode_box_autoadd_record_usize_usize(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_record_usize_usize(raw);
+  }
+
+  @protected
+  RustAst dco_decode_box_rust_ast(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_rust_ast(raw);
   }
 
   @protected
@@ -812,6 +888,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<String> dco_decode_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_String).toList();
+  }
+
+  @protected
   List<GraceError> dco_decode_list_grace_error(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_grace_error).toList();
@@ -830,6 +912,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(String, List<(String, String)>)>
+  dco_decode_list_record_string_list_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_string_list_record_string_string)
+        .toList();
+  }
+
+  @protected
+  List<(String, List<String>)> dco_decode_list_record_string_list_string(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_string_list_string)
+        .toList();
+  }
+
+  @protected
+  List<(String, String?)> dco_decode_list_record_string_opt_string(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_string_opt_string)
+        .toList();
+  }
+
+  @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_string_string).toList();
+  }
+
+  @protected
+  List<RustAst> dco_decode_list_rust_ast(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_rust_ast).toList();
+  }
+
+  @protected
   List<RustToken> dco_decode_list_rust_token(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_rust_token).toList();
@@ -839,6 +962,70 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<SQLToken> dco_decode_list_sql_token(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_sql_token).toList();
+  }
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  List<String>? dco_decode_opt_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_String(raw);
+  }
+
+  @protected
+  List<(String, String?)>? dco_decode_opt_list_record_string_opt_string(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_record_string_opt_string(raw);
+  }
+
+  @protected
+  (String, List<(String, String)>)
+  dco_decode_record_string_list_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_String(arr[0]),
+      dco_decode_list_record_string_string(arr[1]),
+    );
+  }
+
+  @protected
+  (String, List<String>) dco_decode_record_string_list_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_String(arr[0]), dco_decode_list_String(arr[1]));
+  }
+
+  @protected
+  (String, String?) dco_decode_record_string_opt_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_String(arr[0]), dco_decode_opt_String(arr[1]));
+  }
+
+  @protected
+  (String, String) dco_decode_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_String(arr[0]), dco_decode_String(arr[1]));
   }
 
   @protected
@@ -863,6 +1050,117 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('Expected 2 elements, got ${arr.length}');
     }
     return (dco_decode_usize(arr[0]), dco_decode_usize(arr[1]));
+  }
+
+  @protected
+  RustAst dco_decode_rust_ast(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return RustAst_Import(
+          main: dco_decode_list_String(raw[1]),
+          final_: dco_decode_list_String(raw[2]),
+        );
+      case 1:
+        return RustAst_VariableDecl(
+          static_: dco_decode_bool(raw[1]),
+          const_: dco_decode_bool(raw[2]),
+          pub: dco_decode_bool(raw[3]),
+          name: dco_decode_String(raw[4]),
+          type: dco_decode_opt_String(raw[5]),
+          value: dco_decode_list_rust_ast(raw[6]),
+        );
+      case 2:
+        return RustAst_FunctionDecl(
+          pub: dco_decode_bool(raw[1]),
+          name: dco_decode_String(raw[2]),
+          params: dco_decode_list_record_string_opt_string(raw[3]),
+          return_: dco_decode_String(raw[4]),
+        );
+      case 3:
+        return RustAst_FunctionImpl(
+          pub: dco_decode_bool(raw[1]),
+          name: dco_decode_String(raw[2]),
+          params: dco_decode_list_record_string_opt_string(raw[3]),
+          return_: dco_decode_String(raw[4]),
+          children: dco_decode_list_rust_ast(raw[5]),
+        );
+      case 4:
+        return RustAst_FunctionCall(
+          name: dco_decode_String(raw[1]),
+          params: dco_decode_list_String(raw[2]),
+        );
+      case 5:
+        return RustAst_StructDecl(
+          name: dco_decode_String(raw[1]),
+          chidlren: dco_decode_list_record_string_string(raw[2]),
+        );
+      case 6:
+        return RustAst_RawStruct(
+          name: dco_decode_String(raw[1]),
+          chidlren: dco_decode_list_record_string_opt_string(raw[2]),
+        );
+      case 7:
+        return RustAst_EnumDecl(
+          enumValue: dco_decode_list_String(raw[1]),
+          tupleTagged: dco_decode_list_record_string_list_string(raw[2]),
+          structTagged: dco_decode_list_record_string_list_record_string_string(
+            raw[3],
+          ),
+        );
+      case 8:
+        return RustAst_RawEnum(
+          name: dco_decode_String(raw[1]),
+          tupleTagged: dco_decode_opt_list_String(raw[2]),
+          structTagged: dco_decode_opt_list_record_string_opt_string(raw[3]),
+        );
+      case 9:
+        return RustAst_ZeImpl(
+          name: dco_decode_String(raw[1]),
+          for_: dco_decode_opt_String(raw[2]),
+          children: dco_decode_list_rust_ast(raw[3]),
+        );
+      case 10:
+        return RustAst_IfConditional(
+          condition: dco_decode_list_String(raw[1]),
+          children: dco_decode_list_rust_ast(raw[2]),
+          else_: dco_decode_box_rust_ast(raw[3]),
+        );
+      case 11:
+        return RustAst_IfLet(
+          variant: dco_decode_String(raw[1]),
+          variable: dco_decode_String(raw[2]),
+          enum_: dco_decode_String(raw[3]),
+          children: dco_decode_list_rust_ast(raw[4]),
+          else_: dco_decode_box_rust_ast(raw[5]),
+        );
+      case 12:
+        return RustAst_ForLoop(
+          variables: dco_decode_list_String(raw[1]),
+          source: dco_decode_list_String(raw[2]),
+        );
+      case 13:
+        return RustAst_WhileLoop(
+          condition: dco_decode_list_String(raw[1]),
+          children: dco_decode_list_rust_ast(raw[2]),
+        );
+      case 14:
+        return RustAst_WhileLet(
+          variant: dco_decode_String(raw[1]),
+          variable: dco_decode_String(raw[2]),
+          enum_: dco_decode_String(raw[3]),
+          children: dco_decode_list_rust_ast(raw[4]),
+        );
+      case 15:
+        return RustAst_TraitDecl(
+          pub: dco_decode_bool(raw[1]),
+          declarations: dco_decode_list_rust_ast(raw[2]),
+        );
+      case 16:
+        return RustAst_Unknown();
+      default:
+        throw Exception("unreachable");
+    }
   }
 
   @protected
@@ -933,6 +1231,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
   LexerExtras sse_decode_box_autoadd_lexer_extras(
     SseDeserializer deserializer,
   ) {
@@ -946,6 +1250,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_record_usize_usize(deserializer));
+  }
+
+  @protected
+  RustAst sse_decode_box_rust_ast(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_rust_ast(deserializer));
   }
 
   @protected
@@ -1011,6 +1321,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <String>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_String(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<GraceError> sse_decode_list_grace_error(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -1042,6 +1364,77 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(String, List<(String, String)>)>
+  sse_decode_list_record_string_list_record_string_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(String, List<(String, String)>)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(
+        sse_decode_record_string_list_record_string_string(deserializer),
+      );
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(String, List<String>)> sse_decode_list_record_string_list_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(String, List<String>)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_string_list_string(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(String, String?)> sse_decode_list_record_string_opt_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(String, String?)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_string_opt_string(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(String, String)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_string_string(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<RustAst> sse_decode_list_rust_ast(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <RustAst>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_rust_ast(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<RustToken> sse_decode_list_rust_token(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -1066,6 +1459,82 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  List<(String, String?)>? sse_decode_opt_list_record_string_opt_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_record_string_opt_string(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  (String, List<(String, String)>)
+  sse_decode_record_string_list_record_string_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_list_record_string_string(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (String, List<String>) sse_decode_record_string_list_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_list_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (String, String?) sse_decode_record_string_opt_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_opt_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (String, String) sse_decode_record_string_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
   (String, String, String) sse_decode_record_string_string_string(
     SseDeserializer deserializer,
   ) {
@@ -1082,6 +1551,158 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_field0 = sse_decode_usize(deserializer);
     var var_field1 = sse_decode_usize(deserializer);
     return (var_field0, var_field1);
+  }
+
+  @protected
+  RustAst sse_decode_rust_ast(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_main = sse_decode_list_String(deserializer);
+        var var_final_ = sse_decode_list_String(deserializer);
+        return RustAst_Import(main: var_main, final_: var_final_);
+      case 1:
+        var var_static_ = sse_decode_bool(deserializer);
+        var var_const_ = sse_decode_bool(deserializer);
+        var var_pub = sse_decode_bool(deserializer);
+        var var_name = sse_decode_String(deserializer);
+        var var_type = sse_decode_opt_String(deserializer);
+        var var_value = sse_decode_list_rust_ast(deserializer);
+        return RustAst_VariableDecl(
+          static_: var_static_,
+          const_: var_const_,
+          pub: var_pub,
+          name: var_name,
+          type: var_type,
+          value: var_value,
+        );
+      case 2:
+        var var_pub = sse_decode_bool(deserializer);
+        var var_name = sse_decode_String(deserializer);
+        var var_params = sse_decode_list_record_string_opt_string(deserializer);
+        var var_return_ = sse_decode_String(deserializer);
+        return RustAst_FunctionDecl(
+          pub: var_pub,
+          name: var_name,
+          params: var_params,
+          return_: var_return_,
+        );
+      case 3:
+        var var_pub = sse_decode_bool(deserializer);
+        var var_name = sse_decode_String(deserializer);
+        var var_params = sse_decode_list_record_string_opt_string(deserializer);
+        var var_return_ = sse_decode_String(deserializer);
+        var var_children = sse_decode_list_rust_ast(deserializer);
+        return RustAst_FunctionImpl(
+          pub: var_pub,
+          name: var_name,
+          params: var_params,
+          return_: var_return_,
+          children: var_children,
+        );
+      case 4:
+        var var_name = sse_decode_String(deserializer);
+        var var_params = sse_decode_list_String(deserializer);
+        return RustAst_FunctionCall(name: var_name, params: var_params);
+      case 5:
+        var var_name = sse_decode_String(deserializer);
+        var var_chidlren = sse_decode_list_record_string_string(deserializer);
+        return RustAst_StructDecl(name: var_name, chidlren: var_chidlren);
+      case 6:
+        var var_name = sse_decode_String(deserializer);
+        var var_chidlren = sse_decode_list_record_string_opt_string(
+          deserializer,
+        );
+        return RustAst_RawStruct(name: var_name, chidlren: var_chidlren);
+      case 7:
+        var var_enumValue = sse_decode_list_String(deserializer);
+        var var_tupleTagged = sse_decode_list_record_string_list_string(
+          deserializer,
+        );
+        var var_structTagged =
+            sse_decode_list_record_string_list_record_string_string(
+              deserializer,
+            );
+        return RustAst_EnumDecl(
+          enumValue: var_enumValue,
+          tupleTagged: var_tupleTagged,
+          structTagged: var_structTagged,
+        );
+      case 8:
+        var var_name = sse_decode_String(deserializer);
+        var var_tupleTagged = sse_decode_opt_list_String(deserializer);
+        var var_structTagged = sse_decode_opt_list_record_string_opt_string(
+          deserializer,
+        );
+        return RustAst_RawEnum(
+          name: var_name,
+          tupleTagged: var_tupleTagged,
+          structTagged: var_structTagged,
+        );
+      case 9:
+        var var_name = sse_decode_String(deserializer);
+        var var_for_ = sse_decode_opt_String(deserializer);
+        var var_children = sse_decode_list_rust_ast(deserializer);
+        return RustAst_ZeImpl(
+          name: var_name,
+          for_: var_for_,
+          children: var_children,
+        );
+      case 10:
+        var var_condition = sse_decode_list_String(deserializer);
+        var var_children = sse_decode_list_rust_ast(deserializer);
+        var var_else_ = sse_decode_box_rust_ast(deserializer);
+        return RustAst_IfConditional(
+          condition: var_condition,
+          children: var_children,
+          else_: var_else_,
+        );
+      case 11:
+        var var_variant = sse_decode_String(deserializer);
+        var var_variable = sse_decode_String(deserializer);
+        var var_enum_ = sse_decode_String(deserializer);
+        var var_children = sse_decode_list_rust_ast(deserializer);
+        var var_else_ = sse_decode_box_rust_ast(deserializer);
+        return RustAst_IfLet(
+          variant: var_variant,
+          variable: var_variable,
+          enum_: var_enum_,
+          children: var_children,
+          else_: var_else_,
+        );
+      case 12:
+        var var_variables = sse_decode_list_String(deserializer);
+        var var_source = sse_decode_list_String(deserializer);
+        return RustAst_ForLoop(variables: var_variables, source: var_source);
+      case 13:
+        var var_condition = sse_decode_list_String(deserializer);
+        var var_children = sse_decode_list_rust_ast(deserializer);
+        return RustAst_WhileLoop(
+          condition: var_condition,
+          children: var_children,
+        );
+      case 14:
+        var var_variant = sse_decode_String(deserializer);
+        var var_variable = sse_decode_String(deserializer);
+        var var_enum_ = sse_decode_String(deserializer);
+        var var_children = sse_decode_list_rust_ast(deserializer);
+        return RustAst_WhileLet(
+          variant: var_variant,
+          variable: var_variable,
+          enum_: var_enum_,
+          children: var_children,
+        );
+      case 15:
+        var var_pub = sse_decode_bool(deserializer);
+        var var_declarations = sse_decode_list_rust_ast(deserializer);
+        return RustAst_TraitDecl(pub: var_pub, declarations: var_declarations);
+      case 16:
+        return RustAst_Unknown();
+      default:
+        throw UnimplementedError('');
+    }
   }
 
   @protected
@@ -1150,15 +1771,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
-  }
-
-  @protected
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
   }
 
   @protected
@@ -1177,6 +1798,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_record_usize_usize(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_rust_ast(RustAst self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_rust_ast(self, serializer);
   }
 
   @protected
@@ -1228,6 +1855,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_String(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_grace_error(
     List<GraceError> self,
     SseSerializer serializer,
@@ -1262,6 +1898,63 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_record_string_list_record_string_string(
+    List<(String, List<(String, String)>)> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_string_list_record_string_string(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_string_list_string(
+    List<(String, List<String>)> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_string_list_string(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_string_opt_string(
+    List<(String, String?)> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_string_opt_string(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_string_string(
+    List<(String, String)> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_string_string(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_rust_ast(List<RustAst> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_rust_ast(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_rust_token(
     List<RustToken> self,
     SseSerializer serializer,
@@ -1286,6 +1979,82 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_list_String(
+    List<String>? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_list_record_string_opt_string(
+    List<(String, String?)>? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_record_string_opt_string(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_record_string_list_record_string_string(
+    (String, List<(String, String)>) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_list_record_string_string(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_string_list_string(
+    (String, List<String>) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_list_String(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_string_opt_string(
+    (String, String?) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_opt_String(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_string_string(
+    (String, String) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
+  }
+
+  @protected
   void sse_encode_record_string_string_string(
     (String, String, String) self,
     SseSerializer serializer,
@@ -1304,6 +2073,148 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(self.$1, serializer);
     sse_encode_usize(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_rust_ast(RustAst self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case RustAst_Import(main: final main, final_: final final_):
+        sse_encode_i_32(0, serializer);
+        sse_encode_list_String(main, serializer);
+        sse_encode_list_String(final_, serializer);
+      case RustAst_VariableDecl(
+        static_: final static_,
+        const_: final const_,
+        pub: final pub,
+        name: final name,
+        type: final type,
+        value: final value,
+      ):
+        sse_encode_i_32(1, serializer);
+        sse_encode_bool(static_, serializer);
+        sse_encode_bool(const_, serializer);
+        sse_encode_bool(pub, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_opt_String(type, serializer);
+        sse_encode_list_rust_ast(value, serializer);
+      case RustAst_FunctionDecl(
+        pub: final pub,
+        name: final name,
+        params: final params,
+        return_: final return_,
+      ):
+        sse_encode_i_32(2, serializer);
+        sse_encode_bool(pub, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_list_record_string_opt_string(params, serializer);
+        sse_encode_String(return_, serializer);
+      case RustAst_FunctionImpl(
+        pub: final pub,
+        name: final name,
+        params: final params,
+        return_: final return_,
+        children: final children,
+      ):
+        sse_encode_i_32(3, serializer);
+        sse_encode_bool(pub, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_list_record_string_opt_string(params, serializer);
+        sse_encode_String(return_, serializer);
+        sse_encode_list_rust_ast(children, serializer);
+      case RustAst_FunctionCall(name: final name, params: final params):
+        sse_encode_i_32(4, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_list_String(params, serializer);
+      case RustAst_StructDecl(name: final name, chidlren: final chidlren):
+        sse_encode_i_32(5, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_list_record_string_string(chidlren, serializer);
+      case RustAst_RawStruct(name: final name, chidlren: final chidlren):
+        sse_encode_i_32(6, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_list_record_string_opt_string(chidlren, serializer);
+      case RustAst_EnumDecl(
+        enumValue: final enumValue,
+        tupleTagged: final tupleTagged,
+        structTagged: final structTagged,
+      ):
+        sse_encode_i_32(7, serializer);
+        sse_encode_list_String(enumValue, serializer);
+        sse_encode_list_record_string_list_string(tupleTagged, serializer);
+        sse_encode_list_record_string_list_record_string_string(
+          structTagged,
+          serializer,
+        );
+      case RustAst_RawEnum(
+        name: final name,
+        tupleTagged: final tupleTagged,
+        structTagged: final structTagged,
+      ):
+        sse_encode_i_32(8, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_opt_list_String(tupleTagged, serializer);
+        sse_encode_opt_list_record_string_opt_string(structTagged, serializer);
+      case RustAst_ZeImpl(
+        name: final name,
+        for_: final for_,
+        children: final children,
+      ):
+        sse_encode_i_32(9, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_opt_String(for_, serializer);
+        sse_encode_list_rust_ast(children, serializer);
+      case RustAst_IfConditional(
+        condition: final condition,
+        children: final children,
+        else_: final else_,
+      ):
+        sse_encode_i_32(10, serializer);
+        sse_encode_list_String(condition, serializer);
+        sse_encode_list_rust_ast(children, serializer);
+        sse_encode_box_rust_ast(else_, serializer);
+      case RustAst_IfLet(
+        variant: final variant,
+        variable: final variable,
+        enum_: final enum_,
+        children: final children,
+        else_: final else_,
+      ):
+        sse_encode_i_32(11, serializer);
+        sse_encode_String(variant, serializer);
+        sse_encode_String(variable, serializer);
+        sse_encode_String(enum_, serializer);
+        sse_encode_list_rust_ast(children, serializer);
+        sse_encode_box_rust_ast(else_, serializer);
+      case RustAst_ForLoop(variables: final variables, source: final source):
+        sse_encode_i_32(12, serializer);
+        sse_encode_list_String(variables, serializer);
+        sse_encode_list_String(source, serializer);
+      case RustAst_WhileLoop(
+        condition: final condition,
+        children: final children,
+      ):
+        sse_encode_i_32(13, serializer);
+        sse_encode_list_String(condition, serializer);
+        sse_encode_list_rust_ast(children, serializer);
+      case RustAst_WhileLet(
+        variant: final variant,
+        variable: final variable,
+        enum_: final enum_,
+        children: final children,
+      ):
+        sse_encode_i_32(14, serializer);
+        sse_encode_String(variant, serializer);
+        sse_encode_String(variable, serializer);
+        sse_encode_String(enum_, serializer);
+        sse_encode_list_rust_ast(children, serializer);
+      case RustAst_TraitDecl(pub: final pub, declarations: final declarations):
+        sse_encode_i_32(15, serializer);
+        sse_encode_bool(pub, serializer);
+        sse_encode_list_rust_ast(declarations, serializer);
+      case RustAst_Unknown():
+        sse_encode_i_32(16, serializer);
+    }
   }
 
   @protected
@@ -1356,11 +2267,5 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_usize(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putBigUint64(self);
-  }
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
   }
 }

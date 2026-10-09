@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 SCRIPT_PATH=$(realpath `dirname "$0"`)
 SCRIPT="$SCRIPT_PATH"/$(basename "$0")
@@ -32,17 +32,17 @@ case "${1:-}" in
             chmod +x "${SCRIPT_PATH}/built/appimagetool-x86_64.AppImage"
         fi
 
-        if [ -d "${SCRIPT_PATH}/built/exam_checker.AppDir" ]; then
-            rm -rf "${SCRIPT_PATH}/built/exam_checker.AppDir"
+        if [ -d "${SCRIPT_PATH}/built/grace.AppDir" ]; then
+            rm -rf "${SCRIPT_PATH}/built/grace.AppDir"
         fi
 
         cp -r "${SCRIPT_PATH}/build/linux/x64/release/bundle" "${SCRIPT_PATH}/built/exam_checker.AppDir"
         cp "${SCRIPT_PATH}/assets/AppRun" "${SCRIPT_PATH}/built/exam_checker.AppDir"
-        cp "${SCRIPT_PATH}/assets/Exam Checker.desktop" "${SCRIPT_PATH}/built/exam_checker.AppDir"
-        cp "${SCRIPT_PATH}/assets/icons/icon.png" "${SCRIPT_PATH}/built/exam_checker.AppDir"
+        cp "${SCRIPT_PATH}/assets/Grace.desktop" "${SCRIPT_PATH}/built/grace.AppDir"
+        cp "${SCRIPT_PATH}/assets/icons/icon.png" "${SCRIPT_PATH}/built/grace.AppDir"
         "${SCRIPT_PATH}/built/appimagetool-x86_64.AppImage" \
-            "${SCRIPT_PATH}/built/exam_checker.AppDir" \
-            "${SCRIPT_PATH}/built/Exam_Checker.AppImage"
+            "${SCRIPT_PATH}/built/grace.AppDir" \
+            "${SCRIPT_PATH}/built/Grace.AppImage"
         ;;
     "apk")
         "${SCRIPT}" icon
@@ -63,6 +63,9 @@ case "${1:-}" in
         flutter run --verbose
         ;;
     "clean")
+        pushd "${SCRIPT_PATH}"/rust
+        cargo clean
+        popd
         flutter clean
         ;;
     "deldb")

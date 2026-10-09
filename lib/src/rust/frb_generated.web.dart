@@ -6,6 +6,7 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/ast/rust.dart';
 import 'api/drills/rust.dart';
 import 'api/lexers.dart';
 import 'api/lexers/java.dart';
@@ -32,10 +33,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  bool dco_decode_bool(dynamic raw);
+
+  @protected
   LexerExtras dco_decode_box_autoadd_lexer_extras(dynamic raw);
 
   @protected
   (BigInt, BigInt) dco_decode_box_autoadd_record_usize_usize(dynamic raw);
+
+  @protected
+  RustAst dco_decode_box_rust_ast(dynamic raw);
 
   @protected
   GraceError dco_decode_grace_error(dynamic raw);
@@ -56,6 +63,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LexingError dco_decode_lexing_error(dynamic raw);
 
   @protected
+  List<String> dco_decode_list_String(dynamic raw);
+
+  @protected
   List<GraceError> dco_decode_list_grace_error(dynamic raw);
 
   @protected
@@ -65,16 +75,61 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<(String, List<(String, String)>)>
+  dco_decode_list_record_string_list_record_string_string(dynamic raw);
+
+  @protected
+  List<(String, List<String>)> dco_decode_list_record_string_list_string(
+    dynamic raw,
+  );
+
+  @protected
+  List<(String, String?)> dco_decode_list_record_string_opt_string(dynamic raw);
+
+  @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
+
+  @protected
+  List<RustAst> dco_decode_list_rust_ast(dynamic raw);
+
+  @protected
   List<RustToken> dco_decode_list_rust_token(dynamic raw);
 
   @protected
   List<SQLToken> dco_decode_list_sql_token(dynamic raw);
 
   @protected
+  String? dco_decode_opt_String(dynamic raw);
+
+  @protected
+  List<String>? dco_decode_opt_list_String(dynamic raw);
+
+  @protected
+  List<(String, String?)>? dco_decode_opt_list_record_string_opt_string(
+    dynamic raw,
+  );
+
+  @protected
+  (String, List<(String, String)>)
+  dco_decode_record_string_list_record_string_string(dynamic raw);
+
+  @protected
+  (String, List<String>) dco_decode_record_string_list_string(dynamic raw);
+
+  @protected
+  (String, String?) dco_decode_record_string_opt_string(dynamic raw);
+
+  @protected
+  (String, String) dco_decode_record_string_string(dynamic raw);
+
+  @protected
   (String, String, String) dco_decode_record_string_string_string(dynamic raw);
 
   @protected
   (BigInt, BigInt) dco_decode_record_usize_usize(dynamic raw);
+
+  @protected
+  RustAst dco_decode_rust_ast(dynamic raw);
 
   @protected
   RustToken dco_decode_rust_token(dynamic raw);
@@ -101,12 +156,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
   LexerExtras sse_decode_box_autoadd_lexer_extras(SseDeserializer deserializer);
 
   @protected
   (BigInt, BigInt) sse_decode_box_autoadd_record_usize_usize(
     SseDeserializer deserializer,
   );
+
+  @protected
+  RustAst sse_decode_box_rust_ast(SseDeserializer deserializer);
 
   @protected
   GraceError sse_decode_grace_error(SseDeserializer deserializer);
@@ -127,6 +188,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LexingError sse_decode_lexing_error(SseDeserializer deserializer);
 
   @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer);
+
+  @protected
   List<GraceError> sse_decode_list_grace_error(SseDeserializer deserializer);
 
   @protected
@@ -136,10 +200,66 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<(String, List<(String, String)>)>
+  sse_decode_list_record_string_list_record_string_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<(String, List<String>)> sse_decode_list_record_string_list_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<(String, String?)> sse_decode_list_record_string_opt_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<RustAst> sse_decode_list_rust_ast(SseDeserializer deserializer);
+
+  @protected
   List<RustToken> sse_decode_list_rust_token(SseDeserializer deserializer);
 
   @protected
   List<SQLToken> sse_decode_list_sql_token(SseDeserializer deserializer);
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer);
+
+  @protected
+  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
+
+  @protected
+  List<(String, String?)>? sse_decode_opt_list_record_string_opt_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  (String, List<(String, String)>)
+  sse_decode_record_string_list_record_string_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  (String, List<String>) sse_decode_record_string_list_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  (String, String?) sse_decode_record_string_opt_string(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  (String, String) sse_decode_record_string_string(
+    SseDeserializer deserializer,
+  );
 
   @protected
   (String, String, String) sse_decode_record_string_string_string(
@@ -148,6 +268,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (BigInt, BigInt) sse_decode_record_usize_usize(SseDeserializer deserializer);
+
+  @protected
+  RustAst sse_decode_rust_ast(SseDeserializer deserializer);
 
   @protected
   RustToken sse_decode_rust_token(SseDeserializer deserializer);
@@ -171,10 +294,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt sse_decode_usize(SseDeserializer deserializer);
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
+  void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
-  void sse_encode_String(String self, SseSerializer serializer);
+  void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_lexer_extras(
@@ -187,6 +310,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     (BigInt, BigInt) self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_box_rust_ast(RustAst self, SseSerializer serializer);
 
   @protected
   void sse_encode_grace_error(GraceError self, SseSerializer serializer);
@@ -207,6 +333,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_lexing_error(LexingError self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_grace_error(
     List<GraceError> self,
     SseSerializer serializer,
@@ -225,6 +354,33 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_record_string_list_record_string_string(
+    List<(String, List<(String, String)>)> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_record_string_list_string(
+    List<(String, List<String>)> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_record_string_opt_string(
+    List<(String, String?)> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_record_string_string(
+    List<(String, String)> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_rust_ast(List<RustAst> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_rust_token(
     List<RustToken> self,
     SseSerializer serializer,
@@ -232,6 +388,42 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_sql_token(List<SQLToken> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_list_record_string_opt_string(
+    List<(String, String?)>? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_record_string_list_record_string_string(
+    (String, List<(String, String)>) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_record_string_list_string(
+    (String, List<String>) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_record_string_opt_string(
+    (String, String?) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_record_string_string(
+    (String, String) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_record_string_string_string(
@@ -244,6 +436,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     (BigInt, BigInt) self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_rust_ast(RustAst self, SseSerializer serializer);
 
   @protected
   void sse_encode_rust_token(RustToken self, SseSerializer serializer);
@@ -265,9 +460,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
 }
 
 // Section: wire_class

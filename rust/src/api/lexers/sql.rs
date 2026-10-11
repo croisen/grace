@@ -1,8 +1,8 @@
-use anyhow::Result;
 use logos::Logos;
 
-use crate::api::lexers::{GraceError, LexerExtras, LexingError};
-use crate::utils::lexer::{Token, extras_newline, tokenize};
+use crate::api::lexers::{
+    GraceError, LexerExtras, LexingError, Token, tokenize,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = LexingError, extras = LexerExtras)]
@@ -58,7 +58,7 @@ pub enum SQLTokenKind {
     Integer,
     #[regex(r#""([^"\\]|\\.)""#)]
     String,
-    #[regex(r"\n|\r\n", extras_newline)]
+    #[regex(r"\n|\r\n")]
     Newline,
     #[regex(r"[ \t]+", logos::skip)]
     Whitespace,
@@ -74,24 +74,28 @@ pub struct SQLToken {
 }
 
 impl<'a> SQLToken {
-    pub fn tokenize(source: &'a str) -> Result<Vec<Self>, Vec<GraceError>> {
-        tokenize::<SQLToken, SQLTokenKind>(source)
+    pub fn tokenize(source: &'a str) -> (Vec<Self>, Vec<GraceError>) {
+        tokenize(source)
     }
 }
 
-impl Token<SQLTokenKind> for SQLToken {
-    fn nt(
-        kind: SQLTokenKind,
-        source: &str,
+impl<'a> Token<'a> for SQLToken {
+    #[flutter_rust_bridge::frb(ignore)]
+    type TK = SQLTokenKind;
+
+    #[flutter_rust_bridge::frb(ignore)]
+    fn new_token(
+        kind: Self::TK,
+        source: &'a str,
         span: (usize, usize),
-        extras: LexerExtras,
+        line_col: (usize, usize),
     ) -> Self {
         Self {
             kind,
-            text: source[span.0..span.1].to_string(),
+            text: source[span.0..span.1].into(),
             span,
-            line: extras.line,
-            col: extras.col,
+            line: line_col.0,
+            col: line_col.1,
         }
     }
 }

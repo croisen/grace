@@ -1,32 +1,42 @@
-use crate::api::lexers::rust::RustToken;
+use crate::api::ast::AstOperation;
+use crate::api::lexers::GraceError;
+use crate::api::lexers::rust::{RustToken, RustTokenKind};
+use crate::utils::macros::any;
+use crate::utils::prev_iter::PrevIter;
+
+mod imports;
+mod variables;
 
 #[derive(Default, Debug, Clone, PartialEq)]
+// More like IR but sure
 pub enum RustAst {
     Import {
+        pub_: bool,
         main: Vec<String>,   // std::path:: ...
-        _final: Vec<String>, // ... ::{Path, PathBuf, ...} or ... ::Path
+        final_: Vec<String>, // ... ::{Path, PathBuf, ...} or ... ::Path
     },
 
     VariableDecl {
-        _static: bool,
-        _const: bool,
-        _pub: bool,
+        static_: bool,
+        const_: bool,
+        pub_: bool,
         name: String,
-        _type: Option<String>,
-        value: Vec<RustAst>,
+        type_: Option<String>,
+        value: Box<RustAst>,
     },
 
     FunctionDecl {
-        _pub: bool,
+        pub_: bool,
+        mut_: bool,
         name: String,
         params: Vec<(String, Option<String>)>, // name, optional type (because self)
-        _return: String,
+        return_: String,
     },
     FunctionImpl {
-        _pub: bool,
+        pub_: bool,
         name: String,
         params: Vec<(String, Option<String>)>, // name, optional type (because self)
-        _return: String,
+        return_: String,
         children: Vec<RustAst>,
     },
     FunctionCall {
@@ -45,33 +55,32 @@ pub enum RustAst {
     },
 
     EnumDecl {
-        enum_value: Vec<String>, // just named values
-        tuple_tagged: Vec<(String, Vec<String>)>, // sum types Some(type, ...)
-        struct_tagged: Vec<(String, Vec<(String, String)>)>, // like RustAst
+        enumvalue_: Vec<String>, // just named values
+        tupletagged_: Vec<(String, Vec<String>)>, // sum types Some(type, ...)
+        structtagged_: Vec<(String, Vec<(String, String)>)>, // like RustAst
     },
     RawEnum {
         name: String,
-        tuple_tagged: Option<Vec<String>>,
-        struct_tagged: Option<Vec<(String, Option<String>)>>,
+        children: Vec<String>,
     },
 
     ZeImpl {
         name: String,           // impl RustAst
-        _for: Option<String>,   // impl Default for RustAst
+        for_: Option<String>,   // impl Default for RustAst
         children: Vec<RustAst>, // function declarations
     },
 
     IfConditional {
         condition: Vec<String>,
         children: Vec<RustAst>,
-        _else: Box<RustAst>,
+        else_: Box<RustAst>,
     },
     IfLet {
         variant: String,
         variable: String,
-        _enum: String,
+        enum_: String,
         children: Vec<RustAst>,
-        _else: Box<RustAst>,
+        else_: Box<RustAst>,
     },
 
     ForLoop {
@@ -85,13 +94,20 @@ pub enum RustAst {
     WhileLet {
         variant: String,
         variable: String,
-        _enum: String,
+        enum_: String,
         children: Vec<RustAst>,
     },
 
     TraitDecl {
-        _pub: bool,
+        pub_: bool,
         declarations: Vec<RustAst>,
+    },
+
+    ActualAST {
+        operation: AstOperation,
+        text: String,
+        left: Box<RustAst>,
+        right: Box<RustAst>,
     },
 
     #[default]
@@ -99,7 +115,45 @@ pub enum RustAst {
 }
 
 impl RustAst {
-    pub fn new(tokens: Vec<RustToken>) -> Vec<Self> {
-        vec![]
+    pub fn new(
+        tokens: Vec<RustToken>,
+        mut errors: Vec<GraceError>,
+    ) -> (Vec<Self>, Vec<GraceError>) {
+        let mut ast = vec![];
+        let mut iter: PrevIter<'_, RustToken> = tokens.into();
+        let (mut pub_, mut static_, mut const_) = (false, false, false);
+        while let Some(token) = iter.next() {
+            let mut skip_ = false;
+            match token.kind {
+                RustTokenKind::Pub => {
+                    pub_ = true;
+                    skip_ = true;
+                }
+                RustTokenKind::Static => {
+                    static_ = true;
+                    skip_ = true;
+                }
+                RustTokenKind::Const => {
+                    const_ = true;
+                    skip_ = true;
+                }
+                RustTokenKind::Use => {
+                    ast.push(imports::imports(&mut iter, pub_, &mut errors))
+                }
+                RustTokenKind::Whitespace => {
+                    skip_ = any!(pub_, static_, const_);
+                }
+                RustTokenKind::Let => {}
+                _ => {}
+            }
+
+            if !skip_ {
+                pub_ = false;
+                static_ = false;
+                const_ = false;
+            }
+        }
+
+        (ast, errors)
     }
 }

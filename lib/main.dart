@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:grace/src/rust/api/simple.dart';
-import 'package:grace/src/rust/frb_generated.dart';
+import 'package:grace/rust/api/simple.dart';
+import 'package:grace/rust/frb_generated.dart';
 
 import 'package:flutter_highlight/themes/gruvbox-dark.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';

@@ -1,4 +1,5 @@
 rust_input: crate::api
 rust_root: rust/
-dart_output: lib/src/rust
+dart_output: lib/rust
 enable_lifetime: true
+stop_on_error: true

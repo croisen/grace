@@ -96,7 +96,9 @@ case "${1:-}" in
             | xargs -I{} sh -c "echo {}:; cat {}; echo -ne '\x0c'"
         ;;
     "wc")
-        find lib -iname "*.dart" -and -not -name "licenses.g.dart" | xargs wc -l
+        find ${SCRIPT_PATH}/lib ${SCRIPT_PATH}/rust/src \
+            -iname "*.dart" -or -name "*.rs" | \
+            xargs wc -l
         ;;
     "licenses")
         dart run dart_pubspec_licenses:generate -o "${SCRIPT_PATH}"/lib/utils/licenses.g.dart
@@ -113,6 +115,7 @@ case "${1:-}" in
         flutter_rust_bridge_codegen generate
         ;;
     "run-rust")
+        flutter_rust_bridge_codegen generate
         pushd "${SCRIPT_PATH}"/rust
         cargo run --release
         popd
@@ -127,7 +130,7 @@ case "${1:-}" in
         echo "deldb    - deletes the db at a known place on linux"
         echo "rename   - renames the app bundle id"
         echo "cat      - echoes out the contents of all dart files under lib to stdout"
-        echo "wc       - gets the line count of all dart files except licenses.g.dart"
+        echo "wc       - gets the line count of all dart and rust files"
         echo "licenses - generates the licenses of the dependencies used"
         echo "sign     - signs the apk if the apks exist and release.jks exists"
         echo "generate - generates code for rust <-> flutter bridge"

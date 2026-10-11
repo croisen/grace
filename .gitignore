@@ -1,4 +1,6 @@
 /.dart_tool/
-/rust/target/
-/build/
 /.flutter-plugins-dependencies
+/build/
+/lib/rust/
+/rust/target/
+/rust/src/frb_generated.rs

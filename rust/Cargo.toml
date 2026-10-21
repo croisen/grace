@@ -1,6 +1,6 @@
 [package]
 name = "rust-lib-grace"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2024"
 
 [lib]
@@ -15,3 +15,18 @@ rand = { version = "0.10.3", default-features = false, features = ["chacha", "se
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
+
+[profile.release]
+opt-level     = "z"
+strip         = "symbols"
+lto           = "fat"
+incremental   = true
+codegen-units = 1
+panic         = "abort"
+
+[profile.dev]
+opt-level     = "z"
+strip         = "none"
+lto           = "off"
+incremental   = false
+codegen-units = 16

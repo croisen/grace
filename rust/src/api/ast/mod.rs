@@ -1,10 +1,14 @@
+use crate::api::GraceError;
+use crate::api::lexers::LexingError;
+
 pub mod java;
 pub mod rust;
 pub mod sql;
 
 // For precedence
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum AstOperation {
+    Literal,      // Ident
     FunctionCall, // a(), { }, [1, ...], {struct}.member
     UnaryOp,      // negate (!), ref (&), deref (*), ++, --
     MulOp,        // *, /, %

@@ -120,6 +120,18 @@ case "${1:-}" in
         cargo run --release
         popd
         ;;
+    "run-rustr")
+        flutter_rust_bridge_codegen generate
+        pushd "${SCRIPT_PATH}"/rust
+        cargo run --release -Z build-std
+        popd
+        ;;
+    "run-rustd")
+        flutter_rust_bridge_codegen generate
+        pushd "${SCRIPT_PATH}"/rust
+        RUST_BACKTRACE=1 cargo run -Z build-std 
+        popd
+        ;;
     *)
         echo "Usage: $0 {linux,apk,run,clean,icon,deldb,rename,cat}"
         echo "linux    - build linux executable on release mode"

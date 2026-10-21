@@ -1,5 +1,3 @@
-#![feature(allocator_api, ptr_cast_slice, sized_type_properties)]
-
 mod api;
 mod utils;
 
@@ -8,25 +6,28 @@ use crate::api::lexers::rust::RustToken;
 
 fn main() {
     let source = r#"
-        pub use std::path::{Path, PathBuf};
+        pub(super) use std::fmt::{Formatter, Display, Result};
+        pub use std::sync::{atomic::AtomicPtr, Arc, mpsc::channel, mpmc::something::{yada_yada::Woo}};
+        pub(self) use crate::api::ast::rust::RustAst;
+        pub(crate) use crate::api::lexers::rust::RustToken;
 
-        use crate::api::lexers::{GraceError, LexingError};
-        use crate::utils::prev_iter::{PrevIter, PrevIterator}
-
-        pub fn square(i: i32) -> i32 {
-            i * i
-        }
-
-        }{
+        let mut x: Vec<(i32, i32)> = i * &*i;
+        const i = 0xFFFF; // error
     "#;
 
     let (tokens, errors) = RustToken::tokenize(source);
     for token in &tokens {
-        println!("\t{token:?}");
+        println!("{token:?}");
     }
+
+    println!();
     let (ast, errors) = RustAst::new(tokens, errors);
-    // println!("{ast:#?}");
+    for ast in &ast {
+        println!("{ast:#?}");
+    }
+
+    println!();
     for error in errors {
-        println!("{error}");
+        println!("{error:?}");
     }
 }

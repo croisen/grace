@@ -1,107 +1,155 @@
-use logos::Logos;
+use logos::{Logos, skip};
 
 use crate::api::lexers::{
-    GraceError, LexerExtras, LexingError, Token, tokenize,
+    GraceError, LexerExtras, LexingError, Token, reserved_keyword, tokenize,
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = LexingError, extras = LexerExtras)]
 pub enum RustTokenKind {
-    #[token("=")]
-    Equals,
-    #[token("+")]
-    Plus,
-    #[token("-")]
-    Minus,
-    #[token("*")]
-    Asterisk,
-    #[token("/")]
-    FSlash,
-    #[token("\\")]
-    BSlash,
-    #[token("(")]
-    OParen,
-    #[token(")")]
-    CParen,
-    #[token("{")]
-    OCurly,
-    #[token("}")]
-    CCurly,
-    #[token("[")]
-    OBrace,
-    #[token("]")]
-    CBrace,
-    #[token(":")]
-    Colon,
-    #[token("::")]
-    DColon,
-    #[token(";")]
-    Semicolon,
-    #[token(",")]
-    Comma,
-    #[token("?")]
-    Question,
-
-    #[token("use")]
-    Use,
-    #[token("fn")]
-    Fn,
-    #[token("let")]
-    Let,
-    #[token("mut")]
-    Mut,
-    #[token("->")]
-    Return,
-    #[token("static")]
-    Static,
-    #[token("const")]
-    Const,
-    #[token("pub")]
-    Pub,
-    #[token("trait")]
-    Trait,
-    #[token("impl")]
-    Impl,
-    #[token("in")]
-    In,
-
-    #[token("for")]
-    For,
-    #[token("loop")]
-    Loop,
-    #[token("while")]
-    While,
-    #[token("if")]
-    If,
-    #[token("else")]
-    Else,
-
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*!")]
     Macro,
+
+    #[token("'static")]
+    StaticLifetime,
     #[regex(r"'[a-zA-Z_][a-zA-Z0-9_]*")]
     Lifetime,
 
-    #[token(">")]
-    CompGT,
+    #[token("as")]
+    #[token("async")]
+    #[token("await")]
+    #[token("break")]
+    #[token("const")]
+    #[token("continue")]
+    #[token("crate")]
+    #[token("dyn")]
+    #[token("else")]
+    #[token("enum")]
+    #[token("extern")]
+    #[token("false")]
+    #[token("fn")]
+    #[token("for")]
+    #[token("if")]
+    #[token("impl")]
+    #[token("in")]
+    #[token("let")]
+    #[token("loop")]
+    #[token("match")]
+    #[token("mod")]
+    #[token("move")]
+    #[token("mut")]
+    #[token("pub")]
+    #[token("ref")]
+    #[token("return")]
+    #[token("self")]
+    #[token("Self")]
+    #[token("static")]
+    #[token("struct")]
+    #[token("super")]
+    #[token("trait")]
+    #[token("true")]
+    #[token("type")]
+    #[token("unsafe")]
+    #[token("use")]
+    #[token("where")]
+    #[token("while")]
+    #[token("macro_rules")]
+    #[token("safe")]
+    #[token("union")]
+    StrictKeyword,
+
+    #[token("abstract", reserved_keyword)]
+    #[token("become", reserved_keyword)]
+    #[token("box", reserved_keyword)]
+    #[token("do", reserved_keyword)]
+    #[token("final", reserved_keyword)]
+    #[token("gen", reserved_keyword)]
+    #[token("macro", reserved_keyword)]
+    #[token("override", reserved_keyword)]
+    #[token("priv", reserved_keyword)]
+    #[token("try", reserved_keyword)]
+    #[token("typeof", reserved_keyword)]
+    #[token("unsized", reserved_keyword)]
+    #[token("virtual", reserved_keyword)]
+    #[token("yield", reserved_keyword)]
+    ReservedKeyword,
+
+    #[token("::")]
+    #[token(".")]
+    MemberAccess,
+
+    #[token("!")]
+    #[token("++")]
+    #[token("--")]
+    #[token("?)")]
+    UnaryOp,
+
+    #[token("&")]
+    #[token("*")]
+    UBinaryOp,
+
+    #[token("+")]
+    #[token("-")]
+    #[token("<<")]
+    #[token(">>")]
     #[token("<")]
-    CompLT,
-    #[token(">=")]
-    CompGE,
     #[token("<=")]
-    CompLE,
+    #[token(">=")]
+    #[token(">")]
     #[token("==")]
-    CompEQ,
+    #[token("!=")]
+    #[token("|")]
+    #[token("^")]
+    #[token("&&")]
+    #[token("||")]
+    #[token("+=")]
+    #[token("-=")]
+    #[token("*=")]
+    #[token("/=")]
+    #[token("%=")]
+    #[token("<<=")]
+    #[token("=>>")]
+    #[regex("=")]
+    BinaryOp,
+
+    #[token("(")]
+    #[token(")")]
+    #[token("{")]
+    #[token("}")]
+    #[token("[")]
+    #[token("]")]
+    Pairs,
+
+    #[token(";")]
+    #[token(",")]
+    Delimiters,
+
+    #[token(":")]
+    Colon,
 
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*")]
     #[default]
     Identifier,
-    #[regex("-?[0-9]{1,3}(_[0-9]{3})*")]
+
+    #[regex("[+-]?[0-9][_0-9]*")]
+    #[regex("[+-]?0[bB]_*[01][_01]*")]
+    #[regex("[+-]?0[oO]_*[0-7][_0-7]*")]
+    #[regex("[+-]?0[xX]_*[0-9a-fA-F][_0-9a-fA-F]*")]
     Integer,
+
+    #[regex(r#"[+-]?(([0-9][_0-9]*\.([0-9][_0-9]*)?([eE][+-]?([0-9][_0-9]*))?[fFdD]?)|(\.([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))?[fFdD]?)|(([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))[fFdD]?)|(([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))?[fFdD]))"#)]
+    Float,
+
     #[regex(r#""([^"\\]|\\.)""#)]
     String,
+
+    #[regex(r"//[^\n]*", allow_greedy = true)]
+    #[regex(r"/\*(?:[^*]\*[^/])*\*/")]
+    Comment,
+
     #[regex(r"\n|\r\n")]
     Newline,
-    #[regex(r"[ \t]+")]
+    #[regex(r"[ \t]+", skip)]
     Whitespace,
 }
 
@@ -138,5 +186,17 @@ impl<'a> Token<'a> for RustToken {
             line: line_col.0,
             col: line_col.1,
         }
+    }
+
+    fn text(&self) -> &str {
+        &self.text
+    }
+
+    fn line(&self) -> usize {
+        self.line
+    }
+
+    fn col(&self) -> usize {
+        self.col
     }
 }

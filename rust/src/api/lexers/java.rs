@@ -160,4 +160,16 @@ impl<'a> Token<'a> for JavaToken {
             col: line_col.1,
         }
     }
+
+    fn text(&self) -> &str {
+        &self.text
+    }
+
+    fn line(&self) -> usize {
+        self.line
+    }
+
+    fn col(&self) -> usize {
+        self.col
+    }
 }

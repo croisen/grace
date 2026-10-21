@@ -1,19 +1,20 @@
+use std::cmp::Ordering;
+
 use crate::api::GraceError;
 use crate::api::ast::rust::unexpected_eof;
-use crate::api::lexers::LexingError;
 use crate::api::lexers::rust::{RustToken, RustTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[flutter_rust_bridge::frb(ignore)]
 pub struct SimplePath(pub Vec<SimplePathSegment>);
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[flutter_rust_bridge::frb(ignore)]
 pub enum SimplePathSegment {
     Identifier(String),
-    Super,
     Self1,
+    Super,
     Crate,
     DCrate,
 }
@@ -103,6 +104,70 @@ impl SimplePathSegment {
         } else {
             unexpected_eof(iter, errors);
             None
+        }
+    }
+}
+
+impl PartialOrd for SimplePathSegment {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (SimplePathSegment::Self1, SimplePathSegment::Super)
+            | (SimplePathSegment::Self1, SimplePathSegment::Crate)
+            | (SimplePathSegment::Super, SimplePathSegment::Crate)
+            | (SimplePathSegment::Self1, SimplePathSegment::Identifier(_))
+            | (SimplePathSegment::Super, SimplePathSegment::Identifier(_))
+            | (SimplePathSegment::Crate, SimplePathSegment::Identifier(_)) => {
+                Some(Ordering::Less)
+            }
+            (SimplePathSegment::Super, SimplePathSegment::Self1)
+            | (SimplePathSegment::Crate, SimplePathSegment::Self1)
+            | (SimplePathSegment::Crate, SimplePathSegment::Super)
+            | (SimplePathSegment::Identifier(_), SimplePathSegment::Self1)
+            | (SimplePathSegment::Identifier(_), SimplePathSegment::Super)
+            | (SimplePathSegment::Identifier(_), SimplePathSegment::Crate) => {
+                Some(Ordering::Greater)
+            }
+            (
+                SimplePathSegment::Identifier(a),
+                SimplePathSegment::Identifier(_),
+            ) if a == "std" => Some(Ordering::Less),
+            (
+                SimplePathSegment::Identifier(_),
+                SimplePathSegment::Identifier(a),
+            ) if a == "std" => Some(Ordering::Greater),
+            _ => Some(Ordering::Equal),
+        }
+    }
+}
+
+impl Ord for SimplePathSegment {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (SimplePathSegment::Self1, SimplePathSegment::Super)
+            | (SimplePathSegment::Self1, SimplePathSegment::Crate)
+            | (SimplePathSegment::Super, SimplePathSegment::Crate)
+            | (SimplePathSegment::Self1, SimplePathSegment::Identifier(_))
+            | (SimplePathSegment::Super, SimplePathSegment::Identifier(_))
+            | (SimplePathSegment::Crate, SimplePathSegment::Identifier(_)) => {
+                Ordering::Less
+            }
+            (SimplePathSegment::Super, SimplePathSegment::Self1)
+            | (SimplePathSegment::Crate, SimplePathSegment::Self1)
+            | (SimplePathSegment::Crate, SimplePathSegment::Super)
+            | (SimplePathSegment::Identifier(_), SimplePathSegment::Self1)
+            | (SimplePathSegment::Identifier(_), SimplePathSegment::Super)
+            | (SimplePathSegment::Identifier(_), SimplePathSegment::Crate) => {
+                Ordering::Greater
+            }
+            (
+                SimplePathSegment::Identifier(a),
+                SimplePathSegment::Identifier(_),
+            ) if a == "std" => Ordering::Less,
+            (
+                SimplePathSegment::Identifier(_),
+                SimplePathSegment::Identifier(a),
+            ) if a == "std" => Ordering::Greater,
+            _ => Ordering::Equal,
         }
     }
 }

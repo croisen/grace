@@ -1,20 +1,26 @@
 use crate::api::GraceError;
+use crate::api::ast::rust::statement::LetStatement;
 use crate::api::ast::rust::visitem::VisItem;
-use crate::api::lexers::LexingError;
 use crate::api::lexers::rust::{RustToken, RustTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
+pub mod expression;
 pub mod item;
+pub mod paths;
+pub mod patterns;
 pub mod safety;
-pub mod simplepath;
+pub mod statement;
 pub mod use_declaration;
 pub mod visibility;
 pub mod visitem;
 
 #[derive(Debug, Clone, PartialEq)]
 #[flutter_rust_bridge::frb(ignore)]
+// Statements in the Rust Reference book section 8.1
 pub enum RustAst {
-    VisItem(VisItem),
+    Item(VisItem),
+    Let(LetStatement),
+    Expression,
     // MacroItem(MacroItem),
     Unknown,
 }
@@ -39,8 +45,14 @@ impl RustAst {
                         "expected an item",
                     );
                 }
+                RustTokenKind::StrictKeyword if (token.text == "let") => {}
                 _ => {
-                    ast.push(VisItem::new(&mut iter, &mut errors).into());
+                    ast.append(
+                        &mut VisItem::new(&mut iter, &mut errors)
+                            .into_iter()
+                            .map(|u| u.into())
+                            .collect(),
+                    );
                 }
             }
         }

@@ -16,15 +16,28 @@ impl VisItem {
     pub fn new(
         iter: &mut PrevIter<'_, RustToken>,
         errors: &mut Vec<GraceError>,
-    ) -> Self {
+    ) -> Vec<Self> {
+        let mut v = vec![];
         let visibility = Visibility::new(iter, errors);
+
         let item = Item::new(iter, errors, visibility.is_some());
-        Self { visibility, item }
+        if let Item::UseDecl(item) = item {
+            for item in item.flatten() {
+                v.push(Self {
+                    visibility: visibility.clone(),
+                    item: item.into(),
+                })
+            }
+        } else {
+            v.push(Self { visibility, item: item.into() })
+        }
+
+        v
     }
 }
 
 impl From<VisItem> for RustAst {
     fn from(value: VisItem) -> Self {
-        Self::VisItem(value)
+        Self::Item(value)
     }
 }

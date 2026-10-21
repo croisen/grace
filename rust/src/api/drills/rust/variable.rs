@@ -1,6 +1,6 @@
-
-use super::callsign;
 use rand::RngExt;
+
+use crate::api::drills::rust::callsign;
 
 #[derive(Debug, Clone)]
 pub struct VariableDrill {
@@ -12,10 +12,7 @@ pub struct VariableDrill {
     pub value: String,
 }
 
-pub fn generate_variable(
-    choice: usize,
-    if_mut: usize,
-) -> VariableDrill {
+pub fn generate_variable(choice: usize, if_mut: usize) -> VariableDrill {
     let variable_types = ["String", "i32"];
 
     let var_type = match choice {
@@ -45,10 +42,7 @@ pub fn generate_variable(
     };
 
     VariableDrill {
-        code: format!(
-            "let{} {}: {} = {};",
-            state, name, var_type, var_value
-        ),
+        code: format!("let{} {}: {} = {};", state, name, var_type, var_value),
         conditions: format!(
             "- variable must be named \"{}\"\n\
              - variable \"{}\" must be of type \"{}\"\n\
@@ -62,4 +56,3 @@ pub fn generate_variable(
         value,
     }
 }
-

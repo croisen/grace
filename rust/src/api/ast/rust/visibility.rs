@@ -1,5 +1,5 @@
 use crate::api::GraceError;
-use crate::api::ast::rust::simplepath::SimplePath;
+use crate::api::ast::rust::paths::SimplePath;
 use crate::api::lexers::rust::{RustToken, RustTokenKind};
 use crate::utils::macros::skip_match;
 use crate::utils::prev_iter::PrevIter;

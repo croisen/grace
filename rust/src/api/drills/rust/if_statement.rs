@@ -1,6 +1,6 @@
-
 use rand::RngExt;
-use super::variable::generate_variable;
+
+use crate::api::drills::rust::variable::generate_variable;
 
 #[derive(Debug, Clone)]
 pub struct IfStatementDrill {
@@ -10,8 +10,7 @@ pub struct IfStatementDrill {
 
 pub fn generate_if_statement() -> IfStatementDrill {
     let operators = ["==", "<=", ">=", "<", ">"];
-    let operator_index =
-        rand::rng().random_range(0..operators.len());
+    let operator_index = rand::rng().random_range(0..operators.len());
     let operator = operators[operator_index];
 
     let var_one = generate_variable(1, 0);
@@ -24,11 +23,7 @@ pub fn generate_if_statement() -> IfStatementDrill {
     IfStatementDrill {
         answer: format!(
             "{}\n{}\n\nif {} {} {} {{\n    println!(\"pass\");\n}} else {{\n    println!(\"fail\");\n}}",
-            var_one.code,
-            var_two.code,
-            var_one.name,
-            operator,
-            var_two.name,
+            var_one.code, var_two.code, var_one.name, operator, var_two.name,
         ),
         conditions: format!(
             "{}\n\n{}\n\n\
@@ -44,4 +39,3 @@ pub fn generate_if_statement() -> IfStatementDrill {
         ),
     }
 }
-

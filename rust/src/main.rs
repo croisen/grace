@@ -1,7 +1,6 @@
 mod api;
 mod utils;
 
-use crate::api::ast::rust::RustAst;
 use crate::api::lexers::rust::RustToken;
 
 fn main() {
@@ -18,12 +17,6 @@ fn main() {
     let (tokens, errors) = RustToken::tokenize(source);
     for token in &tokens {
         println!("{token:?}");
-    }
-
-    println!();
-    let (ast, errors) = RustAst::new(tokens, errors);
-    for ast in &ast {
-        println!("{ast:#?}");
     }
 
     println!();

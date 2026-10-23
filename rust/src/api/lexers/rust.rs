@@ -72,6 +72,8 @@ pub enum RustTokenKind {
     #[token("unsized", reserved_keyword)]
     #[token("virtual", reserved_keyword)]
     #[token("yield", reserved_keyword)]
+    #[token("++", reserved_keyword)]
+    #[token("--", reserved_keyword)]
     ReservedKeyword,
 
     #[token("::")]
@@ -79,8 +81,6 @@ pub enum RustTokenKind {
     MemberAccess,
 
     #[token("!")]
-    #[token("++")]
-    #[token("--")]
     #[token("?)")]
     UnaryOp,
 
@@ -90,6 +90,7 @@ pub enum RustTokenKind {
 
     #[token("+")]
     #[token("-")]
+    #[token("/")]
     #[token("<<")]
     #[token(">>")]
     #[token("<")]

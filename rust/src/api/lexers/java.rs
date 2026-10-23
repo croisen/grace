@@ -1,4 +1,4 @@
-use logos::Logos;
+use logos::{Logos, skip};
 
 use crate::api::lexers::{
     GraceError, LexerExtras, LexingError, Token, tokenize,
@@ -7,122 +7,84 @@ use crate::api::lexers::{
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = LexingError, extras = LexerExtras)]
 pub enum JavaTokenKind {
-    #[token("=")]
-    Equals,
+    StrictKeyword,
+
+    ReservedKeyword,
+
+    #[token(".")]
+    MemberAccess,
+
+    #[token("!")]
+    #[token("++")]
+    #[token("--")]
+    #[token("?)")]
+    UnaryOp,
+
     #[token("+")]
-    Plus,
     #[token("-")]
-    Minus,
     #[token("*")]
-    Asterisk,
     #[token("/")]
-    FSlash,
-    #[token("\\")]
-    BSlash,
+    #[token("<<")]
+    #[token(">>")]
+    #[token("<")]
+    #[token("<=")]
+    #[token(">=")]
+    #[token(">")]
+    #[token("==")]
+    #[token("!=")]
+    #[token("&")]
+    #[token("|")]
+    #[token("^")]
+    #[token("&&")]
+    #[token("||")]
+    #[token("+=")]
+    #[token("-=")]
+    #[token("*=")]
+    #[token("/=")]
+    #[token("%=")]
+    #[token("<<=")]
+    #[token("=>>")]
+    #[regex("=")]
+    BinaryOp,
+
     #[token("(")]
-    OParen,
     #[token(")")]
-    CParen,
     #[token("{")]
-    OCurly,
     #[token("}")]
-    CCurly,
     #[token("[")]
-    OBrace,
     #[token("]")]
-    CBrace,
+    Pairs,
+
+    #[token(";")]
+    #[token(",")]
+    Delimiters,
+
     #[token(":")]
     Colon,
-    #[token(";")]
-    Semicolon,
-    #[token(",")]
-    Comma,
-
-    #[token("abstract")]
-    Abstract,
-    #[token("class")]
-    Class,
-    #[token("continue")]
-    Continue,
-    #[token("const")]
-    Const,
-    #[token("extends")]
-    Extends,
-    #[token("final")]
-    Final,
-    #[token("goto")]
-    Goto,
-    #[token("implements")]
-    Implements,
-    #[token("import")]
-    Import,
-    #[token("instanceof")]
-    Instanceof,
-    #[token("interface")]
-    Interface,
-    #[token("module")]
-    Module,
-    #[token("native")]
-    Native,
-    #[token("new")]
-    New,
-    #[token("package")]
-    Package,
-    #[token("private")]
-    Private,
-    #[token("protected")]
-    Protected,
-    #[token("public")]
-    Public,
-    #[token("requires")]
-    Requires,
-    #[token("return")]
-    Return,
-    #[token("static")]
-    Static,
-    #[token("super")]
-    Super,
-    #[token("throw")]
-    Throw,
-    #[token("transient")]
-    Transient,
-    #[token("var")]
-    Var,
-    #[token("volatile")]
-    Volatile,
-
-    #[token("for")]
-    For,
-    #[token("loop")]
-    Loop,
-    #[token("while")]
-    While,
-    #[token("if")]
-    If,
-    #[token("else")]
-    Else,
-
-    #[token(">")]
-    CompGT,
-    #[token("<")]
-    CompLT,
-    #[token(">=")]
-    CompGE,
-    #[token("<=")]
-    CompLE,
-    #[token("==")]
-    CompEQ,
 
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*")]
     #[default]
     Identifier,
-    #[regex("-?[0-9]+")]
+
+    #[regex("[+-]?[0-9][_0-9]*")]
+    #[regex("[+-]?0[bB]_*[01][_01]*")]
+    #[regex("[+-]?0[oO]_*[0-7][_0-7]*")]
+    #[regex("[+-]?0[xX]_*[0-9a-fA-F][_0-9a-fA-F]*")]
     Integer,
+
+    #[regex(r#"[+-]?(([0-9][_0-9]*\.([0-9][_0-9]*)?([eE][+-]?([0-9][_0-9]*))?[fFdD]?)|(\.([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))?[fFdD]?)|(([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))[fFdD]?)|(([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))?[fFdD]))"#)]
+    Float,
+
     #[regex(r#""([^"\\]|\\.)""#)]
     String,
+
+    #[regex(r"//[^\n]*", allow_greedy = true)]
+    #[regex(r"/\*(?:[^*]\*[^/])*\*/")]
+    Comment,
+
     #[regex(r"\n|\r\n")]
     Newline,
-    #[regex(r"[ \t]+", logos::skip)]
+    #[regex(r"[ \t]+", skip)]
     Whitespace,
 }
 

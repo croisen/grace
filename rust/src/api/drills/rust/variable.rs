@@ -56,3 +56,25 @@ pub fn generate_variable(choice: usize, if_mut: usize) -> VariableDrill {
         value,
     }
 }
+
+pub fn generate_distinct_variables(
+    count: usize,
+    choice: usize,
+    if_mut: usize,
+) -> Vec<VariableDrill> {
+    assert!(count <= 26, "only 26 callsigns exist");
+
+    let mut vars: Vec<VariableDrill> = Vec::with_capacity(count);
+
+    while vars.len() < count {
+        let next = generate_variable(choice, if_mut);
+
+        if vars.iter().any(|var| var.name == next.name) {
+            continue;
+        }
+
+        vars.push(next);
+    }
+
+    vars
+}

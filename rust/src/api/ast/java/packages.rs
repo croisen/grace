@@ -4,13 +4,13 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaPackage {
+pub(crate) struct JavaPackage {
     pub name: String,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaImport {
+pub(crate) struct JavaImport {
     pub path: String,
     pub is_static: bool,
 }

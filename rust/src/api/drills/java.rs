@@ -1,9 +1,8 @@
-use crate::api::ast::java::item::JavaItem;
 use crate::api::drills::Comp;
 
 #[derive(Default, Debug, Clone)]
 pub struct JavaDrill {
-    pub conditions: Vec<JavaItem>,
+    pub conditions: Vec<String>,
     pub answer: String,
     pub ident_level: usize,
     pub concepts: usize,

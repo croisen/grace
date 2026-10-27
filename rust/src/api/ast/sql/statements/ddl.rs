@@ -6,7 +6,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct SqlCreate {
+pub(crate) struct SqlCreate {
     pub r#type: SqlCreateType,
     pub name: String,
     pub if_not_exists: bool,
@@ -15,7 +15,7 @@ pub struct SqlCreate {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum SqlCreateType {
+pub(crate) enum SqlCreateType {
     TABLE,
     VIEW,
     DATABASE,
@@ -23,7 +23,7 @@ pub enum SqlCreateType {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum SqlCreateBody {
+pub(crate) enum SqlCreateBody {
     Table(Vec<SqlColumnDefinition>),
     View(SqlSelect),
     Index(String, Vec<String>, bool),
@@ -32,7 +32,7 @@ pub enum SqlCreateBody {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct SqlColumnDefinition {
+pub(crate) struct SqlColumnDefinition {
     pub name: String,
     pub r#type: String,
     pub constraints: Vec<SqlColumnRestraint>,
@@ -40,7 +40,7 @@ pub struct SqlColumnDefinition {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum SqlColumnRestraint {
+pub(crate) enum SqlColumnRestraint {
     PrimaryKey,
     NotNull,
     Nullable,
@@ -52,7 +52,7 @@ pub enum SqlColumnRestraint {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct SqlDrop {
+pub(crate) struct SqlDrop {
     pub r#type: SqlCreateType,
     pub name: String,
     pub if_exists: bool,
@@ -60,14 +60,14 @@ pub struct SqlDrop {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct SqlAlter {
+pub(crate) struct SqlAlter {
     pub name: String,
     pub action: SqlAlterAction,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum SqlAlterAction {
+pub(crate) enum SqlAlterAction {
     AddColumn(String, Option<String>),
     DropColumn(String),
     RenameTo(String),

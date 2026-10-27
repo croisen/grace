@@ -4,15 +4,13 @@ use crate::api::lexers::java::{JavaToken, JavaTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub struct JavaAnnotation {
+pub(crate) struct JavaAnnotation {
     pub name: String,
     pub arguments: Vec<JavaExpression>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub struct JavaAnnotationType {
+pub(crate) struct JavaAnnotationType {
     pub name: String,
     pub modifiers: Vec<String>,
     pub annotations: Vec<JavaAnnotation>,
@@ -20,8 +18,7 @@ pub struct JavaAnnotationType {
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub struct JavaAnnotationElement {
+pub(crate) struct JavaAnnotationElement {
     pub name: String,
     pub r#type: String,
     pub default_value: Option<JavaExpression>,

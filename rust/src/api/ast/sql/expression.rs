@@ -5,7 +5,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum SqlExpression {
+pub(crate) enum SqlExpression {
     Literal(String),
     Identifier(String),
     FunctionCall {

@@ -5,7 +5,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaField {
+pub(crate) struct JavaField {
     pub name: String,
     pub r#type: String,
     pub modifiers: Vec<String>,

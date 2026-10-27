@@ -8,7 +8,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum JavaMember {
+pub(crate) enum JavaMember {
     Method(JavaMethod),
     Field(JavaField),
     Constructor(JavaConstructor),

@@ -4,13 +4,13 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct SqlTransaction {
+pub(crate) struct SqlTransaction {
     pub action: SqlTransactionAction,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum SqlTransactionAction {
+pub(crate) enum SqlTransactionAction {
     Begin,
     Commit,
     Rollback,
@@ -18,7 +18,7 @@ pub enum SqlTransactionAction {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct SetNamesStatement {
+pub(crate) struct SqlSetNames {
     pub character_set: String,
     pub collation: Option<String>,
 }

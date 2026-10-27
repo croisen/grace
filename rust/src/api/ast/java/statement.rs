@@ -6,7 +6,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum JavaStatement {
+pub(crate) enum JavaStatement {
     Expression(JavaExpression),
     Return(Option<JavaExpression>),
     Block(Vec<JavaExpression>),
@@ -53,7 +53,7 @@ pub enum JavaStatement {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaTryStatement {
+pub(crate) struct JavaTryStatement {
     pub block: Vec<JavaStatement>,
     pub catches: Vec<JavaCatchClause>,
     pub finally: Option<Vec<JavaStatement>>,
@@ -61,14 +61,14 @@ pub struct JavaTryStatement {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaCatchClause {
+pub(crate) struct JavaCatchClause {
     pub parameter: JavaParameter,
     pub block: Vec<JavaStatement>,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaSwitchCase {
+pub(crate) struct JavaSwitchCase {
     pub label: String,
     pub body: Vec<JavaStatement>,
 }

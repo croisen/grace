@@ -8,7 +8,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaEnum {
+pub(crate) struct JavaEnum {
     pub name: String,
     pub type_parameters: Vec<JavaTypeParameter>,
     pub modifiers: Vec<String>,
@@ -20,7 +20,7 @@ pub struct JavaEnum {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaEnumConstant {
+pub(crate) struct JavaEnumConstant {
     pub name: String,
     pub annotations: Vec<JavaAnnotation>,
     pub arguments: Vec<JavaExpression>,

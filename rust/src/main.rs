@@ -11,7 +11,8 @@ fn main() {
         pub(crate) use crate::api::lexers::rust::RustToken;
 
         let mut x: Vec<(i32, i32)> = i * &*i;
-        const i = 0xFFFF; // error
+        let mut r#pub = 21; // wow a keyword as an identifier???
+        const i = 0xFFFF;   // error
     "#;
 
     let (tokens, errors) = RustToken::tokenize(source);

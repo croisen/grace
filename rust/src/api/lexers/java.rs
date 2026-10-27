@@ -1,14 +1,59 @@
 use logos::{Logos, skip};
 
-use crate::api::lexers::{
-    GraceError, LexerExtras, LexingError, Token, tokenize,
-};
+use crate::api::lexers::{LexerExtras, LexingError, Token, reserved_keyword};
+
+pub(crate) type JavaToken<'a> = Token<'a, JavaTokenKind>;
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = LexingError, extras = LexerExtras)]
-pub enum JavaTokenKind {
+pub(crate) enum JavaTokenKind {
+    #[token("@")]
+    #[token("abstract")]
+    #[token("assert")]
+    #[token("break")]
+    #[token("case")]
+    #[token("catch")]
+    #[token("class")]
+    #[token("continue")]
+    #[token("default")]
+    #[token("do")]
+    #[token("else")]
+    #[token("enum")]
+    #[token("extends")]
+    #[token("final")]
+    #[token("finally")]
+    #[token("for")]
+    #[token("if")]
+    #[token("implements")]
+    #[token("import")]
+    #[token("instanceof")]
+    #[token("interface")]
+    #[token("native")]
+    #[token("new")]
+    #[token("package")]
+    #[token("permits")]
+    #[token("private")]
+    #[token("protected")]
+    #[token("public")]
+    #[token("record")]
+    #[token("return")]
+    #[token("sealed")]
+    #[token("static")]
+    #[token("strictfp")]
+    #[token("super")]
+    #[token("switch")]
+    #[token("synchronized")]
+    #[token("this")]
+    #[token("throw")]
+    #[token("throws")]
+    #[token("transient")]
+    #[token("try")]
+    #[token("volatile")]
+    #[token("while")]
     StrictKeyword,
 
+    #[token("const", reserved_keyword)]
+    #[token("goto", reserved_keyword)]
     ReservedKeyword,
 
     #[token(".")]
@@ -86,52 +131,4 @@ pub enum JavaTokenKind {
     Newline,
     #[regex(r"[ \t]+", skip)]
     Whitespace,
-}
-
-#[derive(Default, Debug, Clone, PartialEq)]
-pub struct JavaToken {
-    pub kind: JavaTokenKind,
-    pub text: String,
-    pub span: (usize, usize),
-    pub line: usize,
-    pub col: usize,
-}
-
-impl<'a> JavaToken {
-    pub fn tokenize(source: &'a str) -> (Vec<Self>, Vec<GraceError>) {
-        tokenize(source)
-    }
-}
-
-impl<'a> Token<'a> for JavaToken {
-    #[flutter_rust_bridge::frb(ignore)]
-    type TK = JavaTokenKind;
-
-    #[flutter_rust_bridge::frb(ignore)]
-    fn new_token(
-        kind: Self::TK,
-        source: &'a str,
-        span: (usize, usize),
-        line_col: (usize, usize),
-    ) -> Self {
-        Self {
-            kind,
-            text: source[span.0..span.1].into(),
-            span,
-            line: line_col.0,
-            col: line_col.1,
-        }
-    }
-
-    fn text(&self) -> &str {
-        &self.text
-    }
-
-    fn line(&self) -> usize {
-        self.line
-    }
-
-    fn col(&self) -> usize {
-        self.col
-    }
 }

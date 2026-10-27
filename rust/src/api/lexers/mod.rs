@@ -49,95 +49,94 @@ impl From<ParseFloatError> for LexingError {
     }
 }
 
+#[derive(Default, Debug, Clone, PartialEq)]
 #[flutter_rust_bridge::frb(ignore)]
-pub trait Token<'a> {
-    #[flutter_rust_bridge::frb(ignore)]
-    type TK;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn new_token(
-        kind: Self::TK,
-        source: &'a str,
-        span: (usize, usize),
-        line_col: (usize, usize),
-    ) -> Self;
-
-    #[flutter_rust_bridge::frb(ignore)]
-    fn text(&self) -> &str;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn line(&self) -> usize;
-    #[flutter_rust_bridge::frb(ignore)]
-    fn col(&self) -> usize;
-}
-
-#[flutter_rust_bridge::frb(ignore)]
-fn tokenize<'a, T, TK>(source: &'a str) -> (Vec<T>, Vec<GraceError>)
+pub(crate) struct Token<'a, TK>
 where
-    T: Token<'a, TK = TK> + Clone,
     TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
         + Default,
 {
-    let mut lexer = TK::lexer(source);
-    lexer.extras = LexerExtras { line: 1, col: 0 };
-    let mut tokens = vec![];
-    let mut errors = vec![];
-    let mut pairs = vec![];
+    pub kind: TK,
+    pub text: &'a str,
+    pub line: usize,
+    pub col: usize,
+}
 
-    let p = HashMap::from([
-        ("(", ")"),
-        ("[", "]"),
-        ("{", "}"),
-        (")", "("),
-        ("]", "["),
-        ("}", "{"),
-    ]);
+impl<'a, TK> Token<'a, TK>
+where
+    TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
+        + Default
+        + Clone,
+{
+    #[flutter_rust_bridge::frb(ignore)]
+    pub fn new(kind: TK, text: &'a str, extras: LexerExtras) -> Self {
+        Self { kind, text, line: extras.line, col: extras.col }
+    }
 
-    while let Some(t) = lexer.next() {
-        let span = lexer.span();
-        let span = (span.start, span.end);
-        let text = lexer.slice();
+    #[flutter_rust_bridge::frb(ignore)]
+    pub fn tokenize(source: &'a str) -> (Vec<Self>, Vec<GraceError>) {
+        let mut lexer = TK::lexer(source);
+        lexer.extras = LexerExtras { line: 1, col: 0 };
+        let mut tokens = vec![];
+        let mut errors = vec![];
+        let mut pairs = vec![];
 
-        let LexerExtras { line, mut col } = lexer.extras;
-        col = span.0 - col + 1;
-        let line_col = (line, col);
-        match t {
-            Ok(token) => {
-                let t = T::new_token(token, source, span, line_col);
-                if matches!(text, "\n" | "\r\n") {
-                    lexer.extras.line += 1;
-                    lexer.extras.col = span.1;
-                } else {
-                    tokens.push(t.clone());
-                }
+        let p = HashMap::from([
+            ("(", ")"),
+            ("[", "]"),
+            ("{", "}"),
+            (")", "("),
+            ("]", "["),
+            ("}", "{"),
+        ]);
 
-                match text {
-                    "{" | "(" | "[" => pairs.push(t),
-                    "}" | ")" | "]" => {
-                        pairs.pop_if(|t| t.text() == p[text]).or_else(|| {
-                            pairs.push(t);
-                            None
-                        });
+        while let Some(t) = lexer.next() {
+            let span = lexer.span();
+            let span = (span.start, span.end);
+            let text = lexer.slice();
+
+            let mut extras = lexer.extras;
+            extras.col = span.0 - extras.col + 1;
+            match t {
+                Ok(kind) => {
+                    if matches!(text, "\n" | "\r\n") {
+                        lexer.extras.line += 1;
+                        lexer.extras.col = span.1;
+                        continue;
                     }
-                    _ => {}
-                };
+
+                    let t = Self::new(kind, text, extras);
+                    tokens.push(t.clone());
+                    match text {
+                        "{" | "(" | "[" => pairs.push(t),
+                        "}" | ")" | "]" => {
+                            pairs.pop_if(|t| t.text == p[text]).or_else(|| {
+                                pairs.push(t);
+                                None
+                            });
+                        }
+                        _ => {}
+                    };
+                }
+                Err(kind) => GraceError::new(
+                    &mut errors,
+                    kind,
+                    &Self::new(TK::default(), text, extras),
+                ),
             }
-            Err(kind) => GraceError::new(
-                &mut errors,
-                kind,
-                &T::new_token(TK::default(), source, span, line_col),
-            ),
         }
-    }
 
-    for token in pairs {
-        let text = token.text();
-        GraceError::unmatched_pair(
-            &mut errors,
-            &token,
-            format!("No `{}` found for `{text}`", p[text]),
-        );
-    }
+        for token in pairs {
+            let text = token.text;
+            GraceError::unmatched_pair(
+                &mut errors,
+                &token,
+                format!("No `{}` found for `{text}`", p[text]),
+            );
+        }
 
-    (tokens, errors)
+        (tokens, errors)
+    }
 }
 
 fn reserved_keyword<'a, T>(lex: &mut Lexer<'a, T>) -> Result<(), LexingError>

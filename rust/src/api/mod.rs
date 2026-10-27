@@ -2,7 +2,9 @@ use std::cmp::Ordering;
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result};
 
-use crate::api::lexers::{LexingError, Token};
+use logos::Logos;
+
+use crate::api::lexers::{LexerExtras, LexingError, Token};
 use crate::utils::macros::all;
 
 pub mod ast;
@@ -20,25 +22,31 @@ pub struct GraceError {
 
 impl GraceError {
     #[flutter_rust_bridge::frb(ignore)]
-    pub fn new<'a, T: Token<'a>>(
+    pub fn new<'a, TK>(
         errors: &mut Vec<Self>,
         kind: LexingError,
-        token: &T,
-    ) {
+        token: &Token<'a, TK>,
+    ) where
+        TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
+            + Default,
+    {
         errors.push(Self {
             kind,
-            text: token.text().into(),
-            line: token.line(),
-            col: token.col(),
+            text: token.text.into(),
+            line: token.line,
+            col: token.col,
         })
     }
 
     #[flutter_rust_bridge::frb(ignore)]
-    pub fn unmatched_pair<'a, T: Token<'a>>(
+    pub fn unmatched_pair<'a, TK>(
         errors: &mut Vec<Self>,
-        token: &T,
+        token: &Token<'a, TK>,
         reason: impl AsRef<str>,
-    ) {
+    ) where
+        TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
+            + Default,
+    {
         Self::new(
             errors,
             LexingError::UnmatchedPair(reason.as_ref().into()),
@@ -47,11 +55,14 @@ impl GraceError {
     }
 
     #[flutter_rust_bridge::frb(ignore)]
-    pub fn syntax_error<'a, T: Token<'a>>(
+    pub fn syntax_error<'a, TK>(
         errors: &mut Vec<Self>,
-        token: &T,
+        token: &Token<'a, TK>,
         reason: impl AsRef<str>,
-    ) {
+    ) where
+        TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
+            + Default,
+    {
         Self::new(
             errors,
             LexingError::SyntaxError(reason.as_ref().into()),

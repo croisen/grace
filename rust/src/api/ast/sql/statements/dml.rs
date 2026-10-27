@@ -5,7 +5,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct SqlInsertStatement {
+pub(crate) struct SqlInsert {
     pub table_name: String,
     pub columns: Vec<String>,
     pub values: Vec<SqlExpression>,
@@ -13,7 +13,7 @@ pub struct SqlInsertStatement {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct SqlUpdateStatement {
+pub(crate) struct SqlUpdate {
     pub table_name: String,
     pub assignments: Vec<SqlAssignment>,
     pub selection: Option<SqlExpression>,
@@ -21,14 +21,14 @@ pub struct SqlUpdateStatement {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct SqlAssignment {
+pub(crate) struct SqlAssignment {
     pub column: String,
     pub value: SqlExpression,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct DeleteStatement {
+pub(crate) struct Delete {
     pub table_name: String,
     pub selection: Option<SqlExpression>,
 }

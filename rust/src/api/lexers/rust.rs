@@ -1,12 +1,12 @@
-use logos::{Logos, skip};
+use logos::{Lexer, Logos, skip};
 
-use crate::api::lexers::{
-    GraceError, LexerExtras, LexingError, Token, reserved_keyword, tokenize,
-};
+use crate::api::lexers::{LexerExtras, LexingError, Token, reserved_keyword};
+
+pub(crate) type RustToken<'a> = Token<'a, RustTokenKind>;
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = LexingError, extras = LexerExtras)]
-pub enum RustTokenKind {
+pub(crate) enum RustTokenKind {
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*!")]
     Macro,
 
@@ -128,9 +128,10 @@ pub enum RustTokenKind {
     #[token(":")]
     Colon,
 
-    #[regex("[a-zA-Z_][a-zA-Z0-9_]*")]
-    #[default]
-    Identifier,
+    #[regex("[a-zA-Z_][a-zA-Z0-9_]*", |lex| lex.slice().to_string())]
+    // well let's allow keywords to become identifiers
+    #[regex("r#[a-zA-Z]*", keyword_to_ident)]
+    Identifier(String),
 
     #[regex("[+-]?[0-9][_0-9]*")]
     #[regex("[+-]?0[bB]_*[01][_01]*")]
@@ -152,52 +153,17 @@ pub enum RustTokenKind {
     Newline,
     #[regex(r"[ \t]+", skip)]
     Whitespace,
+
+    #[default]
+    Unknown,
 }
 
-#[derive(Default, Debug, Clone, PartialEq)]
-pub struct RustToken {
-    pub kind: RustTokenKind,
-    pub text: String,
-    pub span: (usize, usize),
-    pub line: usize,
-    pub col: usize,
-}
-
-impl<'a> RustToken {
-    pub fn tokenize(source: &'a str) -> (Vec<Self>, Vec<GraceError>) {
-        tokenize(source)
-    }
-}
-
-impl<'a> Token<'a> for RustToken {
-    #[flutter_rust_bridge::frb(ignore)]
-    type TK = RustTokenKind;
-
-    #[flutter_rust_bridge::frb(ignore)]
-    fn new_token(
-        kind: Self::TK,
-        source: &'a str,
-        span: (usize, usize),
-        line_col: (usize, usize),
-    ) -> Self {
-        Self {
-            kind,
-            text: source[span.0..span.1].into(),
-            span,
-            line: line_col.0,
-            col: line_col.1,
-        }
-    }
-
-    fn text(&self) -> &str {
-        &self.text
-    }
-
-    fn line(&self) -> usize {
-        self.line
-    }
-
-    fn col(&self) -> usize {
-        self.col
-    }
+// extract the text after r#
+fn keyword_to_ident<'a, T>(
+    lex: &mut Lexer<'a, T>,
+) -> Result<String, LexingError>
+where
+    T: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>,
+{
+    Ok(lex.slice()[2..].into())
 }

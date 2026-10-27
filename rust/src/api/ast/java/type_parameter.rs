@@ -4,7 +4,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaTypeParameter {
+pub(crate) struct JavaTypeParameter {
     pub name: String,
     pub constraints: Vec<String>,
 }

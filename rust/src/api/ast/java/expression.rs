@@ -7,7 +7,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum JavaExpression {
+pub(crate) enum JavaExpression {
     Literal(String),
     Identifier(String),
     MethodCall(JavaMethodCall),
@@ -47,7 +47,7 @@ pub enum JavaExpression {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaMethodCall {
+pub(crate) struct JavaMethodCall {
     pub target: Option<Box<JavaExpression>>,
     pub name: String,
     pub arguments: Vec<JavaExpression>,
@@ -55,35 +55,35 @@ pub struct JavaMethodCall {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaFieldAccess {
+pub(crate) struct JavaFieldAccess {
     pub target: Box<JavaExpression>,
     pub field: String,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaArrayAccess {
+pub(crate) struct JavaArrayAccess {
     pub target: Box<JavaExpression>,
     pub index: Box<JavaExpression>,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaArrayCreation {
+pub(crate) struct JavaArrayCreation {
     pub r#type: String,
     pub dim: Vec<JavaExpression>,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaNew {
+pub(crate) struct JavaNew {
     pub r#type: String,
     pub arguments: Vec<JavaExpression>,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaAnonymousClass {
+pub(crate) struct JavaAnonymousClass {
     pub super_type: String,
     pub arguments: Vec<JavaExpression>,
     pub members: Vec<JavaMember>,
@@ -91,14 +91,14 @@ pub struct JavaAnonymousClass {
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaLambda {
+pub(crate) struct JavaLambda {
     pub parameters: Vec<JavaParameter>,
     pub body: JavaLambdaBody,
 }
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub enum JavaLambdaBody {
+pub(crate) enum JavaLambdaBody {
     Expression(Box<JavaExpression>),
     Block(Vec<JavaStatement>),
 }

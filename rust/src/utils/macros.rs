@@ -1,3 +1,4 @@
+#[macro_export]
 macro_rules! all {
     ($($arg:expr),*) => {{
         let mut truthy = false;
@@ -11,6 +12,7 @@ macro_rules! all {
     }};
 }
 
+#[macro_export]
 macro_rules! any {
     ($($arg:expr),*) => {{
         let mut truthy = false;
@@ -24,19 +26,5 @@ macro_rules! any {
         }};
 }
 
-macro_rules! skip_match {
-    ($iter:expr, $pat:pat $(,)?) => {
-        $iter.skip_while(|t| matches!(t.kind, $pat))
-    };
-}
-
-macro_rules! skip_reverse {
-    ($iter:expr, $pat:pat $(,)?) => {
-        $iter.skip_while(|t| !matches!(t.kind, $pat))
-    };
-}
-
 pub(crate) use all;
 pub(crate) use any;
-pub(crate) use skip_match;
-pub(crate) use skip_reverse;

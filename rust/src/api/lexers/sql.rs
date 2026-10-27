@@ -1,113 +1,82 @@
-use logos::Logos;
+use logos::{Logos, skip};
 
-use crate::api::lexers::{
-    GraceError, LexerExtras, LexingError, Token, tokenize,
-};
+use crate::api::lexers::{LexerExtras, LexingError, Token};
+
+pub(crate) type SQLToken<'a> = Token<'a, SQLTokenKind>;
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = LexingError, extras = LexerExtras)]
-pub enum SQLTokenKind {
-    #[token("(")]
-    OParen,
-    #[token(")")]
-    CParen,
-    #[token("`")]
-    Tilde,
-    #[token("=")]
-    Equals,
+pub(crate) enum SQLTokenKind {
+    StrictKeyword,
+
+    ReservedKeyword,
+
     #[token("+")]
-    Plus,
     #[token("-")]
-    Minus,
+    UBinaryOp,
+
     #[token("*")]
-    Asterisk,
     #[token("/")]
-    FSlash,
-    #[token("\\")]
-    BSlash,
+    #[token("<<")]
+    #[token(">>")]
+    #[token("<")]
+    #[token("<=")]
+    #[token(">=")]
+    #[token(">")]
+    #[token("==")]
+    #[token("!=")]
+    #[token("&")]
+    #[token("|")]
+    #[token("^")]
+    #[token("&&")]
+    #[token("||")]
+    #[token("+=")]
+    #[token("-=")]
+    #[token("*=")]
+    #[token("/=")]
+    #[token("%=")]
+    #[token("<<=")]
+    #[token("=>>")]
+    #[regex("=")]
+    BinaryOp,
+
+    #[token("(")]
+    #[token(")")]
     #[token("{")]
-    OCurly,
     #[token("}")]
-    CCurly,
     #[token("[")]
-    OBrace,
     #[token("]")]
-    CBrace,
+    Pairs,
+
+    #[token(";")]
+    #[token(",")]
+    Delimiters,
+
     #[token(":")]
     Colon,
-    #[token(";")]
-    Semicolon,
-    #[token(",")]
-    Comma,
-
-    #[token(">")]
-    CompGT,
-    #[token("<")]
-    CompLT,
-    #[token(">=")]
-    CompGE,
-    #[token("<=")]
-    CompLE,
-    #[token("==")]
-    CompEQ,
 
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*")]
     #[default]
     Identifier,
-    #[regex("-?[0-9]+")]
+
+    #[regex("[+-]?[0-9][_0-9]*")]
+    #[regex("[+-]?0[bB]_*[01][_01]*")]
+    #[regex("[+-]?0[oO]_*[0-7][_0-7]*")]
+    #[regex("[+-]?0[xX]_*[0-9a-fA-F][_0-9a-fA-F]*")]
     Integer,
+
+    #[regex(r#"[+-]?(([0-9][_0-9]*\.([0-9][_0-9]*)?([eE][+-]?([0-9][_0-9]*))?[fFdD]?)|(\.([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))?[fFdD]?)|(([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))[fFdD]?)|(([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))?[fFdD]))"#)]
+    Float,
+
     #[regex(r#""([^"\\]|\\.)""#)]
     String,
+
+    #[regex(r"//[^\n]*", allow_greedy = true)]
+    #[regex(r"/\*(?:[^*]\*[^/])*\*/")]
+    Comment,
+
     #[regex(r"\n|\r\n")]
     Newline,
-    #[regex(r"[ \t]+", logos::skip)]
+    #[regex(r"[ \t]+", skip)]
     Whitespace,
-}
-
-#[derive(Default, Debug, Clone, PartialEq)]
-pub struct SQLToken {
-    pub kind: SQLTokenKind,
-    pub text: String,
-    pub span: (usize, usize),
-    pub line: usize,
-    pub col: usize,
-}
-
-impl<'a> SQLToken {
-    pub fn tokenize(source: &'a str) -> (Vec<Self>, Vec<GraceError>) {
-        tokenize(source)
-    }
-}
-
-impl<'a> Token<'a> for SQLToken {
-    #[flutter_rust_bridge::frb(ignore)]
-    type TK = SQLTokenKind;
-
-    #[flutter_rust_bridge::frb(ignore)]
-    fn new_token(
-        kind: Self::TK,
-        source: &'a str,
-        span: (usize, usize),
-        line_col: (usize, usize),
-    ) -> Self {
-        Self {
-            kind,
-            text: source[span.0..span.1].into(),
-            span,
-            line: line_col.0,
-            col: line_col.1,
-        }
-    }
-
-    fn text(&self) -> &str {
-        &self.text
-    }
-
-    fn line(&self) -> usize {
-        self.line
-    }
-
-    fn col(&self) -> usize {
-        self.col
-    }
 }

@@ -7,7 +7,7 @@ use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore)]
-pub struct JavaConstructor {
+pub(crate) struct JavaConstructor {
     pub modifiers: Vec<String>,
     pub annotations: Vec<JavaAnnotation>,
     pub name: String,

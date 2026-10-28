@@ -35,8 +35,9 @@ pub fn generate_variable(choice: usize, if_mut: usize) -> VariableDrill {
         _ => ("may or may not be mutable.", ""),
     };
 
+    // Fixed: String values now produce valid Rust
     let var_value = if var_type == "String" {
-        format!("{:?}", value)
+        format!("String::from({:?})", value)
     } else {
         value.clone()
     };

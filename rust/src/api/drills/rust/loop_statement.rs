@@ -9,24 +9,21 @@ pub struct LoopStatementDrill {
 }
 
 pub fn generate_loop_statement() -> LoopStatementDrill {
-    let operators = ["==", "<=", ">=", "<", ">"];
-    let operator = operators[rand::rng().random_range(0..operators.len())];
-    let bound = rand::rng().random_range(0..=20);
+    let bound = rand::rng().random_range(3..=8);
+    // Force mutable so we can increment
     let var = generate_variable(1, 1);
 
     LoopStatementDrill {
         answer: format!(
-            "{}\n\nloop {{\n    if {} {} {} {{\n        break;\n    }}\n    println!(\"pass\");\n}}",
-            var.code, var.name, operator, bound,
+            "{}\n\nloop {{\n    if {} >= {} {{\n        break;\n    }}\n    println!(\"pass\");\n    {} += 1;\n}}",
+            var.code, var.name, bound, var.name
         ),
         conditions: format!(
             "{}\n\n\
              - make a loop statement.\n\
-             - inside the loop, compare {} and {}.\n\
-             - use {} as the comparative operator.\n\
-             - if it is true, break out of the loop.\n\
-             - otherwise, print pass.",
-            var.conditions, var.name, bound, operator,
+             - inside the loop, if {} is greater than or equal to {}, break.\n\
+             - otherwise print pass and increment {} by 1.",
+            var.conditions, var.name, bound, var.name
         ),
     }
 }

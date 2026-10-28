@@ -37,9 +37,10 @@ fn function_one_param_return() -> FunctionDrill {
     let name = &names[0];
     let param = &names[1];
 
+    // Idiomatic: expression-style return (no explicit `return`)
     FunctionDrill {
         answer: format!(
-            "fn {name}({param}: i32) -> i32 {{\n    return {param};\n}}"
+            "fn {name}({param}: i32) -> i32 {{\n    {param}\n}}"
         ),
         conditions: format!(
             "- make a function.\n\
@@ -57,9 +58,10 @@ fn function_two_param_return() -> FunctionDrill {
     let left = &names[1];
     let right = &names[2];
 
+    // Idiomatic: expression-style return
     FunctionDrill {
         answer: format!(
-            "fn {name}({left}: i32, {right}: i32) -> i32 {{\n    return {left} + {right};\n}}"
+            "fn {name}({left}: i32, {right}: i32) -> i32 {{\n    {left} + {right}\n}}"
         ),
         conditions: format!(
             "- make a function.\n\

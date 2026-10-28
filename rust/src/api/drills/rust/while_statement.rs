@@ -9,23 +9,21 @@ pub struct WhileStatementDrill {
 }
 
 pub fn generate_while_statement() -> WhileStatementDrill {
-    let operators = ["==", "<=", ">=", "<", ">"];
-    let operator = operators[rand::rng().random_range(0..operators.len())];
-    let bound = rand::rng().random_range(0..=20);
-    let var = generate_variable(1, 0);
+    let bound = rand::rng().random_range(3..=8);
+    // Force mutable so we can increment
+    let var = generate_variable(1, 1);
 
     WhileStatementDrill {
         answer: format!(
-            "{}\n\nwhile {} {} {} {{\n    println!(\"pass\");\n}}",
-            var.code, var.name, operator, bound,
+            "{}\n\nwhile {} < {} {{\n    println!(\"pass\");\n    {} += 1;\n}}",
+            var.code, var.name, bound, var.name
         ),
         conditions: format!(
             "{}\n\n\
              - make a while loop.\n\
-             - make a while loop that compares {} and {}.\n\
-             - use {} as the comparative operator.\n\
-             - make it so that while it is true, it would print pass.",
-            var.conditions, var.name, bound, operator,
+             - the loop should continue while {} is less than {}.\n\
+             - inside the loop, print pass and then increment {} by 1.",
+            var.conditions, var.name, bound, var.name
         ),
     }
 }

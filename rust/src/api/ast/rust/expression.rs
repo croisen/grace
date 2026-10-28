@@ -4,6 +4,7 @@ use crate::api::ast::rust::statement::RustStatement;
 use crate::api::lexers::rust::{RustToken, RustTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
+#[derive(Debug, Clone)]
 pub(crate) enum RustExpression {
     Identifier(String),
     Literal(String),
@@ -51,17 +52,20 @@ pub(crate) enum RustExpression {
     Struct(String, Vec<RustFieldInit>),
 }
 
+#[derive(Debug, Clone)]
 pub(crate) struct RustBlock {
     pub statements: Vec<RustStatement>,
     pub level: usize,
 }
 
+#[derive(Debug, Clone)]
 pub(crate) struct RustMatchArm {
     pub pattern: RustPattern,
     pub guard: Option<RustExpression>,
     pub body: RustExpression,
 }
 
+#[derive(Debug, Clone)]
 pub(crate) struct RustFieldInit {
     pub name: String,
     pub expr: RustExpression,

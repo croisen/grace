@@ -7,6 +7,7 @@ use crate::api::ast::rust::r#type::generics::RustGeneric;
 use crate::api::lexers::rust::{RustToken, RustTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
+#[derive(Debug, Clone)]
 pub(crate) struct RustImpl {
     pub generics: Option<RustGeneric>,
     pub r#trait: Option<RustType>,
@@ -14,6 +15,7 @@ pub(crate) struct RustImpl {
     pub items: Vec<RustImplItem>,
 }
 
+#[derive(Debug, Clone)]
 pub(crate) enum RustImplItem {
     Method(RustFunction),
     Type(RustTypeAlias),

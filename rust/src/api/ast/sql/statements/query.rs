@@ -4,7 +4,6 @@ use crate::api::lexers::sql::{SQLToken, SQLTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlSelect {
     pub items: SqlSelectItems,
     pub from: Option<String>,
@@ -17,14 +16,12 @@ pub(crate) struct SqlSelect {
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) enum SqlSelectItems {
     Asterisk,
     Expr(SqlExpression, Option<SqlExpression>),
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlJoinClause {
     pub join: SqlJoinType,
     pub table: String,
@@ -32,7 +29,6 @@ pub(crate) struct SqlJoinClause {
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) enum SqlJoinType {
     Inner,
     Left,
@@ -41,39 +37,33 @@ pub(crate) enum SqlJoinType {
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlGroupByClause {
     pub columns: Vec<SqlExpression>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlHavingClause {
     pub condition: SqlExpression,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlOrderByClause {
     pub items: Vec<SqlOrderByItem>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlOrderByItem {
     pub expr: SqlExpression,
     pub direction: SqlOrderDirection,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) enum SqlOrderDirection {
     Asc,
     Desc,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlLimitClause {
     pub limit: SqlExpression,
     pub offset: Option<SqlExpression>,

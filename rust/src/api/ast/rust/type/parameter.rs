@@ -5,6 +5,7 @@ use crate::api::ast::rust::r#type::lifetime::RustLifetime;
 use crate::api::lexers::rust::{RustToken, RustTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
+#[derive(Debug, Clone)]
 pub(crate) struct RustParameter {
     pub name: String,
     pub r#type: RustType,

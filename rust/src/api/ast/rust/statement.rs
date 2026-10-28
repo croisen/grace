@@ -5,6 +5,7 @@ use crate::api::ast::rust::r#type::RustType;
 use crate::api::lexers::rust::{RustToken, RustTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
+#[derive(Debug, Clone)]
 pub(crate) enum RustStatement {
     Let(bool, String, Option<RustType>, Option<RustExpression>),
     Expression(RustExpression, bool),

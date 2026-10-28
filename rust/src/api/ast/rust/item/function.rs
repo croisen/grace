@@ -6,6 +6,7 @@ use crate::api::ast::rust::r#type::parameter::RustParameter;
 use crate::api::lexers::rust::{RustToken, RustTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
+#[derive(Debug, Clone)]
 pub(crate) struct RustFunction {
     pub name: String,
     pub generics: Vec<RustGeneric>,

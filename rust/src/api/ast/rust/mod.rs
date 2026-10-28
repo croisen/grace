@@ -12,6 +12,7 @@ pub mod r#type;
 pub mod visibility;
 
 // VisItem in the Rust Reference book section 8.1
+#[derive(Debug, Clone)]
 pub(crate) struct RustAst {
     pub visibility: RustVisibility,
     pub item: RustItem,

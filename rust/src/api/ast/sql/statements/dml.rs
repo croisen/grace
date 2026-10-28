@@ -4,7 +4,6 @@ use crate::api::lexers::sql::{SQLToken, SQLTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlInsert {
     pub table_name: String,
     pub columns: Vec<String>,
@@ -12,7 +11,6 @@ pub(crate) struct SqlInsert {
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlUpdate {
     pub table_name: String,
     pub assignments: Vec<SqlAssignment>,
@@ -20,14 +18,12 @@ pub(crate) struct SqlUpdate {
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct SqlAssignment {
     pub column: String,
     pub value: SqlExpression,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) struct Delete {
     pub table_name: String,
     pub selection: Option<SqlExpression>,

@@ -6,6 +6,7 @@ pub mod lifetime;
 pub mod parameter;
 pub mod type_parameter;
 
+#[derive(Debug, Clone)]
 pub(crate) enum RustType {
     Path(Vec<String>),
     Reference(Option<RustLifetime>, bool, Box<RustType>),

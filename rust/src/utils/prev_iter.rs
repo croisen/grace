@@ -8,6 +8,7 @@ where
     ptr: NonNull<T>,
     index: usize,
     len: usize,
+    owned: bool,
     _phantom: PhantomData<&'a T>,
 }
 
@@ -20,20 +21,20 @@ where
         let ptr = NonNull::from_ref(s).cast::<T>();
         let index = 0usize.wrapping_sub(1);
         let len = s.len();
-        Self { ptr, index, len, _phantom: PhantomData }
+        Self { ptr, index, len, owned: false, _phantom: PhantomData }
     }
 
     #[inline]
     pub fn new_from_box_slice(s: Box<[T]>) -> Self {
         let len = s.len();
-        let ptr = NonNull::from_ref(&*s).cast::<T>();
+        let ptr = NonNull::new(Box::into_raw(s)).unwrap().cast();
         let index = 0usize.wrapping_sub(1);
-        Self { ptr, index, len, _phantom: PhantomData }
+        Self { ptr, index, len, owned: true, _phantom: PhantomData }
     }
 
     #[inline]
     pub fn next(&mut self) -> Option<&T> {
-        self.index += 1;
+        self.index = self.index.wrapping_add(1);
         self.current()
     }
 
@@ -49,12 +50,12 @@ where
     #[inline]
     // now that I've added peek, prev kinda loses it's purpose
     pub fn prev(&mut self) -> Option<&T> {
-        self.index -= 1;
+        self.index = self.index.wrapping_sub(1);
         self.current()
     }
 
     #[inline]
-    pub fn current(&self) -> Option<&T> {
+    pub fn current(&mut self) -> Option<&T> {
         if !(self.index >= self.len) {
             unsafe { Some(self.ptr.add(self.index).as_ref()) }
         } else {
@@ -96,6 +97,14 @@ where
             }
 
             self.index += 1;
+        }
+    }
+}
+
+impl<'a, T> Drop for PrevIter<'a, T> {
+    fn drop(&mut self) {
+        if self.owned {
+            let _ = unsafe { Box::from_non_null(self.ptr) };
         }
     }
 }

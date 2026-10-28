@@ -25,6 +25,7 @@ pub mod r#struct;
 pub mod r#trait;
 pub mod r#use;
 
+#[derive(Debug, Clone)]
 pub(crate) enum RustItem {
     Function(RustFunction),
     Struct(RustStruct),

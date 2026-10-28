@@ -4,7 +4,6 @@ use crate::api::lexers::sql::{SQLToken, SQLTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub(crate) enum SqlExpression {
     Literal(String),
     Identifier(String),

@@ -1,5 +1,5 @@
 use rand::RngExt;
-
+use flutter_rust_bridge::frb;
 use crate::api::drills::rust::distinct_callsigns;
 
 #[derive(Debug, Clone)]
@@ -8,6 +8,7 @@ pub struct FunctionDrill {
     pub conditions: String,
 }
 
+#[frb(sync)]
 pub fn generate_function() -> FunctionDrill {
     match rand::rng().random_range(0..4) {
         0 => function_no_params(),

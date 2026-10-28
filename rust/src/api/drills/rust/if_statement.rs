@@ -1,5 +1,5 @@
 use rand::RngExt;
-
+use flutter_rust_bridge::frb;
 use crate::api::drills::rust::variable::generate_variable;
 
 #[derive(Debug, Clone)]
@@ -8,6 +8,7 @@ pub struct IfStatementDrill {
     pub conditions: String,
 }
 
+#[frb(sync)]
 pub fn generate_if_statement() -> IfStatementDrill {
     let operators = ["==", "<=", ">=", "<", ">"];
     let operator_index = rand::rng().random_range(0..operators.len());

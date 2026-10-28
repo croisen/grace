@@ -1,5 +1,5 @@
 use rand::RngExt;
-
+use flutter_rust_bridge::frb;
 use crate::api::drills::rust::variable::generate_distinct_variables;
 
 #[derive(Debug, Clone)]
@@ -7,7 +7,7 @@ pub struct ElseIfDrill {
     pub answer: String,
     pub conditions: String,
 }
-
+#[frb(sync)]
 pub fn generate_else_if() -> ElseIfDrill {
     let operators = ["==", "<=", ">=", "<", ">"];
     let op_one = operators[rand::rng().random_range(0..operators.len())];

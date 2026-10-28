@@ -1,5 +1,5 @@
 use rand::RngExt;
-
+use flutter_rust_bridge::frb;
 use crate::api::drills::rust::variable::generate_variable;
 
 #[derive(Debug, Clone)]
@@ -7,7 +7,7 @@ pub struct MatchStatementDrill {
     pub answer: String,
     pub conditions: String,
 }
-
+#[frb(sync)]
 pub fn generate_match_statement() -> MatchStatementDrill {
     let mut literals = Vec::new();
 

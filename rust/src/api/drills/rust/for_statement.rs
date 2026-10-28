@@ -1,5 +1,5 @@
 use rand::RngExt;
-
+use flutter_rust_bridge::frb;
 use crate::api::drills::rust::distinct_callsigns;
 
 #[derive(Debug, Clone)]
@@ -7,7 +7,7 @@ pub struct ForStatementDrill {
     pub answer: String,
     pub conditions: String,
 }
-
+#[frb(sync)]
 pub fn generate_for_statement() -> ForStatementDrill {
     let name = distinct_callsigns(1).remove(0);
     let start = rand::rng().random_range(0..=5);

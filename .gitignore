@@ -5,3 +5,5 @@
 /lib/rust/
 /rust/target/
 /rust/src/frb_generated.rs
+*.tar
+*.tar

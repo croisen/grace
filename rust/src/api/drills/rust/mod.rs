@@ -6,7 +6,6 @@ pub mod loop_statement;
 pub mod match_statement;
 pub mod variable;
 pub mod while_statement;
-
 use rand::RngExt;
 
 fn callsign() -> String {

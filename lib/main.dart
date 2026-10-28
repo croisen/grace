@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:grace/rust/api/simple.dart';
 import 'package:grace/rust/frb_generated.dart';
-
-import 'package:flutter_highlight/themes/gruvbox-dark.dart';
-import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:highlight/languages/rust.dart';
-
-final controller = CodeController(language: rust);
+import 'package:grace/screens/drill_screen.dart';
 
 Future<void> main() async {
   await RustLib.init();
@@ -18,17 +12,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Grace')),
-        body: CodeTheme(
-          data: CodeThemeData(styles: gruvboxDarkTheme),
-          child: SingleChildScrollView(
-            child: CodeField(controller: controller),
-          ),
-        ),
-      ),
+      home: DrillScreen(),
     );
   }
 }

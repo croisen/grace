@@ -1,5 +1,5 @@
 use rand::RngExt;
-
+use flutter_rust_bridge::frb;
 use crate::api::drills::rust::variable::generate_variable;
 
 #[derive(Debug, Clone)]
@@ -7,7 +7,7 @@ pub struct WhileStatementDrill {
     pub answer: String,
     pub conditions: String,
 }
-
+#[frb(sync)]
 pub fn generate_while_statement() -> WhileStatementDrill {
     let bound = rand::rng().random_range(3..=8);
     // Force mutable so we can increment

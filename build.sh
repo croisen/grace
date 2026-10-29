@@ -67,6 +67,8 @@ case "${1:-}" in
         cargo clean
         popd
         flutter clean
+        rm "${SCRIPT_PATH}"/rust/src/frb_generated.rs
+        rm -r "${SCRIPT_PATH}"/lib/rust/
         ;;
     "deldb")
         rm -v "$HOME/.local/share/com.croisen.cvsu.exam_checker/exam_checker.db"

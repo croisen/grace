@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use logos::Logos;
 
 use crate::api::GraceError;
@@ -16,7 +18,8 @@ fn unexpected_eof<'a, TK>(
     errors: &mut Vec<GraceError>,
 ) where
     TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
-        + Default,
+        + Default
+        + Debug,
 {
     iter.seek_end();
     if let Some(t) = iter.prev() {

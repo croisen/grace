@@ -1,23 +1,23 @@
+#![allow(dead_code, unused)] // gotta remove these later
 mod api;
 mod utils;
 
 use crate::api::ast::sql::SqlAst;
-use crate::api::lexers::sql::SQLToken;
 
 fn main() {
     let source = r#"
-        create    database test_db;
+        create database test_db;
+        create table if not exists ze_table(
+            id int auto increment not null primary key,
+            age int not null,
+            name text not null
+        );
     "#;
 
-    let (tokens, errors) = SQLToken::tokenize(source);
-    for token in &tokens {
-        println!("{token:?}");
-    }
-
     println!();
-    let (ast, errors) = SqlAst::new(tokens, errors);
+    let (ast, errors) = SqlAst::new(source);
     for ast in &ast {
-        println!("{ast:?}");
+        println!("{ast:#?}");
     }
 
     println!();

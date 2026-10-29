@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 use std::error::Error;
-use std::fmt::{Display, Formatter, Result};
+use std::fmt::{Debug, Display, Formatter, Result};
 
 use logos::Logos;
 
@@ -22,7 +22,7 @@ pub struct GraceError {
 
 impl GraceError {
     #[flutter_rust_bridge::frb(ignore)]
-    pub fn new<'a, TK>(
+    pub fn new<'a, TK: Debug>(
         errors: &mut Vec<Self>,
         kind: LexingError,
         token: &Token<'a, TK>,
@@ -39,7 +39,7 @@ impl GraceError {
     }
 
     #[flutter_rust_bridge::frb(ignore)]
-    pub fn unmatched_pair<'a, TK>(
+    pub fn unmatched_pair<'a, TK: Debug>(
         errors: &mut Vec<Self>,
         token: &Token<'a, TK>,
         reason: impl AsRef<str>,
@@ -55,7 +55,7 @@ impl GraceError {
     }
 
     #[flutter_rust_bridge::frb(ignore)]
-    pub fn syntax_error<'a, TK>(
+    pub fn syntax_error<'a, TK: Debug>(
         errors: &mut Vec<Self>,
         token: &Token<'a, TK>,
         reason: impl AsRef<str>,

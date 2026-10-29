@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::error::Error;
-use std::fmt::{Display, Formatter, Result as FResult};
+use std::fmt::{Debug, Display, Formatter, Result as FResult};
 use std::num::{ParseFloatError, ParseIntError};
 
 use logos::{Lexer, Logos};
@@ -54,7 +54,8 @@ impl From<ParseFloatError> for LexingError {
 pub(crate) struct Token<'a, TK>
 where
     TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
-        + Default,
+        + Default
+        + Debug,
 {
     pub kind: TK,
     pub text: &'a str,
@@ -66,6 +67,7 @@ impl<'a, TK> Token<'a, TK>
 where
     TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
         + Default
+        + Debug
         + Clone,
 {
     #[flutter_rust_bridge::frb(ignore)]

@@ -1,35 +1,35 @@
 use crate::api::GraceError;
-use crate::api::ast::sql::expression::SqlExpression;
+use crate::api::ast::sql::expression::SQLExpression;
 use crate::api::lexers::sql::{SQLToken, SQLTokenKind};
 use crate::utils::prev_iter::PrevIter;
 
 #[derive(Debug, Clone)]
-pub(crate) struct SqlSelect {
-    pub items: SqlSelectItems,
+pub(crate) struct SQLSelect {
+    pub items: SQLSelectItems,
     pub from: Option<String>,
-    pub joins: Vec<SqlJoinClause>,
-    pub r#where: Option<SqlExpression>,
-    pub group_by: Option<SqlGroupByClause>,
-    pub having: Option<SqlHavingClause>,
-    pub order_by: Option<SqlOrderByClause>,
-    pub limit: Option<SqlLimitClause>,
+    pub joins: Vec<SQLJoinClause>,
+    pub r#where: Option<SQLExpression>,
+    pub group_by: Option<SQLGroupByClause>,
+    pub having: Option<SQLHavingClause>,
+    pub order_by: Option<SQLOrderByClause>,
+    pub limit: Option<SQLLimitClause>,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) enum SqlSelectItems {
+pub(crate) enum SQLSelectItems {
     Asterisk,
-    Expr(SqlExpression, Option<SqlExpression>),
+    Expr(SQLExpression, Option<SQLExpression>),
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct SqlJoinClause {
-    pub join: SqlJoinType,
+pub(crate) struct SQLJoinClause {
+    pub join: SQLJoinType,
     pub table: String,
-    pub on: Option<SqlExpression>,
+    pub on: Option<SQLExpression>,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) enum SqlJoinType {
+pub(crate) enum SQLJoinType {
     Inner,
     Left,
     Right,
@@ -37,34 +37,34 @@ pub(crate) enum SqlJoinType {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct SqlGroupByClause {
-    pub columns: Vec<SqlExpression>,
+pub(crate) struct SQLGroupByClause {
+    pub columns: Vec<SQLExpression>,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct SqlHavingClause {
-    pub condition: SqlExpression,
+pub(crate) struct SQLHavingClause {
+    pub condition: SQLExpression,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct SqlOrderByClause {
-    pub items: Vec<SqlOrderByItem>,
+pub(crate) struct SQLOrderByClause {
+    pub items: Vec<SQLOrderByItem>,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct SqlOrderByItem {
-    pub expr: SqlExpression,
-    pub direction: SqlOrderDirection,
+pub(crate) struct SQLOrderByItem {
+    pub expr: SQLExpression,
+    pub direction: SQLOrderDirection,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) enum SqlOrderDirection {
+pub(crate) enum SQLOrderDirection {
     Asc,
     Desc,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct SqlLimitClause {
-    pub limit: SqlExpression,
-    pub offset: Option<SqlExpression>,
+pub(crate) struct SQLLimitClause {
+    pub limit: SQLExpression,
+    pub offset: Option<SQLExpression>,
 }

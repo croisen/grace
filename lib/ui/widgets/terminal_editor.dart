@@ -16,32 +16,49 @@ class TerminalEditor extends StatelessWidget {
   Color get _bg {
     if (!dark) return const Color(0xFFF8F8F2);
     switch (palette) {
-      case 'Gruvbox':     return const Color(0xFF282828);
-      case 'Tokyo Night': return const Color(0xFF1A1B26);
-      case 'Dracula':     return const Color(0xFF282A36);
-      case 'Nord':        return const Color(0xFF2E3440);
-      case 'Catppuccin':  return const Color(0xFF1E1E2E);
-      case 'One Dark':    return const Color(0xFF282C34);
-      case 'Solarized':   return const Color(0xFF002B36);
-      default:            return const Color(0xFF1E1E1E);
+      case 'Gruvbox':
+        return const Color(0xFF282828);
+      case 'Tokyo Night':
+        return const Color(0xFF1A1B26);
+      case 'Dracula':
+        return const Color(0xFF282A36);
+      case 'Nord':
+        return const Color(0xFF2E3440);
+      case 'Catppuccin':
+        return const Color(0xFF1E1E2E);
+      case 'One Dark':
+        return const Color(0xFF282C34);
+      case 'Solarized':
+        return const Color(0xFF002B36);
+      default:
+        return const Color(0xFF1E1E1E);
     }
   }
 
   Color get _fg {
     if (!dark) return const Color(0xFF24292E);
     switch (palette) {
-      case 'Gruvbox':     return const Color(0xFFEBDBB2);
-      case 'Tokyo Night': return const Color(0xFFA9B1D6);
-      case 'Dracula':     return const Color(0xFFF8F8F2);
-      case 'Nord':        return const Color(0xFFD8DEE9);
-      case 'Catppuccin':  return const Color(0xFFCDD6F4);
-      case 'One Dark':    return const Color(0xFFABB2BF);
-      case 'Solarized':   return const Color(0xFF839496);
-      default:            return const Color(0xFFD4D4D4);
+      case 'Gruvbox':
+        return const Color(0xFFEBDBB2);
+      case 'Tokyo Night':
+        return const Color(0xFFA9B1D6);
+      case 'Dracula':
+        return const Color(0xFFF8F8F2);
+      case 'Nord':
+        return const Color(0xFFD8DEE9);
+      case 'Catppuccin':
+        return const Color(0xFFCDD6F4);
+      case 'One Dark':
+        return const Color(0xFFABB2BF);
+      case 'Solarized':
+        return const Color(0xFF839496);
+      default:
+        return const Color(0xFFD4D4D4);
     }
   }
 
-  Color get _lineNumberColor => _fg.withOpacity(0.35);
+  // 0.35 opacity originally, maybe I should have done (1 - 0.35) * 255
+  Color get _lineNumberColor => _fg.withAlpha(89);
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +73,7 @@ class TerminalEditor extends StatelessWidget {
             padding: const EdgeInsets.only(top: 16, right: 10),
             child: ValueListenableBuilder<TextEditingValue>(
               valueListenable: controller,
-              builder: (_, value, __) {
+              builder: (_, value, _) {
                 final lineCount = value.text.split('\n').length;
                 final displayLines = lineCount < 20 ? 20 : lineCount;
                 return Column(
@@ -97,7 +114,7 @@ class TerminalEditor extends StatelessWidget {
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.fromLTRB(4, 16, 16, 16),
                 hintText: '// write your code here',
-                hintStyle: TextStyle(color: _fg.withOpacity(0.3)),
+                hintStyle: TextStyle(color: _fg.withAlpha(77)), // opacity: 0.3
               ),
             ),
           ),

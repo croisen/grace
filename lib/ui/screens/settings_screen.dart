@@ -11,7 +11,8 @@ class SettingsScreen extends StatelessWidget {
     Color? accent,
     bool? termDark,
     String? palette,
-  }) onSettingsChanged;
+  })
+  onSettingsChanged;
 
   const SettingsScreen({
     super.key,
@@ -24,8 +25,14 @@ class SettingsScreen extends StatelessWidget {
   });
 
   static const List<String> palettes = [
-    'Default', 'Gruvbox', 'Tokyo Night', 'Dracula',
-    'Nord', 'Catppuccin', 'One Dark', 'Solarized',
+    'Default',
+    'Gruvbox',
+    'Tokyo Night',
+    'Dracula',
+    'Nord',
+    'Catppuccin',
+    'One Dark',
+    'Solarized',
   ];
 
   @override
@@ -55,8 +62,10 @@ class SettingsScreen extends StatelessWidget {
           ),
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Text('Accent color (from terminal palette)',
-                style: TextStyle(fontSize: 13, color: Colors.grey)),
+            child: Text(
+              'Accent color (from terminal palette)',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -64,7 +73,7 @@ class SettingsScreen extends StatelessWidget {
               spacing: 12,
               runSpacing: 12,
               children: primaries.map((c) {
-                final selected = c.value == appAccent.value;
+                final selected = c.toARGB32() == appAccent.toARGB32();
                 return GestureDetector(
                   onTap: () => onSettingsChanged(accent: c),
                   child: Container(
@@ -73,9 +82,11 @@ class SettingsScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: c,
                       shape: BoxShape.circle,
-                      border: selected ? Border.all(color: Colors.white, width: 3) : null,
+                      border: selected
+                          ? Border.all(color: Colors.white, width: 3)
+                          : null,
                       boxShadow: selected
-                          ? [BoxShadow(color: c.withOpacity(0.6), blurRadius: 8)]
+                          ? [BoxShadow(color: c.withAlpha(153), blurRadius: 8)]
                           : null,
                     ),
                   ),
@@ -93,19 +104,26 @@ class SettingsScreen extends StatelessWidget {
           ),
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Text('Color palette', style: TextStyle(fontSize: 13, color: Colors.grey)),
+            child: Text(
+              'Color palette',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
           ),
-          ...palettes.map((name) => RadioListTile<String>(
-                title: Text(name),
-                value: name,
-                groupValue: terminalPalette,
-                onChanged: (v) => onSettingsChanged(palette: v),
-              )),
+          ...palettes.map(
+            (name) => RadioListTile<String>(
+              title: Text(name),
+              value: name,
+              groupValue: terminalPalette,
+              onChanged: (v) => onSettingsChanged(palette: v),
+            ),
+          ),
           const Divider(height: 32),
           _sectionHeader('About'),
           const ListTile(
             title: Text('Grace'),
-            subtitle: Text('Programming Language Syntax Drill Software\nThesis project • BSCS-3C'),
+            subtitle: Text(
+              'Programming Language Syntax Drill Software\nThesis project • BSCS-3C',
+            ),
             isThreeLine: true,
           ),
           const SizedBox(height: 24),
@@ -117,7 +135,14 @@ class SettingsScreen extends StatelessWidget {
   Widget _sectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-      child: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey)),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey,
+        ),
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../widgets/deck_tile.dart';
 import 'settings_screen.dart';
 import 'language_select_screen.dart';
@@ -14,7 +15,8 @@ class DeckListScreen extends StatefulWidget {
     Color? accent,
     bool? termDark,
     String? palette,
-  }) onSettingsChanged;
+  })
+  onSettingsChanged;
 
   const DeckListScreen({
     super.key,
@@ -70,9 +72,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
           icon: const Icon(Icons.menu),
           onPressed: _openSettings,
         ),
-        actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
       ),
       body: _decks.isEmpty
           ? const Center(

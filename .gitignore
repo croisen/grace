@@ -1,3 +1,4 @@
+/.cache/
 /.dart_tool/
 /.flutter-plugins-dependencies
 /build/
@@ -6,4 +7,4 @@
 /rust/target/
 /rust/src/frb_generated.rs
 *.tar
-*.tar
+*.tar.xz

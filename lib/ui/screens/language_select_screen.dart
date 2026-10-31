@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'create_rust_deck_screen.dart';
 
 class LanguageSelectScreen extends StatelessWidget {
@@ -20,8 +21,10 @@ class LanguageSelectScreen extends StatelessWidget {
           const SizedBox(height: 8),
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Text('Select a language to create a new drill deck',
-                style: TextStyle(color: Colors.grey)),
+            child: Text(
+              'Select a language to create a new drill deck',
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.code),
@@ -44,13 +47,19 @@ class LanguageSelectScreen extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.storage, color: Colors.grey.shade400),
             title: Text('SQL', style: TextStyle(color: Colors.grey.shade500)),
-            subtitle: Text('Coming later', style: TextStyle(color: Colors.grey.shade400)),
+            subtitle: Text(
+              'Coming later',
+              style: TextStyle(color: Colors.grey.shade400),
+            ),
             enabled: false,
           ),
           ListTile(
             leading: Icon(Icons.code, color: Colors.grey.shade400),
             title: Text('Java', style: TextStyle(color: Colors.grey.shade500)),
-            subtitle: Text('Coming later', style: TextStyle(color: Colors.grey.shade400)),
+            subtitle: Text(
+              'Coming later',
+              style: TextStyle(color: Colors.grey.shade400),
+            ),
             enabled: false,
           ),
         ],

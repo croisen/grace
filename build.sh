@@ -59,6 +59,7 @@ case "${1:-}" in
         "${SCRIPT}" sign
         ;;
     "run")
+        rm -r "${SCRIPT_PATH}"/lib/rust/
         flutter_rust_bridge_codegen generate
         flutter run --verbose
         ;;

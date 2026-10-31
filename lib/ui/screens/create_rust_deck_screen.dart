@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'drill_card_screen.dart';
 
 class CreateRustDeckScreen extends StatefulWidget {
@@ -79,8 +80,10 @@ class _CreateRustDeckScreenState extends State<CreateRustDeckScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text('Concepts to include',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          const Text(
+            'Concepts to include',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 8),
           ..._concepts.keys.map((name) {
             return CheckboxListTile(
@@ -94,8 +97,10 @@ class _CreateRustDeckScreenState extends State<CreateRustDeckScreen> {
           const SizedBox(height: 16),
           const Divider(),
           const SizedBox(height: 8),
-          const Text('How many cards / repetitions',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          const Text(
+            'How many cards / repetitions',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 12),
           TextField(
             controller: _repsController,

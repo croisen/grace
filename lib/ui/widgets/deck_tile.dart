@@ -20,7 +20,10 @@ class DeckTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      title: Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+      title: Text(
+        name,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      ),
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 4),
         child: Row(
@@ -44,7 +47,11 @@ class _CountLabel extends StatelessWidget {
   final int count;
   final Color color;
 
-  const _CountLabel({required this.label, required this.count, required this.color});
+  const _CountLabel({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {

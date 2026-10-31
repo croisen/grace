@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 // Real generators
@@ -183,7 +184,9 @@ class _DrillCardScreenState extends State<DrillCardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.deckName}  •  $currentIndex / ${widget.totalCards}'),
+        title: Text(
+          '${widget.deckName}  •  $currentIndex / ${widget.totalCards}',
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -225,8 +228,13 @@ class _DrillCardScreenState extends State<DrillCardScreen> {
                           children: [
                             const Icon(Icons.info_outline, size: 20),
                             const SizedBox(width: 8),
-                            const Text('Conditions',
-                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                            const Text(
+                              'Conditions',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
                             const Spacer(),
                             IconButton(
                               icon: const Icon(Icons.close, size: 20),
@@ -264,7 +272,8 @@ class _DrillCardScreenState extends State<DrillCardScreen> {
                       onPressed: _onSkip,
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
-                        backgroundColor: Theme.of(context).cardColor.withOpacity(0.9),
+                        backgroundColor: Theme.of(context).cardColor
+                            .withOpacity(0.9),
                       ),
                       child: const Text('Skip'),
                     ),
@@ -289,7 +298,10 @@ class _DrillCardScreenState extends State<DrillCardScreen> {
         padding: EdgeInsets.only(bottom: showConditions ? 70 : 16),
         child: FloatingActionButton(
           onPressed: _toggleConditions,
-          child: const Text('!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          child: const Text(
+            '!',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );

@@ -70,13 +70,11 @@ where
         + Debug
         + Clone,
 {
-    #[flutter_rust_bridge::frb(ignore)]
-    pub fn new(kind: TK, text: &'a str, extras: LexerExtras) -> Self {
+    pub(crate) fn new(kind: TK, text: &'a str, extras: LexerExtras) -> Self {
         Self { kind, text, line: extras.line, col: extras.col }
     }
 
-    #[flutter_rust_bridge::frb(ignore)]
-    pub fn tokenize(source: &'a str) -> (Vec<Self>, Vec<GraceError>) {
+    pub(crate) fn tokenize(source: &'a str) -> (Vec<Self>, Vec<GraceError>) {
         let mut lexer = TK::lexer(source);
         lexer.extras = LexerExtras { line: 1, col: 0 };
         let mut tokens = vec![];
@@ -138,6 +136,14 @@ where
         }
 
         (tokens, errors)
+    }
+
+    // for the lines missing a semicolon I take the token before the newline or end
+    // and make a hypothetical token next to it with this new text
+    pub(crate) fn hypot_token(&self, new_text: &'a str) -> Self {
+        let Token { line, col, kind, text } = self;
+        let extras = LexerExtras { line: *line, col: col + text.len() };
+        Self::new(TK::default(), new_text, extras)
     }
 }
 

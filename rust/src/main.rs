@@ -2,7 +2,7 @@
 mod api;
 mod utils;
 
-use crate::api::ast::sql::SqlAst;
+use crate::api::ast::sql::SQLAst;
 
 fn main() {
     let source = r#"
@@ -15,7 +15,7 @@ fn main() {
     "#;
 
     println!();
-    let (ast, errors) = SqlAst::new(source);
+    let (ast, errors) = SQLAst::new(source);
     for ast in &ast {
         println!("{ast:#?}");
     }

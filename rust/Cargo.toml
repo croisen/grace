@@ -6,6 +6,10 @@ edition = "2024"
 [lib]
 crate-type = ["cdylib", "staticlib"]
 
+[[bin]]
+name = "rust-lib-grace"
+path = "src/main.rs"
+
 [dependencies]
 anyhow = { version = "1.0.104", default-features = false, features = ["std"] }
 flutter_rust_bridge = "=2.13.0"

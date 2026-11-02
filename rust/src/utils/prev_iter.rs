@@ -1,7 +1,6 @@
 use std::fmt::Debug;
 use std::marker::PhantomData;
-use std::ptr::NonNull;
-use std::slice::from_raw_parts_mut;
+use std::ptr::{NonNull, slice_from_raw_parts_mut};
 
 pub(crate) struct PrevIter<'a, T>
 where
@@ -29,7 +28,7 @@ where
     #[inline]
     pub fn new_from_box_slice(s: Box<[T]>) -> Self {
         let len = s.len();
-        let ptr = NonNull::new(Box::into_raw(s)).unwrap().cast();
+        let ptr = NonNull::new(Box::into_raw(s) as *mut T).unwrap();
         let index = 0usize.wrapping_sub(1);
         Self { ptr, index, len, owned: true, _phantom: PhantomData }
     }
@@ -37,32 +36,30 @@ where
     #[inline]
     pub fn next(&mut self) -> Option<&T> {
         self.index = self.index.wrapping_add(1);
-        self.current()
+        self.at(self.index)
     }
 
     #[inline]
-    pub fn peek(&self, offset: usize) -> Option<&T> {
-        if !(self.index >= self.len) {
-            unsafe { Some(self.ptr.add(self.index + offset).as_ref()) }
-        } else {
-            None
-        }
+    pub fn peek(&self) -> Option<&T> {
+        self.at(self.index + 1)
     }
 
     #[inline]
-    // now that I've added peek, prev kinda loses it's purpose
     pub fn prev(&mut self) -> Option<&T> {
         self.index = self.index.wrapping_sub(1);
-        self.current()
+        self.at(self.index)
     }
 
     #[inline]
-    pub fn current(&mut self) -> Option<&T> {
-        if !(self.index >= self.len) {
-            unsafe { Some(self.ptr.add(self.index).as_ref()) }
+    pub fn at(&self, idx: usize) -> Option<&T> {
+        let c = if !(self.index >= self.len) {
+            unsafe { Some(self.ptr.add(idx).as_ref()) }
         } else {
             None
-        }
+        };
+
+        // println!("{c:?}");
+        c
     }
 
     #[inline]
@@ -82,18 +79,14 @@ where
 
     #[inline]
     pub fn pos(&self) -> usize {
-        self.len
+        self.index
     }
 
     #[inline]
     pub fn skip_while(&mut self, mut predicate: impl FnMut(&T) -> bool) {
-        if size_of::<T>() == 0 {
-            return;
-        }
-
         self.index += 1;
         while !(self.index >= self.len) {
-            if !predicate(unsafe { &*self.ptr.as_ptr() }) {
+            if !predicate(unsafe { &*self.ptr.add(self.index).as_ptr() }) {
                 self.ptr = unsafe { self.ptr.sub(1) };
                 break;
             }
@@ -107,8 +100,10 @@ impl<'a, T: Debug> Drop for PrevIter<'a, T> {
     fn drop(&mut self) {
         if self.owned {
             let _ = unsafe {
-                Box::from_raw(from_raw_parts_mut(self.ptr.as_ptr(), self.len)
-                    as *mut [T])
+                Box::from_raw(slice_from_raw_parts_mut(
+                    self.ptr.as_ptr(),
+                    self.len,
+                ))
             };
         }
     }

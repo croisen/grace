@@ -25,6 +25,50 @@ macro_rules! any {
 }
 
 macro_rules! iter_unwrap {
+    (peek, $iter:expr, $errors:expr) => {{
+        use $crate::api::ast::unexpected_eof;
+        let token = $iter.peek();
+        if token.is_none() {
+            unexpected_eof($iter, $errors);
+            return;
+        }
+
+        token.unwrap()
+    }};
+
+    (peek, $iter:expr, $errors:expr, $return:expr) => {{
+        use $crate::api::ast::unexpected_eof;
+        let token = $iter.peek();
+        if token.is_none() {
+            unexpected_eof($iter, $errors);
+            return $return;
+        }
+
+        token.unwrap()
+    }};
+
+    (at($idx:expr), $iter:expr, $errors:expr) => {{
+        use $crate::api::ast::unexpected_eof;
+        let token = $iter.at($idx);
+        if token.is_none() {
+            unexpected_eof($iter, $errors);
+            return;
+        }
+
+        token.unwrap()
+    }};
+
+    (at($idx:expr), $iter:expr, $errors:expr, $return:expr) => {{
+        use $crate::api::ast::unexpected_eof;
+        let token = $iter.at($idx);
+        if token.is_none() {
+            unexpected_eof($iter, $errors);
+            return $return;
+        }
+
+        token.unwrap()
+    }};
+
     ($iter:expr, $errors:expr) => {{
         use $crate::api::ast::unexpected_eof;
         let token = $iter.next();
@@ -39,28 +83,6 @@ macro_rules! iter_unwrap {
     ($iter:expr, $errors:expr, $return:expr) => {{
         use $crate::api::ast::unexpected_eof;
         let token = $iter.next();
-        if token.is_none() {
-            unexpected_eof($iter, $errors);
-            return $return;
-        }
-
-        token.unwrap()
-    }};
-
-    (peek($i:expr), $iter:expr, $errors:expr) => {{
-        use $crate::api::ast::unexpected_eof;
-        let token = $iter.peek($i);
-        if token.is_none() {
-            unexpected_eof($iter, $errors);
-            return;
-        }
-
-        token.unwrap()
-    }};
-
-    (peek($i:expr), $iter:expr, $errors:expr, $return:expr) => {{
-        use $crate::api::ast::unexpected_eof;
-        let token = $iter.peek($i);
         if token.is_none() {
             unexpected_eof($iter, $errors);
             return $return;

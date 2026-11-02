@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use crate::api::GraceError;
 use crate::api::ast::sql::SQLAst;
 use crate::api::ast::sql::expression::SQLExpression;
@@ -22,33 +24,28 @@ impl SQLCreate {
         let mut s = Self::default();
 
         if let Some(token) = iter.next() {
-            let token = &token.clone();
+            let text = token.text.to_string();
             match token.kind {
                 SQLTokenKind::StrictKeyword => {
-                    let text = token.text.to_string();
-                    let token2 = iter_unwrap!(peek(1), iter, errors, s);
+                    let token2 = iter_unwrap!(peek, iter, errors, s);
                     if token2.text.eq_ignore_ascii_case("if") {
                         let _ = iter.next();
-                        let token3 = iter_unwrap!(iter, errors, s);
-                        if token3.text.eq_ignore_ascii_case("exists") {
-                            s.if_not_exists = false;
-                        } else if token3.text.eq_ignore_ascii_case("not") {
+                        let mut token3 = iter_unwrap!(peek, iter, errors, s);
+                        if token3.text.eq_ignore_ascii_case("not") {
                             s.if_not_exists = true;
-                            let token4 = iter_unwrap!(iter, errors, s);
-                            if !token4.text.eq_ignore_ascii_case("exists") {
-                                GraceError::syntax_error(
-                                    errors,
-                                    token,
-                                    "expected `EXISTS`",
-                                );
-                            }
-                        } else {
+                            let _ = iter.next();
+                            token3 = iter_unwrap!(peek, iter, errors, s);
+                        }
+
+                        if !token3.text.eq_ignore_ascii_case("exists") {
                             GraceError::syntax_error(
                                 errors,
-                                token,
-                                "expected `NOT EXISTS` or `EXISTS`",
+                                token3,
+                                "expected `EXISTS`",
                             );
                         }
+
+                        let _ = iter.next();
                     }
 
                     s.name(iter, errors);
@@ -88,35 +85,20 @@ impl SQLCreate {
         iter: &mut PrevIter<'_, SQLToken>,
         errors: &mut Vec<GraceError>,
     ) {
-        if let Some(token) = iter.peek(1)
+        if let Some(token) = iter.peek()
             && token.text == ";"
         {
             return;
         }
 
         let token = iter_unwrap!(iter, errors);
-        if !token.text.eq_ignore_ascii_case("if") {
-            GraceError::syntax_error(
-                errors,
-                token,
-                "expected if conditional or `;`",
-            );
-
+        if token.text != ";" {
+            GraceError::syntax_error(errors, token, "expected `;`");
             return;
         }
 
-        let token = iter_unwrap!(iter, errors);
-        if !token.text.eq_ignore_ascii_case("not")
-            && !token.text.eq_ignore_ascii_case("exists")
-        {
-            GraceError::syntax_error(
-                errors,
-                token,
-                "expected if conditional or `;`",
-            );
-
-            return;
-        }
+        // let the main loop eat the semicolon
+        let _ = iter.prev();
     }
 
     fn table(
@@ -158,13 +140,13 @@ impl SQLCreateBody {
         errors: &mut Vec<GraceError>,
     ) -> Self {
         let mut c = vec![];
-        let token = iter_unwrap!(iter, errors, Self::Table(c));
+        let token = iter_unwrap!(peek, iter, errors, Self::Table(c));
         if token.text != "(" {
             GraceError::syntax_error(errors, token, "expected `(`");
-            let _ = iter.prev();
         }
 
-        while let Some(token) = iter.peek(1) {
+        let _ = iter.next();
+        while let Some(token) = iter.peek() {
             match token.kind {
                 SQLTokenKind::Identifier => {
                     c.push(SQLColumnDefinition::new(iter, errors))
@@ -174,15 +156,14 @@ impl SQLCreateBody {
             }
         }
 
-        let token = iter_unwrap!(iter, errors, Self::Table(c));
+        let token = iter_unwrap!(peek, iter, errors, Self::Table(c));
         let text = token.text.to_string();
         if text != ")" && text != ";" {
             GraceError::syntax_error(errors, token, "expected `)`");
-            let _ = iter.prev();
         }
 
-        if text == ";" {
-            let _ = iter.prev();
+        if text != ";" {
+            let _ = iter.next();
         }
 
         Self::Table(c)
@@ -234,16 +215,15 @@ impl SQLColumnDefinition {
                         c.constraints.push(constraint);
                     }
                 }
-                SQLTokenKind::Pairs if token.text == ")" => {
-                    let _ = iter.prev();
-                    break;
-                }
+                SQLTokenKind::Pairs if token.text == ")" => break,
                 SQLTokenKind::Delimiters => break,
                 _ => {
                     GraceError::syntax_error(errors, token, "unexpected token");
                 }
             }
         }
+
+        // TODO: Dedup constraints
 
         c
     }
@@ -266,7 +246,7 @@ impl SQLColumnRestraint {
         iter: &mut PrevIter<'_, SQLToken>,
         errors: &mut Vec<GraceError>,
     ) -> Option<Self> {
-        let token = iter_unwrap!(peek(0), iter, errors, None);
+        let token = iter_unwrap!(at(iter.pos()), iter, errors, None);
         if token.text.eq_ignore_ascii_case("primary") {
             let token2 = iter_unwrap!(iter, errors, Some(Self::PrimaryKey));
             if !token2.text.eq_ignore_ascii_case("key") {
@@ -297,9 +277,6 @@ impl SQLColumnRestraint {
             }
 
             Some(Self::Unique)
-        } else if token.text == "," {
-            let _ = iter.prev();
-            None
         } else if token.text.eq_ignore_ascii_case("auto_increment") {
             Some(Self::AutoIncrement)
         } else if token.text.eq_ignore_ascii_case("auto") {

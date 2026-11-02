@@ -7,6 +7,7 @@ use crate::api::ast::sql::statements::query::{
 };
 use crate::api::ast::sql::statements::session::{SQLSetNames, SQLTransaction};
 use crate::api::lexers::sql::{SQLToken, SQLTokenKind};
+use crate::utils::macros::iter_unwrap;
 use crate::utils::prev_iter::PrevIter;
 
 pub mod expression;
@@ -43,6 +44,23 @@ impl SQLAst {
                 SQLTokenKind::StrictKeyword => {
                     if token.text.eq_ignore_ascii_case("create") {
                         ast.push(SQLCreate::new(&mut iter, &mut errors).into());
+                    }
+
+                    let mut token = iter.peek();
+                    if token.is_none() {
+                        iter.seek_end();
+                        token = iter.prev();
+                    }
+
+                    if let Some(token) = token
+                        && token.text != ";"
+                    {
+                        let token = token.hypot_token(";");
+                        GraceError::syntax_error(
+                            &mut errors,
+                            &token,
+                            "expected `;`",
+                        );
                     }
                 }
                 _ => {}

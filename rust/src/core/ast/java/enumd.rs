@@ -1,12 +1,11 @@
-use crate::api::ast::java::annotation::JavaAnnotation;
-use crate::api::ast::java::expression::JavaExpression;
-use crate::api::ast::java::member::JavaMember;
-use crate::api::ast::java::type_parameter::JavaTypeParameter;
-use crate::api::lexers::java::{JavaToken, JavaTokenKind};
+use crate::core::ast::java::annotation::JavaAnnotation;
+use crate::core::ast::java::expression::JavaExpression;
+use crate::core::ast::java::member::JavaMember;
+use crate::core::ast::java::type_parameter::JavaTypeParameter;
+use crate::core::lexers::java::{JavaToken, JavaTokenKind};
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaEnum {
+pub struct JavaEnum {
     pub name: String,
     pub type_parameters: Vec<JavaTypeParameter>,
     pub modifiers: Vec<String>,
@@ -17,8 +16,7 @@ pub(crate) struct JavaEnum {
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaEnumConstant {
+pub struct JavaEnumConstant {
     pub name: String,
     pub annotations: Vec<JavaAnnotation>,
     pub arguments: Vec<JavaExpression>,

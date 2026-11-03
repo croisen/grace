@@ -1,14 +1,14 @@
 use logos::{Logos, skip};
 
-use crate::api::errors::kind::GraceErrorKind;
-use crate::api::lexers::{LexerExtras, Token};
+use crate::core::errors::kind::GraceErrorKind;
+use crate::core::lexers::{LexerExtras, Token};
 
-pub(crate) type SQLToken<'a> = Token<'a, SQLTokenKind>;
+pub type SQLToken<'a> = Token<'a, SQLTokenKind>;
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = GraceErrorKind, extras = LexerExtras)]
 #[rustfmt::skip]
-pub(crate) enum SQLTokenKind {
+pub enum SQLTokenKind {
     #[regex("(?i:ADD)")]        // constraint
     #[regex("(?i:ALL)")]
     #[regex("(?i:ALTER)")]      // {column, table, view}
@@ -16,13 +16,13 @@ pub(crate) enum SQLTokenKind {
     #[regex("(?i:ANY)")]
     #[regex("(?i:AS)")]
     #[regex("(?i:ASC)")]
-    // #[regex("(?i:BACKUP)")]  // database
+    #[regex("(?i:BACKUP)")]     // database (we don't use this in the ast)
     #[regex("(?i:BETWEEN)")]
     #[regex("(?i:BY)")]
     #[regex("(?i:CASE)")]
     #[regex("(?i:CHECK)")]
     #[regex("(?i:COLUMN)")]
-    #[regex("(?i:CONSTRAINT)")] // create constraint, (not sure we have this in the ast)
+    #[regex("(?i:CONSTRAINT)")] // create constraint, (we don't use this in the ast)
     #[regex("(?i:CREATE)")]     // {database, index, table, or replace view, unique index, view, procedure}
     #[regex("(?i:DATABASE)")]
     #[regex("(?i:DEFAULT)")]

@@ -1,17 +1,19 @@
+use std::error::Error;
 use std::fmt::{Debug, Display, Formatter, Result as FResult};
 
-#[derive(Default, Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum GraceErrorKind {
     SyntaxError(String),
     ExpectedToken(String),
+    ExpectedText(String),
     ReservedKeyword(String),
+    TrailingComma,
     UnexpectedToken(String),
     UnexpectedEOF,
     UnmatchedTokenPair(String),
     Custom(String),
     #[default]
-    Unknown(String),
+    Unknown,
 }
 
 impl Display for GraceErrorKind {

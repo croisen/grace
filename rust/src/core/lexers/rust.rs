@@ -1,13 +1,13 @@
 use logos::{Lexer, Logos, skip};
 
-use crate::api::errors::kind::GraceErrorKind;
-use crate::api::lexers::{LexerExtras, Token, reserved_keyword};
+use crate::core::errors::kind::GraceErrorKind;
+use crate::core::lexers::{LexerExtras, Token, reserved_keyword};
 
-pub(crate) type RustToken<'a> = Token<'a, RustTokenKind>;
+pub type RustToken<'a> = Token<'a, RustTokenKind>;
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = GraceErrorKind, extras = LexerExtras)]
-pub(crate) enum RustTokenKind {
+pub enum RustTokenKind {
     #[regex("[a-zA-Z_][a-zA-Z0-9_]*!")]
     Macro,
 
@@ -162,9 +162,9 @@ pub(crate) enum RustTokenKind {
 // extract the text after r#
 fn keyword_to_ident<'a, T>(
     lex: &mut Lexer<'a, T>,
-) -> Result<String, LexingError>
+) -> Result<String, GraceErrorKind>
 where
-    T: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>,
+    T: Logos<'a, Source = str, Error = GraceErrorKind, Extras = LexerExtras>,
 {
     Ok(lex.slice()[2..].into())
 }

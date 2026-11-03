@@ -1,11 +1,10 @@
-use crate::api::ast::java::member::JavaMember;
-use crate::api::ast::java::parameter::JavaParameter;
-use crate::api::ast::java::statement::JavaStatement;
-use crate::api::lexers::java::{JavaToken, JavaTokenKind};
+use crate::core::ast::java::member::JavaMember;
+use crate::core::ast::java::parameter::JavaParameter;
+use crate::core::ast::java::statement::JavaStatement;
+use crate::core::lexers::java::{JavaToken, JavaTokenKind};
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) enum JavaExpression {
+pub enum JavaExpression {
     Literal(String),
     Identifier(String),
     MethodCall(JavaMethodCall),
@@ -44,59 +43,51 @@ pub(crate) enum JavaExpression {
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaMethodCall {
+pub struct JavaMethodCall {
     pub target: Option<Box<JavaExpression>>,
     pub name: String,
     pub arguments: Vec<JavaExpression>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaFieldAccess {
+pub struct JavaFieldAccess {
     pub target: Box<JavaExpression>,
     pub field: String,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaArrayAccess {
+pub struct JavaArrayAccess {
     pub target: Box<JavaExpression>,
     pub index: Box<JavaExpression>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaArrayCreation {
+pub struct JavaArrayCreation {
     pub r#type: String,
     pub dim: Vec<JavaExpression>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaNew {
+pub struct JavaNew {
     pub r#type: String,
     pub arguments: Vec<JavaExpression>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaAnonymousClass {
+pub struct JavaAnonymousClass {
     pub super_type: String,
     pub arguments: Vec<JavaExpression>,
     pub members: Vec<JavaMember>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaLambda {
+pub struct JavaLambda {
     pub parameters: Vec<JavaParameter>,
     pub body: JavaLambdaBody,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) enum JavaLambdaBody {
+pub enum JavaLambdaBody {
     Expression(Box<JavaExpression>),
     Block(Vec<JavaStatement>),
 }

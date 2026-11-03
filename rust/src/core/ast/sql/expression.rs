@@ -1,9 +1,8 @@
-use crate::api::GraceError;
-use crate::api::ast::sql::statements::query::SQLSelect;
-use crate::api::lexers::sql::{SQLToken, SQLTokenKind};
+use crate::core::ast::sql::statements::query::SQLSelect;
+use crate::core::lexers::sql::{SQLToken, SQLTokenKind};
 
 #[derive(Debug, Clone)]
-pub(crate) enum SQLExpression {
+pub enum SQLExpression {
     Literal(String),
     Identifier(String),
     FunctionCall {

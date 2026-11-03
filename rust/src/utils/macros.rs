@@ -26,4 +26,3 @@ macro_rules! any {
 
 pub(crate) use all;
 pub(crate) use any;
-pub(crate) use iter_unwrap;

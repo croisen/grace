@@ -1,4 +1,4 @@
-use crate::api::lexers::rust::{RustToken, RustTokenKind};
+use crate::core::lexers::rust::{RustToken, RustTokenKind};
 
 #[derive(Debug, Clone)]
-pub(crate) struct RustLifetime(String);
+pub struct RustLifetime(String);

@@ -1,11 +1,11 @@
-use crate::api::ast::java::annotation::JavaAnnotationType;
-use crate::api::ast::java::class::JavaClass;
-use crate::api::ast::java::enumd::JavaEnum;
-use crate::api::ast::java::interface::JavaInterface;
-use crate::api::ast::java::packages::{JavaImport, JavaPackage};
-use crate::api::ast::java::record::JavaRecord;
-use crate::api::ast::java::structd::JavaStruct;
-use crate::api::lexers::java::{JavaToken, JavaTokenKind};
+use crate::core::ast::java::annotation::JavaAnnotationType;
+use crate::core::ast::java::class::JavaClass;
+use crate::core::ast::java::enumd::JavaEnum;
+use crate::core::ast::java::interface::JavaInterface;
+use crate::core::ast::java::packages::{JavaImport, JavaPackage};
+use crate::core::ast::java::record::JavaRecord;
+use crate::core::ast::java::structd::JavaStruct;
+use crate::core::lexers::java::{JavaToken, JavaTokenKind};
 
 pub mod annotation;
 pub mod class;
@@ -25,8 +25,7 @@ pub mod structd;
 pub mod type_parameter;
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) enum JavaAst {
+pub enum JavaAst {
     Class(JavaClass),
     Interface(JavaInterface),
     Struct(JavaStruct),
@@ -35,13 +34,4 @@ pub(crate) enum JavaAst {
     AnnotationType(JavaAnnotationType),
     Package(JavaPackage),
     Import(JavaImport),
-}
-
-impl JavaAst {
-    pub fn new(
-        tokens: Vec<JavaToken>,
-        errors: Vec<GraceError>,
-    ) -> (Vec<Self>, Vec<GraceError>) {
-        (vec![], errors)
-    }
 }

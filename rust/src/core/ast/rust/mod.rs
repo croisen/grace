@@ -1,6 +1,6 @@
-use crate::api::ast::rust::item::RustItem;
-use crate::api::ast::rust::visibility::RustVisibility;
-use crate::api::lexers::rust::{RustToken, RustTokenKind};
+use crate::core::ast::rust::item::RustItem;
+use crate::core::ast::rust::visibility::RustVisibility;
+use crate::core::lexers::rust::{RustToken, RustTokenKind};
 
 pub mod expression;
 pub mod item;
@@ -9,9 +9,8 @@ pub mod statement;
 pub mod r#type;
 pub mod visibility;
 
-// VisItem in the Rust Reference book section 8.1
 #[derive(Debug, Clone)]
-pub(crate) struct RustAst {
+pub struct RustAst {
     pub visibility: RustVisibility,
     pub item: RustItem,
 }

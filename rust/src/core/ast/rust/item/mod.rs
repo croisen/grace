@@ -1,15 +1,15 @@
-use crate::api::ast::rust::item::alias::RustTypeAlias;
-use crate::api::ast::rust::item::r#const::RustConst;
-use crate::api::ast::rust::item::r#enum::RustEnum;
-use crate::api::ast::rust::item::r#extern::RustExtern;
-use crate::api::ast::rust::item::function::RustFunction;
-use crate::api::ast::rust::item::r#impl::RustImpl;
-use crate::api::ast::rust::item::module::RustModule;
-use crate::api::ast::rust::item::r#static::RustStatic;
-use crate::api::ast::rust::item::r#struct::RustStruct;
-use crate::api::ast::rust::item::r#trait::RustTrait;
-use crate::api::ast::rust::item::r#use::RustUse;
-use crate::api::lexers::rust::{RustToken, RustTokenKind};
+use crate::core::ast::rust::item::alias::RustTypeAlias;
+use crate::core::ast::rust::item::r#const::RustConst;
+use crate::core::ast::rust::item::r#enum::RustEnum;
+use crate::core::ast::rust::item::r#extern::RustExtern;
+use crate::core::ast::rust::item::function::RustFunction;
+use crate::core::ast::rust::item::r#impl::RustImpl;
+use crate::core::ast::rust::item::module::RustModule;
+use crate::core::ast::rust::item::r#static::RustStatic;
+use crate::core::ast::rust::item::r#struct::RustStruct;
+use crate::core::ast::rust::item::r#trait::RustTrait;
+use crate::core::ast::rust::item::r#use::RustUse;
+use crate::core::lexers::rust::{RustToken, RustTokenKind};
 
 pub mod alias;
 pub mod r#const;
@@ -24,7 +24,7 @@ pub mod r#trait;
 pub mod r#use;
 
 #[derive(Debug, Clone)]
-pub(crate) enum RustItem {
+pub enum RustItem {
     Function(RustFunction),
     Struct(RustStruct),
     Enum(RustEnum),

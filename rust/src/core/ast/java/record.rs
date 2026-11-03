@@ -1,12 +1,11 @@
-use crate::api::ast::java::annotation::JavaAnnotation;
-use crate::api::ast::java::member::JavaMember;
-use crate::api::ast::java::parameter::JavaParameter;
-use crate::api::ast::java::type_parameter::JavaTypeParameter;
-use crate::api::lexers::java::{JavaToken, JavaTokenKind};
+use crate::core::ast::java::annotation::JavaAnnotation;
+use crate::core::ast::java::member::JavaMember;
+use crate::core::ast::java::parameter::JavaParameter;
+use crate::core::ast::java::type_parameter::JavaTypeParameter;
+use crate::core::lexers::java::{JavaToken, JavaTokenKind};
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaRecord {
+pub struct JavaRecord {
     pub name: String,
     pub modifiers: Vec<String>,
     pub annotations: Vec<JavaAnnotation>,

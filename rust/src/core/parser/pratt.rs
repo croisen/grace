@@ -1,11 +1,16 @@
-#[flutter_rust_bridge::frb(ignore)]
+use std::fmt::Debug;
+
+use logos::Logos;
+
+use crate::core::errors::kind::GraceErrorKind;
+use crate::core::lexers::LexerExtras;
+
 pub enum PrattAssociativity {
     Left,
     Right,
     None,
 }
 
-#[flutter_rust_bridge::frb(ignore)]
 pub struct PrattOperator {
     pub precedence: usize,
     pub associativity: PrattAssociativity,

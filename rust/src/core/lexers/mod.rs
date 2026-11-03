@@ -5,8 +5,8 @@ use std::num::{ParseFloatError, ParseIntError};
 
 use logos::{Lexer, Logos};
 
-use crate::api::errors::GraceError;
-use crate::api::errors::kind::GraceErrorKind;
+use crate::core::errors::GraceError;
+use crate::core::errors::kind::GraceErrorKind;
 
 pub mod java;
 pub mod rust;
@@ -19,11 +19,12 @@ pub struct LexerExtras {
 }
 
 #[derive(Default, Debug, Clone, PartialEq)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct Token<'a, TK>
+pub struct Token<'a, TK>
 where
     TK: Logos<'a, Source = str, Error = GraceErrorKind, Extras = LexerExtras>
         + Default
+        + Clone
+        + PartialEq
         + Debug,
 {
     pub kind: TK,
@@ -34,16 +35,17 @@ where
 
 impl<'a, TK> Token<'a, TK>
 where
-    TK: Logos<'a, Source = str, Error = LexingError, Extras = LexerExtras>
+    TK: Logos<'a, Source = str, Error = GraceErrorKind, Extras = LexerExtras>
         + Default
-        + Debug
-        + Clone,
+        + Clone
+        + PartialEq
+        + Debug,
 {
-    pub(crate) fn new(kind: TK, text: &'a str, extras: LexerExtras) -> Self {
+    pub fn new(kind: TK, text: &'a str, extras: LexerExtras) -> Self {
         Self { kind, text, line: extras.line, col: extras.col }
     }
 
-    pub(crate) fn tokenize(source: &'a str) -> (Vec<Self>, Vec<GraceError>) {
+    pub fn tokenize(source: &'a str) -> (Vec<Self>, Vec<GraceError>) {
         let mut lexer = TK::lexer(source);
         lexer.extras = LexerExtras { line: 1, col: 0 };
         let mut tokens = vec![];
@@ -94,20 +96,11 @@ where
         }
 
         for token in pairs {
-            let (text, line, col) = (&token.text, token.line, token.col);
+            let (text, line, col) = (token.text, token.line, token.col);
             errors.push(GraceError::unmatched_token_pair(text, line, col));
         }
 
         (tokens, errors)
-    }
-
-    pub(crate) fn hypot_token(&self, new_text: &str) -> Self {
-        Self {
-            kind: TK::default(),
-            text: &new_text.to_string(),
-            line: self.line,
-            col: self.col + self.text.len(),
-        }
     }
 }
 

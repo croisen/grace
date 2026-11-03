@@ -1,7 +1,7 @@
-use crate::api::lexers::rust::{RustToken, RustTokenKind};
+use crate::core::lexers::rust::{RustToken, RustTokenKind};
 
 #[derive(Debug, Clone)]
-pub(crate) enum RustVisibility {
+pub enum RustVisibility {
     Pub,
     PubCrate,
     PubSelf,

@@ -15,10 +15,10 @@ anyhow = { version = "1.0.104", default-features = false, features = ["std"] }
 flutter_rust_bridge = "=2.13.0"
 libc = { version = "0.2.189", default-features = false, features = ["align", "const-extern-fn", "extra_traits", "use_std"] }
 logos = { version = "0.16.1", default-features = false, features = ["export_derive", "logos-derive", "state_machine_codegen", "std"] }
-oak-core = { version = "0.0.11", default-features = false }
-oak-java = { version = "0.0.11", default-features = false }
-oak-rust = { version = "0.0.11", default-features = false }
-oak-sql = { version = "0.0.11", default-features = false }
+# oak-core = { version = "0.0.11", default-features = false }
+# oak-java = { version = "0.0.11", default-features = false }
+# oak-rust = { version = "0.0.11", default-features = false }
+# oak-sql = { version = "0.0.11", default-features = false }
 rand = { version = "0.10.3", default-features = false, features = ["chacha", "serde", "thread_rng"] }
 
 [lints.rust]

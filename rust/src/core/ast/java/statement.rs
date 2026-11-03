@@ -1,10 +1,9 @@
-use crate::api::ast::java::expression::JavaExpression;
-use crate::api::ast::java::parameter::JavaParameter;
-use crate::api::lexers::java::{JavaToken, JavaTokenKind};
+use crate::core::ast::java::expression::JavaExpression;
+use crate::core::ast::java::parameter::JavaParameter;
+use crate::core::lexers::java::{JavaToken, JavaTokenKind};
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) enum JavaStatement {
+pub enum JavaStatement {
     Expression(JavaExpression),
     Return(Option<JavaExpression>),
     Block(Vec<JavaExpression>),
@@ -50,23 +49,20 @@ pub(crate) enum JavaStatement {
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaTryStatement {
+pub struct JavaTryStatement {
     pub block: Vec<JavaStatement>,
     pub catches: Vec<JavaCatchClause>,
     pub finally: Option<Vec<JavaStatement>>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaCatchClause {
+pub struct JavaCatchClause {
     pub parameter: JavaParameter,
     pub block: Vec<JavaStatement>,
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
-pub(crate) struct JavaSwitchCase {
+pub struct JavaSwitchCase {
     pub label: String,
     pub body: Vec<JavaStatement>,
 }

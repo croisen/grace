@@ -1,7 +1,7 @@
-use crate::api::lexers::rust::{RustToken, RustTokenKind};
+use crate::core::lexers::rust::{RustToken, RustTokenKind};
 
 #[derive(Debug, Clone)]
-pub(crate) enum RustPattern {
+pub enum RustPattern {
     Wildcard,
     Identifier(String),
     Literal(String),
@@ -10,7 +10,7 @@ pub(crate) enum RustPattern {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct RustFieldPattern {
+pub struct RustFieldPattern {
     pub name: String,
     pub pattern: RustPattern,
 }

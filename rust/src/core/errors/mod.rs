@@ -1,9 +1,8 @@
-use crate::api::errors::kind::GraceErrorKind;
+use crate::core::errors::kind::GraceErrorKind;
 
 pub mod kind;
 
 #[derive(Default, Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore)]
 pub struct GraceError {
     kind: GraceErrorKind,
     line: usize,
@@ -31,12 +30,24 @@ impl GraceError {
         Self::new(GraceErrorKind::ExpectedToken(reason.into()), line, col)
     }
 
+    pub fn expected_text(
+        reason: impl Into<String>,
+        line: usize,
+        col: usize,
+    ) -> Self {
+        Self::new(GraceErrorKind::ExpectedText(reason.into()), line, col)
+    }
+
     pub fn reserved_keyword(
         reason: impl Into<String>,
         line: usize,
         col: usize,
     ) -> Self {
         Self::new(GraceErrorKind::ReservedKeyword(reason.into()), line, col)
+    }
+
+    pub fn trailing_comma(line: usize, col: usize) -> Self {
+        Self::new(GraceErrorKind::TrailingComma, line, col)
     }
 
     pub fn unexpected_token(

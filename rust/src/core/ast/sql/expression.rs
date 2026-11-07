@@ -1,5 +1,9 @@
-use crate::core::ast::sql::statements::query::SQLSelect;
-use crate::core::lexers::sql::{SQLToken, SQLTokenKind};
+use crate::core::ast::sql::{SQLAst, SQLParserState};
+use crate::core::ast::sql::sstatements::query::SQLSelect;
+use crate::core::lexers::sql::SQLTokenKind;
+use crate::core::parser::pratt::{
+    PrattAssociativity, PrattLanguage, parse_expr,
+};
 
 #[derive(Debug, Clone)]
 pub enum SQLExpression {
@@ -32,4 +36,15 @@ pub enum SQLExpression {
         negated: bool,
     },
     SubQuery(Box<SQLSelect>),
+}
+
+impl SQLExpression { 
+    pub fn new<'a>(state: &mut SQLParserState<'a>)-> Self {
+        parse_expr::<Self>(state, 0)
+    }
+}
+
+impl<'a> PrattLanguage<'a> for SQLExpression {
+    type Root = SQLAst;
+    type TokenKind = SQLTokenKind;
 }

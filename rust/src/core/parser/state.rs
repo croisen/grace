@@ -80,6 +80,22 @@ where
         token.unwrap().kind == kind
     }
 
+    pub fn token_eat_kinds(&mut self, kind: &[TK]) -> bool {
+        let token = self.get_token();
+        if token.is_err() {
+            return false;
+        }
+
+        let token = token.unwrap();
+        for kind in kind.iter() {
+            if &token.kind == kind {
+                return true;
+            }
+        }
+
+        false
+    }
+
     /// case _ins_ensitive
     pub fn token_eat_text_ins(&mut self, text: impl AsRef<str>) -> bool {
         let token = self.get_token();

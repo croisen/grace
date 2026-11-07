@@ -2,10 +2,10 @@ use crate::core::ast::sql::statements::ddl::{SQLAlter, SQLCreate, SQLDrop};
 use crate::core::ast::sql::statements::dml::{Delete, SQLInsert, SQLUpdate};
 use crate::core::ast::sql::statements::query::{
     SQLGroupByClause, SQLHavingClause, SQLJoinClause, SQLLimitClause,
-    SQLOrderByClause, SQLSelectItems,
+    SQLOrderByClause, SQLSelectItem,
 };
 use crate::core::ast::sql::statements::session::{SQLSetNames, SQLTransaction};
-use crate::core::lexers::sql::{SQLToken, SQLTokenKind};
+use crate::core::lexers::sql::SQLTokenKind;
 use crate::core::parser::output::ParserOutput;
 use crate::core::parser::state::ParserState;
 
@@ -24,7 +24,7 @@ pub enum SQLAst {
     Update(SQLUpdate),
     Delete(Delete),
 
-    Select(SQLSelectItems),
+    Select(SQLSelectItem),
     Join(SQLJoinClause),
     GroupBy(SQLGroupByClause),
     Having(SQLHavingClause),

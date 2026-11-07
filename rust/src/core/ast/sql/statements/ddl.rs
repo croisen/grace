@@ -33,13 +33,17 @@ impl SQLCreate {
         } else if state.token_eat_text_ins("view") {
             s.if_not_exists(state);
             s.name(state);
+            state.token_expect_text_ins("as");
+            s.body = SQLCreateBody::view(state);
         } else if state.token_eat_text_ins("or") {
             state.advance();
             state.token_expect_text_ins("replace");
             state.advance();
             state.token_expect_text_ins("view");
-            s.if_not_exists(state);
+            s.if_not_exists = true; // cause we're replacing it anyway
             s.name(state);
+            state.token_expect_text_ins("as");
+            s.body = SQLCreateBody::view(state);
         } else if state.token_eat_text_ins("index") {
             s.if_not_exists(state);
             s.name(state);
@@ -178,6 +182,15 @@ impl SQLCreateBody {
 
         Self::Index_(target_table, columns, unique)
     }
+
+    pub fn view(state: &mut SQLParserState) -> Self {
+        state.advance();
+        if state.token_expect_text_ins("select") {
+            state.advance();
+        }
+
+        Self::View(SQLSelect::new(state))
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -272,6 +285,18 @@ pub struct SQLDrop {
     pub r#type: SQLDropType,
     pub name: String,
     pub if_exists: bool,
+}
+
+impl SQLDrop {
+    pub fn new(state: &mut SQLParserState) -> Self {
+        let mut s = Self {
+            r#type: SQLDropType::Database,
+            name: String::new(),
+            if_exists: false,
+        };
+
+        s
+    }
 }
 
 #[derive(Debug, Clone)]

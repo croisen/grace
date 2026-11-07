@@ -1,4 +1,4 @@
-use logos::{Logos, skip};
+use logos::{Lexer, Logos, skip};
 
 use crate::core::errors::kind::GraceErrorKind;
 use crate::core::lexers::{LexerExtras, Token};
@@ -131,7 +131,8 @@ pub enum SQLTokenKind {
     #[regex(r#"[+-]?(([0-9][_0-9]*\.([0-9][_0-9]*)?([eE][+-]?([0-9][_0-9]*))?[fFdD]?)|(\.([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))?[fFdD]?)|(([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))[fFdD]?)|(([0-9][_0-9]*)([eE][+-]?([0-9][_0-9]*))?[fFdD]))"#)]
     Float,
 
-    #[regex(r#""([^"\\]|\\.)""#)]
+    #[regex(r#""([^"\\]|\\.)""#, not_string)]
+    #[regex(r#"'([^"\\]|\\.)'"#)]
     String,
 
     #[regex(r"//[^\n]*", allow_greedy = true)]
@@ -142,4 +143,14 @@ pub enum SQLTokenKind {
     Newline,
     #[regex(r"[ \t]+", skip)]
     Whitespace,
+}
+
+fn not_string<'a, T>(lex: &mut Lexer<'a, T>) -> Result<(), GraceErrorKind>
+where
+    T: Logos<'a, Source = str, Error = GraceErrorKind, Extras = LexerExtras>,
+{
+    let text = lex.slice();
+    Err(GraceErrorKind::SyntaxError(format!(
+        "Strings made with double quotes aren't actually treated as strings, use single quotes instead",
+    )))
 }

@@ -1,9 +1,8 @@
-#![allow(dead_code, unused)]
-
-use crate::core::ast::sql::SQLAst; // gotta remove these later
 mod api;
 mod core;
 mod utils;
+
+use crate::core::ast::sql::SQLAst;
 
 fn main() {
     let source = r#"
@@ -26,6 +25,9 @@ fn main() {
             id,
             fname,
         );
+
+        "aaaaaaa"
+        'aaaaaaa'
     "#;
 
     let output = SQLAst::new(source);

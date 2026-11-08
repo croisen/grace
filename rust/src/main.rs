@@ -1,3 +1,4 @@
+#![allow(dead_code, unused)] // remove later
 mod api;
 mod core;
 mod utils;
@@ -18,16 +19,13 @@ fn main() {
 
         CREATE UNIQUE INDEX IF NOT EXISTS test_idx1 on test_table (
             fname,
-            lname,
+            lname
         );
 
         CREATE INDEX test_idx2 on test_table (
             id,
-            fname,
+            fname
         );
-
-        "aaaaaaa"
-        'aaaaaaa'
     "#;
 
     let output = SQLAst::new(source);

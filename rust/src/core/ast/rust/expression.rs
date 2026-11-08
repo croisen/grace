@@ -1,6 +1,8 @@
 use crate::core::ast::rust::pattern::RustPattern;
 use crate::core::ast::rust::statement::RustStatement;
+use crate::core::ast::rust::{RustAst, RustParserState};
 use crate::core::lexers::rust::{RustToken, RustTokenKind};
+use crate::core::parser::pratt::{PrattLanguage, parse_expr};
 
 #[derive(Debug, Clone)]
 pub enum RustExpression {
@@ -48,6 +50,18 @@ pub enum RustExpression {
     Tuple(Vec<RustExpression>),
     Array(Vec<RustExpression>),
     Struct(String, Vec<RustFieldInit>),
+}
+
+impl RustExpression {
+    pub fn new<'a>(state: &mut RustParserState<'a>) -> Self {
+        parse_expr(state, 0).unwrap_or(Self::Identifier("Placeholder".into()))
+    }
+}
+
+// impl later
+impl<'a> PrattLanguage<'a> for RustExpression {
+    type Root = RustAst;
+    type TokenKind = RustTokenKind;
 }
 
 #[derive(Debug, Clone)]

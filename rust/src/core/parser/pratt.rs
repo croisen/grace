@@ -29,9 +29,16 @@ impl PrattAssociativity {
     pub fn right_power(&self) -> isize {
         self.power().1
     }
+
+    pub fn is_none(&self) -> bool {
+        matches!(self, Self::None(_))
+    }
 }
 
-pub trait PrattLanguage<'a> {
+pub trait PrattLanguage<'a>
+where
+    Self: Sized,
+{
     type Root;
     type TokenKind: Logos<'a, Source = str, Error = GraceErrorKind, Extras = LexerExtras>
         + Default
@@ -41,36 +48,53 @@ pub trait PrattLanguage<'a> {
 
     fn prefix_binding(
         token: &Token<'a, Self::TokenKind>,
-    ) -> Option<PrattAssociativity>;
+    ) -> Option<PrattAssociativity> {
+        todo!("");
+    }
     fn infix_binding(
         token: &Token<'a, Self::TokenKind>,
-    ) -> Option<PrattAssociativity>;
+    ) -> Option<PrattAssociativity> {
+        todo!("");
+    }
     fn postfix_binding(
         token: &Token<'a, Self::TokenKind>,
-    ) -> Option<PrattAssociativity>;
+    ) -> Option<PrattAssociativity> {
+        todo!("");
+    }
 
     fn parse_atom(
         state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-    ) -> Self;
+    ) -> Option<Self> {
+        todo!("");
+    }
     fn parse_prefix(
         state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        op: String,
         rhs: Self,
-    ) -> Self;
+    ) -> Option<Self> {
+        todo!("");
+    }
     fn parse_postfix(
         state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        op: String,
         lhs: Self,
-    ) -> Self;
+    ) -> Option<Self> {
+        todo!("");
+    }
     fn parse_infix(
         state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        op: String,
         lhs: Self,
         rhs: Self,
-    ) -> Self;
+    ) -> Option<Self> {
+        todo!("");
+    }
 }
 
 pub fn parse_expr<'a, L>(
     state: &mut ParserState<'a, L::TokenKind, L::Root>,
     min: isize,
-) -> L
+) -> Option<L>
 where
     L: PrattLanguage<'a>,
     L::TokenKind: Logos<'a, Source = str, Error = GraceErrorKind, Extras = LexerExtras>
@@ -79,7 +103,8 @@ where
         + PartialEq
         + Debug,
 {
-    let mut lhs = parse_initial(state);
+    let mut lhs = parse_initial(state)?;
+    let mut non_assoc = None;
     loop {
         let Some(token) = state.token_current() else {
             break;
@@ -91,8 +116,9 @@ where
                 break;
             }
 
+            let text = token.text.to_string();
             state.advance();
-            lhs = L::parse_postfix(state, lhs);
+            lhs = L::parse_postfix(state, text, lhs)?;
             continue;
         }
 
@@ -102,17 +128,34 @@ where
                 break;
             }
 
+            if binding.is_none() {
+                if non_assoc == Some(left) {
+                    state.record_syntax_error(
+                        format!(
+                            "Same none associative operator `{}` used in succession",
+                            token.text,
+                        )
+                    );
+                    return None;
+                }
+
+                non_assoc = Some(left);
+            }
+
+            let text = token.text.to_string();
             state.advance();
-            let rhs = parse_expr(state, right);
-            lhs = L::parse_infix(state, lhs, rhs);
+            let rhs = parse_expr(state, right)?;
+            lhs = L::parse_infix(state, text, lhs, rhs)?;
             continue;
         }
     }
 
-    lhs
+    Some(lhs)
 }
 
-fn parse_initial<'a, L>(state: &mut ParserState<'a, L::TokenKind, L::Root>) -> L
+fn parse_initial<'a, L>(
+    state: &mut ParserState<'a, L::TokenKind, L::Root>,
+) -> Option<L>
 where
     L: PrattLanguage<'a>,
     L::TokenKind: Logos<'a, Source = str, Error = GraceErrorKind, Extras = LexerExtras>
@@ -121,14 +164,12 @@ where
         + PartialEq
         + Debug,
 {
-    let Ok(token) = state.get_token() else {
-        return L::parse_atom(state);
-    };
-
+    let token = state.get_token()?;
     if let Some(binding) = L::prefix_binding(token) {
+        let text = token.text.to_string();
         state.advance();
-        let rhs = parse_expr(state, binding.right_power());
-        return L::parse_prefix(state, rhs);
+        let rhs = parse_expr(state, binding.right_power())?;
+        return L::parse_prefix(state, text, rhs);
     }
 
     L::parse_atom(state)

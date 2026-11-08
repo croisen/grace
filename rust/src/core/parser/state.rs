@@ -1,5 +1,4 @@
 use std::fmt::Debug;
-use std::marker::PhantomData;
 
 use logos::Logos;
 
@@ -18,6 +17,7 @@ where
     pub tokens: Vec<Token<'a, TK>>,
     pub index: usize,
     pub root: Vec<L>,
+    pub checkpoint: Option<usize>,
     pub errors: Vec<GraceError>,
 }
 
@@ -31,7 +31,7 @@ where
 {
     pub fn new(source: &'a str) -> Self {
         let (tokens, errors) = Token::tokenize(source);
-        Self { tokens, index: 0, errors, root: vec![] }
+        Self { tokens, index: 0, errors, checkpoint: None, root: vec![] }
     }
 
     pub fn root_push(&mut self, item: impl Into<L>) {
@@ -50,12 +50,42 @@ where
         self.index < self.tokens.len()
     }
 
+    pub fn checkpoint_clear(&mut self) {
+        self.checkpoint = None;
+    }
+
+    pub fn checkpoint_set(&mut self, index: usize) {
+        self.checkpoint = Some(index);
+    }
+
+    pub fn checkpoint_get(&mut self) -> usize {
+        self.checkpoint.unwrap_or(self.index)
+    }
+
+    pub fn get_token(&mut self) -> Option<&Token<'a, TK>> {
+        let Some(token) = self.token_current() else {
+            self.record_unexpected_eof();
+            return None;
+        };
+
+        Some(token)
+    }
+
+    pub fn get_token_at(&mut self, offset: isize) -> Option<&Token<'a, TK>> {
+        let Some(token) = self.token_peek_at(offset) else {
+            self.record_unexpected_eof();
+            return None;
+        };
+
+        Some(token)
+    }
+
     pub fn token_current(&self) -> Option<&Token<'a, TK>> {
         self.tokens.get(self.index)
     }
 
-    pub fn token_peek_text(&mut self) -> Option<&'a str> {
-        Some(self.get_token().ok()?.text)
+    pub fn token_text(&mut self) -> Option<&'a str> {
+        self.get_token().map(|t| t.text)
     }
 
     pub fn token_peek_at(&self, offset: isize) -> Option<&Token<'a, TK>> {
@@ -63,30 +93,16 @@ where
     }
 
     pub fn token_peek_at_text(&mut self, offset: isize) -> Option<&'a str> {
-        Some(self.get_token_at(offset).ok()?.text)
-    }
-
-    pub fn token_eat(&mut self) -> bool {
-        let token = self.get_token();
-        token.is_ok()
+        self.token_peek_at(offset).map(|t| t.text)
     }
 
     pub fn token_eat_kind(&mut self, kind: TK) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        token.unwrap().kind == kind
+        let Some(token) = self.get_token() else { return false };
+        token.kind == kind
     }
 
     pub fn token_eat_kinds(&mut self, kind: &[TK]) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        let token = token.unwrap();
+        let Some(token) = self.get_token() else { return false };
         for kind in kind.iter() {
             if &token.kind == kind {
                 return true;
@@ -98,22 +114,13 @@ where
 
     /// case _ins_ensitive
     pub fn token_eat_text_ins(&mut self, text: impl AsRef<str>) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        token.unwrap().text.eq_ignore_ascii_case(text.as_ref())
+        let Some(token) = self.get_token() else { return false };
+        token.text.eq_ignore_ascii_case(text.as_ref())
     }
 
     /// case _ins_ensitive
     pub fn token_eat_texts_ins(&mut self, text: &[impl AsRef<str>]) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        let token = token.unwrap();
+        let Some(token) = self.get_token() else { return false };
         for text in text.iter() {
             if token.text.eq_ignore_ascii_case(text.as_ref()) {
                 return true;
@@ -125,22 +132,13 @@ where
 
     /// case _sen_sitive
     pub fn token_eat_text_sen(&mut self, text: impl AsRef<str>) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        token.unwrap().text == text.as_ref()
+        let Some(token) = self.get_token() else { return false };
+        token.text == text.as_ref()
     }
 
     /// case _sen_sitive
     pub fn token_eat_texts_sen(&mut self, text: &[impl AsRef<str>]) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        let token = token.unwrap();
+        let Some(token) = self.get_token() else { return false };
         for text in text.iter() {
             if token.text == text.as_ref() {
                 return true;
@@ -151,12 +149,8 @@ where
     }
 
     pub fn token_expect_kind(&mut self, kind: TK) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        let res = token.unwrap().kind == kind;
+        let Some(token) = self.get_token() else { return false };
+        let res = token.kind == kind;
         if !res {
             self.record_expected_token(format!("{kind:?}"));
         }
@@ -165,12 +159,7 @@ where
     }
 
     pub fn token_expect_kinds(&mut self, kind: &[TK]) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        let token = token.unwrap();
+        let Some(token) = self.get_token() else { return false };
         for kind in kind.iter() {
             if &token.kind == kind {
                 return true;
@@ -183,12 +172,8 @@ where
 
     /// case _ins_ensitive
     pub fn token_expect_text_ins(&mut self, text: impl AsRef<str>) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        let res = token.unwrap().text.eq_ignore_ascii_case(text.as_ref());
+        let Some(token) = self.get_token() else { return false };
+        let res = token.text.eq_ignore_ascii_case(text.as_ref());
         if !res {
             self.record_expected_text(text.as_ref().to_uppercase());
         }
@@ -198,12 +183,8 @@ where
 
     /// case _sen_sitive
     pub fn token_expect_text_sen(&mut self, text: impl AsRef<str>) -> bool {
-        let token = self.get_token();
-        if token.is_err() {
-            return false;
-        }
-
-        let res = token.unwrap().text == text.as_ref();
+        let Some(token) = self.get_token() else { return false };
+        let res = token.text == text.as_ref();
         if !res {
             self.record_expected_text(text.as_ref());
         }
@@ -249,17 +230,11 @@ where
         self.errors.push(GraceError::unexpected_token(token.text, line, col));
     }
 
-    pub fn record_unexpected_eof(&mut self) -> GraceError {
-        if !self.not_at_end() {
-            self.seek_end();
-        }
-
+    pub fn record_unexpected_eof(&mut self) {
         let t = Token::new(TK::default(), "", LexerExtras { line: 1, col: 0 });
-        let token = self.tokens.get(self.index).unwrap_or(&t);
+        let token = self.tokens.last().unwrap_or(&t);
         let (line, col) = (token.line, token.col + token.text.len());
-        let err = GraceError::unexpected_eof(line, col);
-        self.errors.push(err.clone());
-        err
+        self.errors.push(GraceError::unexpected_eof(line, col));
     }
 
     pub fn record_unmatched_token_pair(&mut self, reason: impl Into<String>) {
@@ -279,31 +254,10 @@ where
     }
 
     pub fn seek_end(&mut self) {
-        self.seek(self.index - 1)
+        self.seek(self.tokens.len().wrapping_sub(1))
     }
 
     pub fn seek_offset(&mut self, offset: isize) {
         self.seek(self.index.wrapping_add_signed(offset))
-    }
-
-    pub fn get_token(&mut self) -> Result<&Token<'a, TK>, GraceError> {
-        if let Some(token) = self.tokens.get(self.index) {
-            Ok(token)
-        } else {
-            Err(self.record_unexpected_eof())
-        }
-    }
-
-    pub fn get_token_at(
-        &mut self,
-        offset: isize,
-    ) -> Result<&Token<'a, TK>, GraceError> {
-        if let Some(token) =
-            self.tokens.get(self.index.wrapping_add_signed(offset))
-        {
-            Ok(token)
-        } else {
-            Err(self.record_unexpected_eof())
-        }
     }
 }

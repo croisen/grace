@@ -1,7 +1,9 @@
 use crate::core::ast::java::member::JavaMember;
 use crate::core::ast::java::parameter::JavaParameter;
 use crate::core::ast::java::statement::JavaStatement;
+use crate::core::ast::java::{JavaAst, JavaParserState};
 use crate::core::lexers::java::{JavaToken, JavaTokenKind};
+use crate::core::parser::pratt::{PrattLanguage, parse_expr};
 
 #[derive(Debug, Clone)]
 pub enum JavaExpression {
@@ -40,6 +42,18 @@ pub enum JavaExpression {
         expression: Box<JavaExpression>,
     },
     Lambda(JavaLambda),
+}
+
+impl JavaExpression {
+    pub fn new<'a>(state: &mut JavaParserState<'a>) -> Self {
+        parse_expr(state, 0).unwrap_or(Self::Identifier("Placeholder".into()))
+    }
+}
+
+// impl later
+impl<'a> PrattLanguage<'a> for JavaExpression {
+    type Root = JavaAst;
+    type TokenKind = JavaTokenKind;
 }
 
 #[derive(Debug, Clone)]

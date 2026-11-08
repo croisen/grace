@@ -1,10 +1,7 @@
-use std::collections::HashSet;
-
 use crate::core::ast::sql::expression::SQLExpression;
 use crate::core::ast::sql::statements::query::SQLSelect;
 use crate::core::ast::sql::{SQLAst, SQLParserState};
 use crate::core::lexers::sql::{SQLToken, SQLTokenKind};
-use crate::core::parser::state::ParserState;
 
 #[derive(Debug, Clone)]
 pub struct SQLCreate {
@@ -117,7 +114,7 @@ impl SQLCreateBody {
             }
 
             if state.token_expect_text_ins(",") {
-                if let Ok(token) = state.get_token_at(1)
+                if let Some(token) = state.get_token_at(1)
                     && token.text == ")"
                 {
                     state.advance();
@@ -164,7 +161,7 @@ impl SQLCreateBody {
             }
 
             if state.token_expect_text_ins(",") {
-                if let Ok(token) = state.get_token_at(1)
+                if let Some(token) = state.get_token_at(1)
                     && token.text == ")"
                 {
                     state.advance();
@@ -209,12 +206,12 @@ impl SQLColumnDefinition {
         };
 
         if state.token_expect_kind(SQLTokenKind::Identifier) {
-            s.name = state.token_current().unwrap().text.to_string();
+            s.name = state.token_text().unwrap().to_string();
         }
 
         state.advance();
         if state.token_expect_kind(SQLTokenKind::Identifier) {
-            s.name = state.token_current().unwrap().text.to_string();
+            s.r#type = state.token_text().unwrap().to_string();
         }
 
         state.advance();
@@ -295,7 +292,58 @@ impl SQLDrop {
             if_exists: false,
         };
 
+        state.advance();
+
+        if state.token_eat_text_ins("database") {
+            s.r#type = SQLDropType::Database; // not really necessary
+        } else if state.token_eat_text_ins("table") {
+            s.r#type = SQLDropType::Table;
+        } else if state.token_eat_text_ins("view") {
+            s.r#type = SQLDropType::View;
+        } else if state.token_eat_text_ins("index") {
+            s.r#type = SQLDropType::Index;
+        } else {
+            state.record_unexpected_token();
+        }
+
+        s.if_exists(state);
+        s.name(state);
+
         s
+    }
+
+    fn if_exists(&mut self, state: &mut SQLParserState) {
+        state.advance();
+        if !state.token_eat_text_ins("if") {
+            return;
+        }
+
+        state.advance();
+        if state.token_eat_text_ins("not") {
+            state.advance();
+            self.if_exists = false;
+        } else {
+            self.if_exists = true;
+        }
+
+        if state.token_expect_text_ins("exists") {
+            state.advance();
+        }
+    }
+
+    fn name(&mut self, state: &mut SQLParserState) {
+        if !state.token_expect_kind(SQLTokenKind::Identifier) {
+            return;
+        }
+
+        self.name = state.token_current().unwrap().text.to_string();
+        state.advance();
+    }
+}
+
+impl From<SQLDrop> for SQLAst {
+    fn from(value: SQLDrop) -> Self {
+        Self::Drop(value)
     }
 }
 

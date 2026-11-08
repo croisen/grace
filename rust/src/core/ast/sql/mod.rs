@@ -47,7 +47,8 @@ impl SQLAst {
                 let c = SQLCreate::new(&mut state);
                 state.root_push(c);
             } else if state.token_eat_text_ins("drop") {
-                state.record_unexpected_token();
+                let d = SQLDrop::new(&mut state);
+                state.root_push(d);
             } else if state.token_eat_text_ins("alter") {
                 state.record_unexpected_token();
             } else if state.token_eat_text_ins("insert") {

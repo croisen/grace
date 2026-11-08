@@ -4,7 +4,7 @@ use crate::core::lexers::sql::{SQLToken, SQLTokenKind};
 
 #[derive(Debug, Clone)]
 pub struct SQLSelect {
-    pub items: SQLSelectItems,
+    pub items: Vec<SQLSelectItem>,
     pub from: Option<String>,
     pub joins: Vec<SQLJoinClause>,
     pub r#where: Option<SQLExpression>,

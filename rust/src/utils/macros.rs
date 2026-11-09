@@ -1,4 +1,3 @@
-#[macro_export]
 macro_rules! all {
     ($($arg:expr),*) => {{
         let mut truthy = false;
@@ -12,7 +11,6 @@ macro_rules! all {
     }};
 }
 
-#[macro_export]
 macro_rules! any {
     ($($arg:expr),*) => {{
         let mut truthy = false;

@@ -1,5 +1,3 @@
-use crate::api::drills::Comp;
-
 #[derive(Default, Debug, Clone)]
 pub struct JavaDrill {
     pub conditions: Vec<String>,

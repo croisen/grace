@@ -85,7 +85,11 @@ where
     }
 
     pub fn token_text(&mut self) -> Option<&'a str> {
-        self.get_token().map(|t| t.text)
+        self.tokens.get(self.index).map(|t| t.text)
+    }
+
+    pub fn token_kind(&mut self) -> Option<&TK> {
+        self.tokens.get(self.index).map(|t| &t.kind)
     }
 
     pub fn token_peek_at(&self, offset: isize) -> Option<&Token<'a, TK>> {
@@ -94,6 +98,10 @@ where
 
     pub fn token_peek_at_text(&mut self, offset: isize) -> Option<&'a str> {
         self.token_peek_at(offset).map(|t| t.text)
+    }
+
+    pub fn token_peek_at_kind(&mut self, offset: isize) -> Option<&TK> {
+        self.token_peek_at(offset).map(|t| &t.kind)
     }
 
     pub fn token_eat_kind(&mut self, kind: TK) -> bool {
@@ -193,39 +201,39 @@ where
     }
 
     pub fn record_syntax_error(&mut self, reason: impl Into<String>) {
-        let token = &self.tokens[self.index];
+        let Some(token) = &self.token_current() else { return };
         let (line, col) = (token.line, token.col);
         self.errors.push(GraceError::syntax_error(reason, line, col));
     }
 
     pub fn record_expected_token(&mut self, text: impl Into<String>) {
-        let token = &self.tokens[self.index];
+        let Some(token) = &self.token_current() else { return };
         let (line, col) = (token.line, token.col);
         let reason = format!("`{}` found `{:?}`", text.into(), token.kind);
         self.errors.push(GraceError::expected_token(reason, line, col));
     }
 
     pub fn record_expected_text(&mut self, text: impl Into<String>) {
-        let token = &self.tokens[self.index];
+        let Some(token) = &self.token_current() else { return };
         let (line, col) = (token.line, token.col);
         let reason = format!("`{}` found `{}`", text.into(), token.text);
         self.errors.push(GraceError::expected_text(reason, line, col));
     }
 
     pub fn record_reserved_keyword(&mut self, reason: impl Into<String>) {
-        let token = &self.tokens[self.index];
+        let Some(token) = &self.token_current() else { return };
         let (line, col) = (token.line, token.col);
         self.errors.push(GraceError::reserved_keyword(reason, line, col));
     }
 
     pub fn record_trailing_comma(&mut self) {
-        let token = &self.tokens[self.index];
+        let Some(token) = &self.token_current() else { return };
         let (line, col) = (token.line, token.col);
         self.errors.push(GraceError::trailing_comma(line, col));
     }
 
     pub fn record_unexpected_token(&mut self) {
-        let token = &self.tokens[self.index];
+        let Some(token) = &self.token_current() else { return };
         let (line, col) = (token.line, token.col);
         self.errors.push(GraceError::unexpected_token(token.text, line, col));
     }
@@ -238,13 +246,13 @@ where
     }
 
     pub fn record_unmatched_token_pair(&mut self, reason: impl Into<String>) {
-        let token = &self.tokens[self.index];
+        let Some(token) = &self.token_current() else { return };
         let (line, col) = (token.line, token.col);
         self.errors.push(GraceError::unmatched_token_pair(reason, line, col));
     }
 
     pub fn record_custom(&mut self, reason: impl Into<String>) {
-        let token = &self.tokens[self.index];
+        let Some(token) = &self.token_current() else { return };
         let (line, col) = (token.line, token.col);
         self.errors.push(GraceError::custom(reason, line, col));
     }

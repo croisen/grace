@@ -114,11 +114,9 @@ impl SQLCreateBody {
             }
 
             if state.token_expect_text_ins(",") {
-                if let Some(token) = state.get_token_at(1)
-                    && token.text == ")"
-                {
-                    state.advance();
+                if state.token_peek_at_text(1) == Some(")") {
                     state.record_trailing_comma();
+                    state.advance();
                     break;
                 }
             }
@@ -161,11 +159,9 @@ impl SQLCreateBody {
             }
 
             if state.token_expect_text_ins(",") {
-                if let Some(token) = state.get_token_at(1)
-                    && token.text == ")"
-                {
-                    state.advance();
+                if state.token_peek_at_text(1) == Some(")") {
                     state.record_trailing_comma();
+                    state.advance();
                     break;
                 }
             }
@@ -239,7 +235,7 @@ pub enum SQLColumnRestraint {
     NotNull,
     Nullable,
     AutoIncrement,
-    Default(SQLExpression), // TODO: SQL Expression Parsing
+    Default(SQLExpression),
     Check(SQLExpression),
 }
 
@@ -270,6 +266,12 @@ impl SQLColumnRestraint {
             Some(Self::AutoIncrement)
         } else if state.token_eat_text_ins("auto_increment") {
             Some(Self::AutoIncrement)
+        } else if state.token_eat_text_ins("default") {
+            state.advance();
+            Some(Self::Default(SQLExpression::new(state)))
+        } else if state.token_eat_text_ins("check") {
+            state.advance();
+            Some(Self::Check(SQLExpression::new(state)))
         } else {
             state.record_unexpected_token();
             None

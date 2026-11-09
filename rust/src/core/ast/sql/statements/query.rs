@@ -1,5 +1,5 @@
-use crate::core::ast::sql::SQLParserState;
 use crate::core::ast::sql::expression::SQLExpression;
+use crate::core::ast::sql::{SQLAst, SQLParserState};
 use crate::core::lexers::sql::{SQLToken, SQLTokenKind};
 
 #[derive(Debug, Clone)]
@@ -27,7 +27,64 @@ impl SQLSelect {
             limit: None,
         };
 
+        state.advance();
+        if state.token_eat_text_ins("distinct") {
+            state.advance();
+        }
+
+        while state.not_at_end() {
+            s.items.push(SQLSelectItem::new(state));
+            if state.token_eat_kind(SQLTokenKind::StrictKeyword) {
+                break;
+            }
+
+            if state.token_expect_text_ins(",") {
+                if state.token_peek_at_kind(1)
+                    == Some(&SQLTokenKind::StrictKeyword)
+                {
+                    state.record_trailing_comma();
+                    state.advance();
+                    break;
+                }
+            }
+
+            state.advance();
+        }
+
+        if state.token_eat_text_ins("from") {
+            state.advance();
+            state.token_expect_kind(SQLTokenKind::Identifier);
+            s.from = state.token_text().map(|t| t.to_string());
+            state.advance();
+        }
+
+        while state.not_at_end() {
+            if state.token_eat_text_ins("where") {
+                if s.r#where.is_none() {
+                    state.advance();
+                    s.r#where = Some(SQLExpression::new(state));
+                } else {
+                    state.advance();
+                    let _ = SQLExpression::new(state);
+                    state.record_syntax_error("Where clause was used again");
+                }
+            }
+
+            /* TODO */
+            // the rest...
+
+            if state.token_eat_text_ins(";") {
+                break;
+            }
+        }
+
         s
+    }
+}
+
+impl From<SQLSelect> for SQLAst {
+    fn from(value: SQLSelect) -> Self {
+        Self::Select(value)
     }
 }
 
@@ -39,7 +96,17 @@ pub enum SQLSelectItem {
 
 impl SQLSelectItem {
     pub fn new(state: &mut SQLParserState) -> Self {
-        Self::Asterisk
+        if state.token_eat_text_sen("*") {
+            return Self::Asterisk;
+        }
+
+        let mut expr = SQLExpression::new(state);
+        if state.token_eat_text_ins("as") {
+            state.advance();
+            return Self::Expr(expr, Some(SQLExpression::new(state)));
+        }
+
+        Self::Expr(expr, None)
     }
 }
 

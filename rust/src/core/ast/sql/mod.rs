@@ -2,7 +2,7 @@ use crate::core::ast::sql::statements::ddl::{SQLAlter, SQLCreate, SQLDrop};
 use crate::core::ast::sql::statements::dml::{Delete, SQLInsert, SQLUpdate};
 use crate::core::ast::sql::statements::query::{
     SQLGroupByClause, SQLHavingClause, SQLJoinClause, SQLLimitClause,
-    SQLOrderByClause, SQLSelectItem,
+    SQLOrderByClause, SQLSelect,
 };
 use crate::core::ast::sql::statements::session::{SQLSetNames, SQLTransaction};
 use crate::core::lexers::sql::SQLTokenKind;
@@ -24,7 +24,7 @@ pub enum SQLAst {
     Update(SQLUpdate),
     Delete(Delete),
 
-    Select(SQLSelectItem),
+    Select(SQLSelect),
     Join(SQLJoinClause),
     GroupBy(SQLGroupByClause),
     Having(SQLHavingClause),
@@ -58,7 +58,8 @@ impl SQLAst {
             } else if state.token_eat_text_ins("delete") {
                 state.record_unexpected_token();
             } else if state.token_eat_text_ins("select") {
-                state.record_unexpected_token();
+                let s = SQLSelect::new(&mut state);
+                state.root_push(s);
             } else {
                 state.record_unexpected_token();
             }

@@ -105,7 +105,8 @@ where
 {
     let mut lhs = parse_initial(state)?;
     let mut non_assoc = None;
-    loop {
+    state.advance();
+    while state.not_at_end() {
         let Some(token) = state.token_current() else {
             break;
         };
@@ -148,6 +149,8 @@ where
             lhs = L::parse_infix(state, text, lhs, rhs)?;
             continue;
         }
+
+        break;
     }
 
     Some(lhs)

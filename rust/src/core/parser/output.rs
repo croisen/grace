@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fmt::Debug;
 
 use logos::Logos;
@@ -21,6 +22,14 @@ where
         + Debug,
 {
     fn from(value: ParserState<'a, TK, L>) -> Self {
-        Self { root: value.root, errors: value.errors }
+        Self {
+            root: value.root,
+            errors: value
+                .errors
+                .into_iter()
+                .collect::<HashSet<_>>()
+                .into_iter()
+                .collect(),
+        }
     }
 }

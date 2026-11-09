@@ -3,29 +3,16 @@ mod api;
 mod core;
 mod utils;
 
-use crate::core::ast::sql::SQLAst;
+use crate::core::ast::sql::expression::SQLExpression;
+use crate::core::ast::sql::{SQLAst, SQLParserState};
 
 fn main() {
     let source = r#"
-        CREATE DATABASE IF NOT EXISTS test_db1;
-        CREATE DATABASE IF EXISTS test_db2;
-        CREATE DATABASE test_db3;
-
-        CREATE TABLE IF NOT EXISTS test_table(
-            id INT AUTO INCREMENT PRIMARY KEY,
-            fname TEXT,
-            lname TEXT
-        );
-
-        CREATE UNIQUE INDEX IF NOT EXISTS test_idx1 on test_table (
-            fname,
-            lname
-        );
-
-        CREATE INDEX test_idx2 on test_table (
-            id,
-            fname
-        );
+        SELECT
+            age * 2 + 1 as new_age,
+            lname as Last,
+            fname as first,
+        FROM test_table;
     "#;
 
     let output = SQLAst::new(source);

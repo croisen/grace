@@ -68,6 +68,7 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
             return Some(Self::Literal(state.token_text().unwrap().into()));
         }
 
+        state.record_unexpected_token();
         None
     }
 
@@ -94,7 +95,7 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
         lhs: Self,
     ) -> Option<Self> {
         // not like this could happen but we're gonna be precise here, but our postfix operator is only
-        // this right now
+        // functions right now
         if op != "(" {
             state.record_unexpected_token();
             return None;
@@ -108,7 +109,6 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
         };
 
         let mut args = vec![];
-        state.advance();
         loop {
             args.push(parse_expr(state, 0)?);
             if state.token_eat_text_ins(")") {
@@ -116,11 +116,9 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
             }
 
             if state.token_expect_text_ins(",") {
-                if let Some(token) = state.get_token_at(1)
-                    && token.text == ")"
-                {
-                    state.advance();
+                if state.token_peek_at_text(1) == Some(")") {
                     state.record_trailing_comma();
+                    state.advance();
                     break;
                 }
             }

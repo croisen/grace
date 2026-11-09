@@ -2,7 +2,7 @@ use crate::core::errors::kind::GraceErrorKind;
 
 pub mod kind;
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GraceError {
     kind: GraceErrorKind,
     line: usize,

@@ -1,10 +1,13 @@
 #![allow(dead_code, unused)] // remove later
 mod api;
 mod core;
+mod langs;
 mod utils;
 
+use crate::api::drills::java::java_if_statement;
 use crate::core::ast::sql::expression::SQLExpression;
 use crate::core::ast::sql::{SQLAst, SQLParserState};
+use crate::core::edit::edit_distance;
 
 fn main() {
     let source = r#"
@@ -24,4 +27,8 @@ fn main() {
     for err in output.errors {
         println!("{err:?}");
     }
+
+    java_if_statement();
+
+    println!("Edit distance: {}", edit_distance("kro1sen", "croisen"));
 }

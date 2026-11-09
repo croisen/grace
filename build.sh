@@ -94,14 +94,28 @@ case "${1:-}" in
             --value "$2"
         ;;
     "cat")
-        find lib -iname *.dart -and -not -name 'licenses.g.dart' \
+        find "${SCRIPT_PATH}"/lib "${SCRIPT_PATH}"/rust/src \
+            \( -not -path "${SCRIPT_PATH}"/lib/rust/\* \) -and \
+            \( -not -iname "licenses.g.dart" \) -and \
+            \( -not -iname "frb_generated.*" \) -and \
+            \( -iname "*.dart" -or -name "*.rs" \) \
             | sort \
             | xargs -I{} sh -c "echo {}:; cat {}; echo -ne '\x0c'"
         ;;
     "wc")
-        find ${SCRIPT_PATH}/lib ${SCRIPT_PATH}/rust/src \
-            -iname "*.dart" -or -name "*.rs" | \
-            xargs wc -l
+        find "${SCRIPT_PATH}"/lib "${SCRIPT_PATH}"/rust/src \
+            \( -not -path "${SCRIPT_PATH}"/lib/rust/\* \) -and \
+            \( -not -iname "licenses.g.dart" \) -and \
+            \( -not -iname "frb_generated.*" \) -and \
+            \( -iname "*.dart" -or -name "*.rs" \) \
+            | sort \
+            | xargs wc -l
+        ;;
+    "raw-wc")
+        find "${SCRIPT_PATH}"/lib "${SCRIPT_PATH}"/rust/src \
+            \( -iname "*.dart" -or -name "*.rs" \) \
+            | sort \
+            | xargs wc -l
         ;;
     "licenses")
         dart run dart_pubspec_licenses:generate -o "${SCRIPT_PATH}"/lib/utils/licenses.g.dart
@@ -145,7 +159,8 @@ case "${1:-}" in
         echo "deldb    - deletes the db at a known place on linux"
         echo "rename   - renames the app bundle id"
         echo "cat      - echoes out the contents of all dart files under lib to stdout"
-        echo "wc       - gets the line count of all dart and rust files"
+        echo "wc       - gets the line count of all dart and rust files (except generated files)"
+        echo "raw-wc   - gets the line count of all dart and rust files"
         echo "licenses - generates the licenses of the dependencies used"
         echo "sign     - signs the apk if the apks exist and release.jks exists"
         echo "generate - generates code for rust <-> flutter bridge"

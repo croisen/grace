@@ -2,8 +2,7 @@ use std::fmt::Debug;
 
 use logos::Logos;
 
-use crate::config::EDIT_THRESHOLD;
-use crate::core::edit::{edit_distance_ins, edit_distance_sen};
+use crate::core::edit::{close_enough, edit_distance_ins, edit_distance_sen};
 use crate::core::errors::GraceError;
 use crate::core::errors::kind::GraceErrorKind;
 use crate::core::lexers::{LexerExtras, Token};
@@ -125,9 +124,9 @@ where
     /// case _ins_ensitive
     pub fn token_eat_text_ins(&mut self, text: impl AsRef<str>) -> bool {
         let Some(token) = self.get_token() else { return false };
-        let res = edit_distance_sen(text.as_ref(), token.text); // 0 is actual match
-        let output = res < text.as_ref().len() / EDIT_THRESHOLD;
-        if res != 0 && !output {
+        let distance = edit_distance_ins(text.as_ref(), token.text); // 0 is actual match
+        let output = close_enough(text.as_ref(), distance);
+        if distance != 0 && output {
             self.record_close_enough(text.as_ref());
         }
 
@@ -149,9 +148,9 @@ where
     /// case _sen_sitive
     pub fn token_eat_text_sen(&mut self, text: impl AsRef<str>) -> bool {
         let Some(token) = self.get_token() else { return false };
-        let res = edit_distance_ins(text.as_ref(), token.text); // 0 is actual match
-        let output = res < text.as_ref().len() / EDIT_THRESHOLD;
-        if res != 0 && !output {
+        let distance = edit_distance_sen(text.as_ref(), token.text); // 0 is actual match
+        let output = close_enough(text.as_ref(), distance);
+        if distance != 0 && output {
             self.record_close_enough(text.as_ref());
         }
 
@@ -160,7 +159,7 @@ where
 
     /// case _sen_sitive
     pub fn token_eat_texts_sen(&mut self, text: &[impl AsRef<str>]) -> bool {
-        let Some(token) = self.get_token() else { return false };
+        let Some(_) = self.get_token() else { return false };
         for text in text.iter() {
             if self.token_eat_text_sen(text) {
                 return true;
@@ -193,13 +192,11 @@ where
     /// case _ins_ensitive
     pub fn token_expect_text_ins(&mut self, text: impl AsRef<str>) -> bool {
         let Some(token) = self.get_token() else { return false };
-        let res = edit_distance_ins(text.as_ref(), token.text); // 0 is actual match
-        let mut output = true;
-        if 0 < res && res < text.as_ref().len() / EDIT_THRESHOLD {
-            output = true;
-            self.record_close_enough(text.as_ref().to_uppercase());
-        } else if res != 0 {
-            output = false;
+        let distance = edit_distance_ins(text.as_ref(), token.text); // 0 is actual match
+        let output = close_enough(text.as_ref(), distance);
+        if distance != 0 && output {
+            self.record_close_enough(text.as_ref());
+        } else if distance != 0 {
             self.record_expected_text(text.as_ref().to_uppercase());
         }
 
@@ -209,13 +206,11 @@ where
     /// case _sen_sitive
     pub fn token_expect_text_sen(&mut self, text: impl AsRef<str>) -> bool {
         let Some(token) = self.get_token() else { return false };
-        let res = edit_distance_sen(text.as_ref(), token.text); // 0 is actual match
-        let mut output = true;
-        if 0 < res && res < text.as_ref().len() / EDIT_THRESHOLD {
-            output = true;
-            self.record_close_enough(text.as_ref().to_uppercase());
-        } else if res != 0 {
-            output = false;
+        let distance = edit_distance_sen(text.as_ref(), token.text); // 0 is actual match
+        let output = close_enough(text.as_ref(), distance);
+        if distance != 0 && output {
+            self.record_close_enough(text.as_ref());
+        } else if distance != 0 {
             self.record_expected_text(text.as_ref().to_uppercase());
         }
 

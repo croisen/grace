@@ -1,3 +1,5 @@
+pub static EDIT_THRESHOLD: usize = 3; // up to two mistakes
+
 pub fn edit_distance_sen(source: &str, text: &str) -> usize {
     let a = source.chars().collect::<Vec<_>>();
     let b = text.chars().collect::<Vec<_>>();
@@ -46,4 +48,9 @@ pub fn edit_distance_ins(source: &str, text: &str) -> usize {
     }
 
     curr[n]
+}
+
+pub fn close_enough(source: &str, distance: usize) -> bool {
+    let threshold = EDIT_THRESHOLD.min(source.len());
+    distance == 0 || distance < threshold
 }

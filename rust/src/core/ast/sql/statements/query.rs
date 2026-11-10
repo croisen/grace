@@ -34,23 +34,28 @@ impl SQLSelect {
 
         while state.not_at_end() {
             s.items.push(SQLSelectItem::new(state));
-            if state.token_eat_kind(SQLTokenKind::StrictKeyword) {
+            if state.token_eat_kind(SQLTokenKind::StrictKeyword)
+                || state.token_eat_texts_ins(&["from", "where"])
+            {
                 break;
             }
 
             if state.token_expect_text_ins(",") {
-                if state.token_peek_at_kind(1)
-                    == Some(&SQLTokenKind::StrictKeyword)
+                state.advance();
+                if state.token_eat_kind(SQLTokenKind::StrictKeyword)
+                    || state.token_eat_texts_ins(&["from", "where"])
                 {
                     state.record_trailing_comma();
-                    state.advance();
                     break;
                 }
+
+                state.seek_offset(-1);
             }
 
             state.advance();
         }
 
+        println!("{:?}", state.token_current());
         if state.token_eat_text_ins("from") {
             state.advance();
             state.token_expect_kind(SQLTokenKind::Identifier);
@@ -68,14 +73,14 @@ impl SQLSelect {
                     let _ = SQLExpression::new(state);
                     state.record_syntax_error("Where clause was used again");
                 }
+
+                continue;
             }
 
             /* TODO */
             // the rest...
 
-            if state.token_eat_text_ins(";") {
-                break;
-            }
+            break;
         }
 
         s

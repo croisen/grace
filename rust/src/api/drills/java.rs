@@ -1,3 +1,7 @@
+use crate::api::drills::{
+    generic_operator, generic_varname1, generic_varname2,
+};
+
 #[derive(Default, Debug, Clone)]
 #[flutter_rust_bridge::frb(non_opaque)]
 pub struct JavaDrill {
@@ -90,9 +94,14 @@ pub fn java_if_statement() -> JavaDrill {
     drill.new_class("Main");
     drill.new_main();
 
-    drill.new_if_statement("a", "<=", "b");
+    drill.new_if_statement(
+        generic_varname1(),
+        generic_operator(),
+        generic_varname2(),
+    );
     drill.print("pass");
-    drill.print("yadada");
+    drill.new_else_statement();
+    drill.print("fail");
     drill.close_if_statement();
 
     drill.close_main();

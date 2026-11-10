@@ -24,7 +24,8 @@ trap __croi_exit SIGINT
 case "${1:-}" in
     "linux")
         "${SCRIPT}" icon
-        "${SCRIPT}" licenses
+        dart run dart_pubspec_licenses:generate -o "${SCRIPT_PATH}"/lib/utils/licenses.g.dart
+        flutter_rust_bridge_codegen generate
         flutter build linux --release --verbose
         if ! [ -f "${SCRIPT_PATH}/built/appimagetool-x86_64.AppImage" ]; then
             wget -O "${SCRIPT_PATH}/built/appimagetool-x86_64.AppImage" \
@@ -36,8 +37,8 @@ case "${1:-}" in
             rm -rf "${SCRIPT_PATH}/built/grace.AppDir"
         fi
 
-        cp -r "${SCRIPT_PATH}/build/linux/x64/release/bundle" "${SCRIPT_PATH}/built/exam_checker.AppDir"
-        cp "${SCRIPT_PATH}/assets/AppRun" "${SCRIPT_PATH}/built/exam_checker.AppDir"
+        cp -r "${SCRIPT_PATH}/build/linux/x64/release/bundle" "${SCRIPT_PATH}/built/grace.AppDir"
+        cp "${SCRIPT_PATH}/assets/AppRun" "${SCRIPT_PATH}/built/grace.AppDir"
         cp "${SCRIPT_PATH}/assets/Grace.desktop" "${SCRIPT_PATH}/built/grace.AppDir"
         cp "${SCRIPT_PATH}/assets/icons/icon.png" "${SCRIPT_PATH}/built/grace.AppDir"
         "${SCRIPT_PATH}/built/appimagetool-x86_64.AppImage" \
@@ -46,7 +47,7 @@ case "${1:-}" in
         ;;
     "apk")
         "${SCRIPT}" icon
-        "${SCRIPT}" licenses
+        dart run dart_pubspec_licenses:generate -o "${SCRIPT_PATH}"/lib/utils/licenses.g.dart
         flutter_rust_bridge_codegen generate
         flutter build apk \
             --release \
@@ -132,21 +133,18 @@ case "${1:-}" in
         flutter_rust_bridge_codegen generate
         ;;
     "run-rust")
-        flutter_rust_bridge_codegen generate
         pushd "${SCRIPT_PATH}"/rust
-        cargo run --release
+        cargo run --release --bin rust-lib-grace
         popd
         ;;
     "run-rustr")
-        flutter_rust_bridge_codegen generate
         pushd "${SCRIPT_PATH}"/rust
-        cargo run --release -Z build-std
+        cargo run --release -Z build-std --bin rust-lib-grace
         popd
         ;;
     "run-rustd")
-        flutter_rust_bridge_codegen generate
         pushd "${SCRIPT_PATH}"/rust
-        RUST_BACKTRACE=1 cargo run -Z build-std 
+        RUST_BACKTRACE=1 cargo run -Z build-std --bin rust-lib-grace
         popd
         ;;
     *)

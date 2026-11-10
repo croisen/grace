@@ -2,6 +2,8 @@ use std::fmt::Debug;
 
 use logos::Logos;
 
+use crate::config::EDIT_THRESHOLD;
+use crate::core::edit::{edit_distance_ins, edit_distance_sen};
 use crate::core::errors::GraceError;
 use crate::core::errors::kind::GraceErrorKind;
 use crate::core::lexers::{LexerExtras, Token};
@@ -123,14 +125,20 @@ where
     /// case _ins_ensitive
     pub fn token_eat_text_ins(&mut self, text: impl AsRef<str>) -> bool {
         let Some(token) = self.get_token() else { return false };
-        token.text.eq_ignore_ascii_case(text.as_ref())
+        let res = edit_distance_sen(text.as_ref(), token.text); // 0 is actual match
+        let output = res < text.as_ref().len() / EDIT_THRESHOLD;
+        if res != 0 && !output {
+            self.record_close_enough(text.as_ref());
+        }
+
+        output
     }
 
     /// case _ins_ensitive
     pub fn token_eat_texts_ins(&mut self, text: &[impl AsRef<str>]) -> bool {
         let Some(token) = self.get_token() else { return false };
         for text in text.iter() {
-            if token.text.eq_ignore_ascii_case(text.as_ref()) {
+            if self.token_eat_text_ins(text) {
                 return true;
             }
         }
@@ -141,14 +149,20 @@ where
     /// case _sen_sitive
     pub fn token_eat_text_sen(&mut self, text: impl AsRef<str>) -> bool {
         let Some(token) = self.get_token() else { return false };
-        token.text == text.as_ref()
+        let res = edit_distance_ins(text.as_ref(), token.text); // 0 is actual match
+        let output = res < text.as_ref().len() / EDIT_THRESHOLD;
+        if res != 0 && !output {
+            self.record_close_enough(text.as_ref());
+        }
+
+        output
     }
 
     /// case _sen_sitive
     pub fn token_eat_texts_sen(&mut self, text: &[impl AsRef<str>]) -> bool {
         let Some(token) = self.get_token() else { return false };
         for text in text.iter() {
-            if token.text == text.as_ref() {
+            if self.token_eat_text_sen(text) {
                 return true;
             }
         }
@@ -157,8 +171,7 @@ where
     }
 
     pub fn token_expect_kind(&mut self, kind: TK) -> bool {
-        let Some(token) = self.get_token() else { return false };
-        let res = token.kind == kind;
+        let res = self.token_eat_kind(kind.clone());
         if !res {
             self.record_expected_token(format!("{kind:?}"));
         }
@@ -167,9 +180,8 @@ where
     }
 
     pub fn token_expect_kinds(&mut self, kind: &[TK]) -> bool {
-        let Some(token) = self.get_token() else { return false };
         for kind in kind.iter() {
-            if &token.kind == kind {
+            if self.token_eat_kind(kind.clone()) {
                 return true;
             }
         }
@@ -181,29 +193,47 @@ where
     /// case _ins_ensitive
     pub fn token_expect_text_ins(&mut self, text: impl AsRef<str>) -> bool {
         let Some(token) = self.get_token() else { return false };
-        let res = token.text.eq_ignore_ascii_case(text.as_ref());
-        if !res {
+        let res = edit_distance_ins(text.as_ref(), token.text); // 0 is actual match
+        let mut output = true;
+        if 0 < res && res < text.as_ref().len() / EDIT_THRESHOLD {
+            output = true;
+            self.record_close_enough(text.as_ref().to_uppercase());
+        } else if res != 0 {
+            output = false;
             self.record_expected_text(text.as_ref().to_uppercase());
         }
 
-        res
+        output
     }
 
     /// case _sen_sitive
     pub fn token_expect_text_sen(&mut self, text: impl AsRef<str>) -> bool {
         let Some(token) = self.get_token() else { return false };
-        let res = token.text == text.as_ref();
-        if !res {
-            self.record_expected_text(text.as_ref());
+        let res = edit_distance_sen(text.as_ref(), token.text); // 0 is actual match
+        let mut output = true;
+        if 0 < res && res < text.as_ref().len() / EDIT_THRESHOLD {
+            output = true;
+            self.record_close_enough(text.as_ref().to_uppercase());
+        } else if res != 0 {
+            output = false;
+            self.record_expected_text(text.as_ref().to_uppercase());
         }
 
-        res
+        output
     }
 
     pub fn record_syntax_error(&mut self, reason: impl Into<String>) {
         let Some(token) = &self.token_current() else { return };
         let (line, col) = (token.line, token.col);
         self.errors.push(GraceError::syntax_error(reason, line, col));
+    }
+
+    pub fn record_close_enough(&mut self, text: impl Into<String>) {
+        let Some(token) = &self.token_current() else { return };
+        let (line, col) = (token.line, token.col);
+        let reason =
+            format!("`{}` close enough to `{:?}`", token.text, text.into());
+        self.errors.push(GraceError::close_to_expected_text(reason, line, col));
     }
 
     pub fn record_expected_token(&mut self, text: impl Into<String>) {

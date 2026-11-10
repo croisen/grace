@@ -1,4 +1,4 @@
-#![allow(dead_code, unused)] // remove later
+mod config;
 mod core;
 mod frb_generated;
 mod langs;

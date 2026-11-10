@@ -22,6 +22,14 @@ impl GraceError {
         Self::new(GraceErrorKind::SyntaxError(reason.into()), line, col)
     }
 
+    pub fn close_to_expected_text(
+        reason: impl Into<String>,
+        line: usize,
+        col: usize,
+    ) -> Self {
+        Self::new(GraceErrorKind::CloseToExpectedText(reason.into()), line, col)
+    }
+
     pub fn expected_token(
         reason: impl Into<String>,
         line: usize,

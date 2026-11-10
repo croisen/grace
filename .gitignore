@@ -4,6 +4,7 @@
 /build/
 /built/
 /lib/rust/
+/lib/utils/licenses.g.dart
 /rust/target/
 /rust/src/frb_generated.rs
 *.tar

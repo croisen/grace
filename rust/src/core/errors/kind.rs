@@ -4,6 +4,7 @@ use std::fmt::{Debug, Display, Formatter, Result as FResult};
 #[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum GraceErrorKind {
     SyntaxError(String),
+    CloseToExpectedText(String),
     ExpectedToken(String),
     ExpectedText(String),
     ReservedKeyword(String),

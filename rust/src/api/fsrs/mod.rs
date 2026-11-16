@@ -7,22 +7,20 @@ static FSRS6: &[f64] = &[
     0.0912, 0.0658, 0.1542,
 ];
 
-#[flutter_rust_bridge::frb(sync)]
-pub struct FSRS {
+#[flutter_rust_bridge::frb(opaque)]
+pub struct Fsrs {
     pub concept: Concept,
     pub stability: f64,
     pub difficulty: f64,
-    pub time: usize, // more like attempts as the formula used is for same day recall
+    pub time: usize,
 }
 
-impl FSRS {
-    #[inline]
+impl Fsrs {
     #[flutter_rust_bridge::frb(sync)]
-    pub fn new(concept: Concept) -> Self {
+    pub fn from_grade(concept: Concept) -> Self {
         Self { concept, stability: 1.0, difficulty: FSRS6[4], time: 1 }
     }
 
-    #[inline]
     #[flutter_rust_bridge::frb(sync)]
     pub fn review(&mut self, grade: Grade) {
         self.stability = self.stability
@@ -38,16 +36,15 @@ impl FSRS {
         // self.time += 1;
     }
 
-    #[inline]
+    // #[flutter_rust_bridge::frb(sync)]
+    // pub fn difficulty(&self) -> f64 {
+    //     self.difficulty
+    // }
+
     #[flutter_rust_bridge::frb(sync)]
     pub fn retainability(&self) -> f64 {
         let factor = 0.9f64.powf(-1.0 / FSRS6[20]) - 1.0;
         (1.0 + factor * (self.time as f64 / self.stability)).powf(-FSRS6[20])
-    }
-
-    #[inline]
-    pub fn clear_attempts(&mut self) {
-        self.time = 0;
     }
 
     #[inline]
@@ -56,6 +53,7 @@ impl FSRS {
     }
 }
 
+#[derive(Debug, Copy, Clone)]
 pub enum Concept {
     VarDecl,
     FunctionDecl,

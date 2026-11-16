@@ -5,7 +5,9 @@
 /built/
 /lib/rust/
 /lib/utils/licenses.g.dart
+/logs/
 /rust/target/
 /rust/src/frb_generated.rs
+*.AppImage
 *.tar
 *.tar.xz

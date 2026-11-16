@@ -24,8 +24,8 @@ trap __croi_exit SIGINT
 case "${1:-}" in
     "linux")
         "${SCRIPT}" icon
-        dart run dart_pubspec_licenses:generate -o "${SCRIPT_PATH}"/lib/utils/licenses.g.dart
-        flutter_rust_bridge_codegen generate
+        "${SCRIPT}" licenses
+        "${SCRIPT}" generate
         flutter build linux --release --verbose
         if ! [ -f "${SCRIPT_PATH}/built/appimagetool-x86_64.AppImage" ]; then
             wget -O "${SCRIPT_PATH}/built/appimagetool-x86_64.AppImage" \
@@ -47,8 +47,8 @@ case "${1:-}" in
         ;;
     "apk")
         "${SCRIPT}" icon
-        dart run dart_pubspec_licenses:generate -o "${SCRIPT_PATH}"/lib/utils/licenses.g.dart
-        flutter_rust_bridge_codegen generate
+        "${SCRIPT}" licenses
+        "${SCRIPT}" generate
         flutter build apk \
             --release \
             --verbose \
@@ -61,7 +61,8 @@ case "${1:-}" in
         ;;
     "run")
         rm -r "${SCRIPT_PATH}"/lib/rust/
-        flutter_rust_bridge_codegen generate
+        "${SCRIPT}" licenses
+        "${SCRIPT}" generate
         flutter run --verbose
         ;;
     "clean")
@@ -130,7 +131,9 @@ case "${1:-}" in
         fi
         ;;
     "generate")
-        flutter_rust_bridge_codegen generate
+        # FRB_DEBUG_SKIP_SANITY_CHECK_CLASS_NAME_DUPLICATES=1 \
+        # RUST_LOG=debug \
+            flutter_rust_bridge_codegen generate
         ;;
     "run-rust")
         pushd "${SCRIPT_PATH}"/rust

@@ -12,7 +12,7 @@ pub fn rust_to_ast(source: String) {
     let mut a = b.build(&s, &[], &mut c);
 
     match a.result {
-        Ok(root) => println!("{root:#?}\n"),
+        Ok(_) => println!("No fatal errors"),
         Err(e) => a.diagnostics.push(e),
     }
 

@@ -73,7 +73,7 @@ impl Diagnostics {
         let line = lines.iter().filter(|&&a| a <= start).count();
         let col = source[o..start].graphemes(true).count();
 
-        (line + 1, col + 1)
+        (line, col + 1)
     }
 }
 

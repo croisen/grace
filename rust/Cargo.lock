@@ -186,9 +186,9 @@ checksum = "776dfebd015e2d8732c684a2c71003674ccb49457b539b9e82151ba38e96dd7c"
 
 [[package]]
 name = "cc"
-version = "1.11.2"
+version = "1.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33ef9e3e8154a45c7a95cff4c1299702106ad94062d7bb85fdc5d3a5afd91d45"
+checksum = "02f0e023adb368345ce0ca6cdfc0f24a06554468d0e8503e14a0841de79bfa69"
 dependencies = [
  "find-msvc-tools",
  "shlex",
@@ -885,7 +885,7 @@ dependencies = [
 [[package]]
 name = "oak-c"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -894,7 +894,7 @@ dependencies = [
 [[package]]
 name = "oak-core"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "boost-fs",
  "serde",
@@ -906,7 +906,7 @@ dependencies = [
 [[package]]
 name = "oak-cpp"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -915,7 +915,7 @@ dependencies = [
 [[package]]
 name = "oak-csharp"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -924,7 +924,7 @@ dependencies = [
 [[package]]
 name = "oak-folding"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -933,7 +933,7 @@ dependencies = [
 [[package]]
 name = "oak-formatter"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
 ]
@@ -941,7 +941,7 @@ dependencies = [
 [[package]]
 name = "oak-haskell"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -950,7 +950,7 @@ dependencies = [
 [[package]]
 name = "oak-highlight"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -959,7 +959,7 @@ dependencies = [
 [[package]]
 name = "oak-hover"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -968,7 +968,7 @@ dependencies = [
 [[package]]
 name = "oak-java"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -977,7 +977,7 @@ dependencies = [
 [[package]]
 name = "oak-javascript"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "oak-typescript",
@@ -987,7 +987,7 @@ dependencies = [
 [[package]]
 name = "oak-lsp"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "boost-diagnostic",
  "dashmap 6.2.1",
@@ -1008,7 +1008,7 @@ dependencies = [
 [[package]]
 name = "oak-lua"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -1018,7 +1018,7 @@ dependencies = [
 [[package]]
 name = "oak-macros"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1028,7 +1028,7 @@ dependencies = [
 [[package]]
 name = "oak-navigation"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -1037,7 +1037,7 @@ dependencies = [
 [[package]]
 name = "oak-php"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -1046,7 +1046,7 @@ dependencies = [
 [[package]]
 name = "oak-pretty-print"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "oak-macros",
@@ -1057,7 +1057,7 @@ dependencies = [
 [[package]]
 name = "oak-python"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -1066,7 +1066,7 @@ dependencies = [
 [[package]]
 name = "oak-resolver"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "dashmap 6.2.1",
  "oak-core",
@@ -1078,7 +1078,7 @@ dependencies = [
 [[package]]
 name = "oak-rust"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "dashmap 6.2.1",
  "futures",
@@ -1095,7 +1095,7 @@ dependencies = [
 [[package]]
 name = "oak-semantic-tokens"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -1104,7 +1104,7 @@ dependencies = [
 [[package]]
 name = "oak-sql"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -1113,7 +1113,7 @@ dependencies = [
 [[package]]
 name = "oak-structural-view"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -1122,7 +1122,7 @@ dependencies = [
 [[package]]
 name = "oak-symbols"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "serde",
@@ -1131,7 +1131,7 @@ dependencies = [
 [[package]]
 name = "oak-typescript"
 version = "0.0.12"
-source = "git+https://github.com/yggdrasil-language/oak.rs#4dae755e7b767b56f8fc357d8bc2910b2b3460e3"
+source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
  "oak-core",
  "oak-formatter",

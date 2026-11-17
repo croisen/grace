@@ -1,4 +1,4 @@
-#![allow(dead_code, unused)] // remove later
+// #![allow(dead_code, unused)] // remove later
 
 mod core;
 mod frb_generated;

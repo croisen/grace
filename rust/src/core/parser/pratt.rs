@@ -47,45 +47,45 @@ where
         + Debug;
 
     fn prefix_binding(
-        token: &Token<'a, Self::TokenKind>,
+        _token: &Token<'a, Self::TokenKind>,
     ) -> Option<PrattAssociativity> {
         todo!("");
     }
     fn infix_binding(
-        token: &Token<'a, Self::TokenKind>,
+        _token: &Token<'a, Self::TokenKind>,
     ) -> Option<PrattAssociativity> {
         todo!("");
     }
     fn postfix_binding(
-        token: &Token<'a, Self::TokenKind>,
+        _token: &Token<'a, Self::TokenKind>,
     ) -> Option<PrattAssociativity> {
         todo!("");
     }
 
     fn parse_atom(
-        state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        _state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
     ) -> Option<Self> {
         todo!("");
     }
     fn parse_prefix(
-        state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-        op: String,
-        rhs: Self,
+        _state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        _op: String,
+        _rhs: Self,
     ) -> Option<Self> {
         todo!("");
     }
     fn parse_postfix(
-        state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-        op: String,
-        lhs: Self,
+        _state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        _op: String,
+        _lhs: Self,
     ) -> Option<Self> {
         todo!("");
     }
     fn parse_infix(
-        state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-        op: String,
-        lhs: Self,
-        rhs: Self,
+        _state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        _op: String,
+        _lhs: Self,
+        _rhs: Self,
     ) -> Option<Self> {
         todo!("");
     }

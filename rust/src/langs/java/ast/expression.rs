@@ -1,9 +1,11 @@
-use crate::core::parser::pratt::{PrattLanguage, parse_expr};
+use crate::core::parser::pratt::{
+    PrattAssociativity, PrattLanguage, parse_expr,
+};
 use crate::langs::java::ast::member::JavaMember;
 use crate::langs::java::ast::parameter::JavaParameter;
 use crate::langs::java::ast::statement::JavaStatement;
 use crate::langs::java::ast::{JavaAst, JavaParserState};
-use crate::langs::java::lexer::JavaTokenKind;
+use crate::langs::java::lexer::{JavaToken, JavaTokenKind};
 
 #[derive(Debug, Clone)]
 pub enum JavaExpression {
@@ -54,6 +56,47 @@ impl JavaExpression {
 impl<'a> PrattLanguage<'a> for JavaExpression {
     type Root = JavaAst;
     type TokenKind = JavaTokenKind;
+
+    fn parse_atom(state: &mut JavaParserState<'a>) -> Option<Self> {
+        None
+    }
+
+    fn parse_prefix(
+        state: &mut JavaParserState<'a>,
+        op: String,
+        rhs: Self,
+    ) -> Option<Self> {
+        None
+    }
+
+    fn parse_infix(
+        state: &mut JavaParserState<'a>,
+        min_bp: isize,
+        op: String,
+        lhs: Self,
+    ) -> Option<Self> {
+        None
+    }
+
+    fn parse_postfix(
+        state: &mut JavaParserState<'a>,
+        op: String,
+        lhs: Self,
+    ) -> Option<Self> {
+        None
+    }
+
+    fn prefix_binding(token: &JavaToken<'a>) -> Option<PrattAssociativity> {
+        None
+    }
+
+    fn infix_binding(token: &JavaToken<'a>) -> Option<PrattAssociativity> {
+        None
+    }
+
+    fn postfix_binding(token: &JavaToken<'a>) -> Option<PrattAssociativity> {
+        None
+    }
 }
 
 #[derive(Debug, Clone)]

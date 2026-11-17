@@ -1,5 +1,8 @@
 use core::f64::consts::E;
-use std::ops::Sub;
+
+pub mod grade;
+
+use crate::api::fsrs::grade::Grade;
 
 static FSRS6: &[f64] = &[
     0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722,
@@ -62,20 +65,4 @@ pub enum Concept {
     ForLoop,
     WhileLoop,
     Switch,
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum Grade {
-    Again = 1,
-    Hard = 2,
-    Good = 3,
-    Easy = 4,
-}
-
-impl Sub<usize> for Grade {
-    type Output = isize;
-
-    fn sub(self, rhs: usize) -> Self::Output {
-        (self as isize).wrapping_sub_unsigned(rhs)
-    }
 }

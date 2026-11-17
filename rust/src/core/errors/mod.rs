@@ -4,9 +4,9 @@ pub mod kind;
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GraceError {
-    kind: GraceErrorKind,
-    line: usize,
-    col: usize,
+    pub kind: GraceErrorKind,
+    pub line: usize,
+    pub col: usize,
 }
 
 impl GraceError {

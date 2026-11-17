@@ -55,7 +55,6 @@ impl SQLSelect {
             state.advance();
         }
 
-        println!("{:?}", state.token_current());
         if state.token_eat_text_ins("from") {
             state.advance();
             state.token_expect_kind(SQLTokenKind::Identifier);

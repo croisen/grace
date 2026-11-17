@@ -23,6 +23,7 @@ pub enum SQLExpression {
         left: Box<SQLExpression>,
         right: Box<SQLExpression>,
     },
+    // not sure about this though. It's in the spec but I haven't encountered it
     Vector(Vec<SQLExpression>),
     InList {
         expr: Box<SQLExpression>,
@@ -40,7 +41,100 @@ pub enum SQLExpression {
 
 impl SQLExpression {
     pub fn new<'a>(state: &mut SQLParserState<'a>) -> Self {
-        parse_expr(state, 0).unwrap_or(Self::Identifier("Placeholder".into()))
+        parse_expr::<Self>(state, 0)
+            .unwrap_or(Self::Identifier("Placeholder".into()))
+    }
+
+    fn parse_between<'a>(
+        state: &mut SQLParserState<'a>,
+        negated: bool,
+        min_bp: isize,
+        lhs: Self,
+    ) -> Option<Self> {
+        let Some(low) = parse_expr::<Self>(state, min_bp) else {
+            state.record_syntax_error(
+                "Lower bound of BETWEEN statement can't be parsed properly",
+            );
+
+            return None;
+        };
+
+        if state.token_expect_text_ins("and") {
+            state.advance();
+        }
+
+        let Some(high) = parse_expr::<Self>(state, min_bp) else {
+            state.record_syntax_error(
+                "Higher bound of BETWEEN statement can't be parsed properly",
+            );
+
+            return None;
+        };
+
+        Some(Self::Between {
+            expr: lhs.into(),
+            low: low.into(),
+            high: high.into(),
+            negated,
+        })
+    }
+
+    fn parse_inlist<'a>(
+        state: &mut SQLParserState<'a>,
+        negated: bool,
+        lhs: Self,
+    ) -> Option<Self> {
+        let mut list = vec![];
+        while state.not_at_end() {
+            let Some(expr) = parse_expr::<Self>(state, 0) else {
+                state.record_syntax_error(
+                    "Failed to parse expression for in list statement",
+                );
+
+                return None;
+            };
+
+            list.push(expr);
+            if state.token_eat_kind(SQLTokenKind::StrictKeyword) {
+                break;
+            }
+
+            if state.token_expect_text_sen(",") {
+                state.advance();
+                if state.token_eat_kind(SQLTokenKind::StrictKeyword) {
+                    state.record_trailing_comma();
+                    break;
+                }
+
+                state.seek_offset(-1);
+            }
+
+            state.advance();
+        }
+
+        Some(Self::InList { expr: lhs.into(), list, negated })
+    }
+
+    fn parse_negated<'a>(
+        state: &mut SQLParserState<'a>,
+        min_bp: isize,
+        op: String,
+        lhs: Self,
+    ) -> Option<Self> {
+        if state.token_eat_text_ins("in") {
+            Self::parse_inlist(state, true, lhs)
+        } else if state.token_eat_text_ins("between") {
+            let binding =
+                Self::infix_binding(state.token_current().unwrap()).unwrap();
+
+            Self::parse_between(state, true, binding.left_power(), lhs)
+        } else {
+            Some(Self::BinaryOp {
+                op,
+                left: lhs.into(),
+                right: parse_expr::<Self>(state, min_bp)?.into(),
+            })
+        }
     }
 }
 
@@ -51,7 +145,7 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
     fn parse_atom(state: &mut SQLParserState<'a>) -> Option<Self> {
         if state.token_eat_text_sen("(") {
             state.advance();
-            let expr = parse_expr(state, 0);
+            let expr = parse_expr::<Self>(state, 0);
             state.token_expect_text_sen(")");
             return expr;
         }
@@ -68,12 +162,16 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
             return Some(Self::Literal(state.token_text().unwrap().into()));
         }
 
+        if state.token_eat_text_ins("select") {
+            return Some(Self::SubQuery(SQLSelect::new(state).into()));
+        }
+
         state.record_unexpected_token();
         None
     }
 
     fn parse_prefix(
-        state: &mut SQLParserState<'a>,
+        _state: &mut SQLParserState<'a>,
         op: String,
         rhs: Self,
     ) -> Option<Self> {
@@ -82,11 +180,24 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
 
     fn parse_infix(
         state: &mut SQLParserState<'a>,
+        min_bp: isize,
         op: String,
         lhs: Self,
-        rhs: Self,
     ) -> Option<Self> {
-        Some(Self::BinaryOp { op, left: lhs.into(), right: rhs.into() })
+        if op.eq_ignore_ascii_case("not") {
+            state.advance();
+            Self::parse_negated(state, min_bp, op, lhs)
+        } else if op.eq_ignore_ascii_case("between") {
+            Self::parse_between(state, false, min_bp, lhs)
+        } else if op.eq_ignore_ascii_case("in") {
+            Self::parse_inlist(state, false, lhs)
+        } else {
+            Some(Self::BinaryOp {
+                op,
+                left: lhs.into(),
+                right: parse_expr::<Self>(state, min_bp)?.into(),
+            })
+        }
     }
 
     fn parse_postfix(
@@ -130,6 +241,10 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
     }
 
     fn prefix_binding(token: &SQLToken<'a>) -> Option<PrattAssociativity> {
+        if token.text.eq_ignore_ascii_case("not") {
+            return Some(PrattAssociativity::Right(10));
+        }
+
         match token.text {
             "+" => Some(PrattAssociativity::Right(9)),
             "-" => Some(PrattAssociativity::Right(9)),
@@ -160,24 +275,16 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
 
         match token.text {
             // Multiply
-            "*" => Some(PrattAssociativity::Left(7)),
-            "/" => Some(PrattAssociativity::Left(7)),
-            "%" => Some(PrattAssociativity::Left(7)),
+            "*" | "/" | "%" => Some(PrattAssociativity::Left(7)),
 
             // Add
-            "+" => Some(PrattAssociativity::Left(6)),
-            "-" => Some(PrattAssociativity::Left(6)),
+            "+" | "-" => Some(PrattAssociativity::Left(6)),
 
             // Comp
-            "<" => Some(PrattAssociativity::None(5)),
-            ">" => Some(PrattAssociativity::None(5)),
-            "<=" => Some(PrattAssociativity::None(5)),
-            ">=" => Some(PrattAssociativity::None(5)),
+            "<" | ">" | "<=" | ">=" => Some(PrattAssociativity::None(5)),
 
             // Equal
-            "==" => Some(PrattAssociativity::None(4)),
-            "!=" => Some(PrattAssociativity::None(4)), // SQL not equal
-            "<>" => Some(PrattAssociativity::None(4)), // SQL not equal
+            "==" | "!=" | "<>" => Some(PrattAssociativity::None(4)),
 
             // Logical
             "&&" => Some(PrattAssociativity::Left(3)),
@@ -199,7 +306,7 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
             // function call
             "(" => Some(PrattAssociativity::Left(10)),
             // array access, though this is different in SQL impls
-            // "[" => Some(PrattAssociativity::Left(10)),
+            // "[" | "->" => Some(PrattAssociativity::Left(10)),
             _ => None,
         }
     }

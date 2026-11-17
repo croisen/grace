@@ -47,48 +47,34 @@ where
         + Debug;
 
     fn prefix_binding(
-        _token: &Token<'a, Self::TokenKind>,
-    ) -> Option<PrattAssociativity> {
-        todo!("");
-    }
+        token: &Token<'a, Self::TokenKind>,
+    ) -> Option<PrattAssociativity>;
     fn infix_binding(
-        _token: &Token<'a, Self::TokenKind>,
-    ) -> Option<PrattAssociativity> {
-        todo!("");
-    }
+        token: &Token<'a, Self::TokenKind>,
+    ) -> Option<PrattAssociativity>;
     fn postfix_binding(
-        _token: &Token<'a, Self::TokenKind>,
-    ) -> Option<PrattAssociativity> {
-        todo!("");
-    }
+        token: &Token<'a, Self::TokenKind>,
+    ) -> Option<PrattAssociativity>;
 
     fn parse_atom(
-        _state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-    ) -> Option<Self> {
-        todo!("");
-    }
+        state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+    ) -> Option<Self>;
     fn parse_prefix(
-        _state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-        _op: String,
-        _rhs: Self,
-    ) -> Option<Self> {
-        todo!("");
-    }
+        state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        op: String,
+        rhs: Self,
+    ) -> Option<Self>;
     fn parse_postfix(
-        _state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-        _op: String,
-        _lhs: Self,
-    ) -> Option<Self> {
-        todo!("");
-    }
+        state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        op: String,
+        lhs: Self,
+    ) -> Option<Self>;
     fn parse_infix(
-        _state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-        _op: String,
-        _lhs: Self,
-        _rhs: Self,
-    ) -> Option<Self> {
-        todo!("");
-    }
+        state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
+        min_bp: isize,
+        op: String,
+        lhs: Self,
+    ) -> Option<Self>;
 }
 
 pub fn parse_expr<'a, L>(
@@ -132,11 +118,9 @@ where
             if binding.is_none() {
                 if non_assoc == Some(left) {
                     state.record_syntax_error(
-                        format!(
-                            "Same none associative operator `{}` used in succession",
-                            token.text,
-                        )
+                        "Non-associative operators can't be chained",
                     );
+
                     return None;
                 }
 
@@ -145,8 +129,7 @@ where
 
             let text = token.text.to_string();
             state.advance();
-            let rhs = parse_expr(state, right)?;
-            lhs = L::parse_infix(state, text, lhs, rhs)?;
+            lhs = L::parse_infix(state, right, text, lhs)?;
             continue;
         }
 

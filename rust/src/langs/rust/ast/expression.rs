@@ -1,8 +1,10 @@
-use crate::core::parser::pratt::{PrattLanguage, parse_expr};
+use crate::core::parser::pratt::{
+    PrattAssociativity, PrattLanguage, parse_expr,
+};
 use crate::langs::rust::ast::pattern::RustPattern;
 use crate::langs::rust::ast::statement::RustStatement;
 use crate::langs::rust::ast::{RustAst, RustParserState};
-use crate::langs::rust::lexer::RustTokenKind;
+use crate::langs::rust::lexer::{RustToken, RustTokenKind};
 
 #[derive(Debug, Clone)]
 pub enum RustExpression {
@@ -54,14 +56,98 @@ pub enum RustExpression {
 
 impl RustExpression {
     pub fn new<'a>(state: &mut RustParserState<'a>) -> Self {
-        parse_expr(state, 0).unwrap_or(Self::Identifier("Placeholder".into()))
+        parse_expr::<Self>(state, 0)
+            .unwrap_or(Self::Identifier("Placeholder".into()))
     }
 }
 
-// impl later
 impl<'a> PrattLanguage<'a> for RustExpression {
     type Root = RustAst;
     type TokenKind = RustTokenKind;
+
+    fn parse_atom(state: &mut RustParserState<'a>) -> Option<Self> {
+        None
+    }
+
+    fn parse_prefix(
+        state: &mut RustParserState<'a>,
+        op: String,
+        rhs: Self,
+    ) -> Option<Self> {
+        None
+    }
+
+    fn parse_infix(
+        state: &mut RustParserState<'a>,
+        min_bp: isize,
+        op: String,
+        lhs: Self,
+    ) -> Option<Self> {
+        None
+    }
+
+    fn parse_postfix(
+        state: &mut RustParserState<'a>,
+        op: String,
+        lhs: Self,
+    ) -> Option<Self> {
+        None
+    }
+
+    fn prefix_binding(token: &RustToken<'a>) -> Option<PrattAssociativity> {
+        match token.text {
+            "-" | "!" | "*" | "&" => Some(PrattAssociativity::Right(12)),
+            _ => None,
+        }
+    }
+
+    fn infix_binding(token: &RustToken<'a>) -> Option<PrattAssociativity> {
+        match token.text {
+            // Multiply
+            "*" | "/" | "%" => Some(PrattAssociativity::Left(11)),
+
+            // Add
+            "+" | "-" => Some(PrattAssociativity::Left(10)),
+
+            // Bitwise
+            "<<" | ">>" => Some(PrattAssociativity::Left(9)),
+            "&" => Some(PrattAssociativity::Left(8)),
+            "^" => Some(PrattAssociativity::Left(7)),
+            "|" => Some(PrattAssociativity::Left(6)),
+
+            // Logical
+            "&&" => Some(PrattAssociativity::Left(5)),
+            "||" => Some(PrattAssociativity::Left(4)),
+
+            // Comp
+            "<" | ">" | "<=" | ">=" => Some(PrattAssociativity::None(3)),
+
+            // Equal
+            "==" | "!=" => Some(PrattAssociativity::None(2)),
+
+            // Assignment
+            "=" => Some(PrattAssociativity::Right(1)),
+            "+=" => Some(PrattAssociativity::Right(1)),
+            "-=" => Some(PrattAssociativity::Right(1)),
+            "*=" => Some(PrattAssociativity::Right(1)),
+            "%=" => Some(PrattAssociativity::Right(1)),
+            "/=" => Some(PrattAssociativity::Right(1)),
+            "&=" => Some(PrattAssociativity::Right(1)),
+            "|=" => Some(PrattAssociativity::Right(1)),
+            "^=" => Some(PrattAssociativity::Right(1)),
+            "<<=" => Some(PrattAssociativity::Right(1)),
+            "=>>" => Some(PrattAssociativity::Right(1)),
+            _ => None,
+        }
+    }
+
+    fn postfix_binding(token: &RustToken<'a>) -> Option<PrattAssociativity> {
+        match token.text {
+            "." | "(" | "[" | "?" => Some(PrattAssociativity::Left(14)),
+            "as" => Some(PrattAssociativity::Left(13)),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -125,10 +125,10 @@ pub enum RustTokenKind {
     #[token(":")]
     Colon,
 
-    #[regex("[a-zA-Z_][a-zA-Z0-9_]*", |lex| lex.slice().to_string())]
-    // well let's allow keywords to become identifiers
-    #[regex("r#[a-zA-Z]*", keyword_to_ident)]
-    Identifier(String),
+    #[regex("[a-zA-Z_][a-zA-Z0-9_]*")]
+    // well let's allow keywords to become identifiers (meh too complicated)
+    // #[regex("r#[a-zA-Z]*", keyword_to_ident)]
+    Identifier,
 
     #[regex("[+-]?[0-9][_0-9]*")]
     #[regex("[+-]?0[bB]_*[01][_01]*")]

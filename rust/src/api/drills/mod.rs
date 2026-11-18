@@ -1,7 +1,12 @@
 use rand::random_range;
 
+pub mod c;
+pub mod cpp;
+pub mod csharp;
 pub mod java;
+pub mod javascript;
 pub mod rust;
+pub mod sql;
 
 // there are two to prevent the same name to be put out
 fn generic_varname1() -> &'static str {

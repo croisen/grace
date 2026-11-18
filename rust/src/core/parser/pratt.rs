@@ -1,10 +1,45 @@
 use std::fmt::Debug;
+use std::ops::Deref;
 
 use logos::Logos;
 
 use crate::core::errors::kind::GraceErrorKind;
 use crate::core::lexers::{LexerExtras, Token};
 use crate::core::parser::state::ParserState;
+
+#[derive(Debug, Clone)]
+pub struct Token2 {
+    pub text: String,
+    pub line: usize,
+    pub col: usize,
+}
+
+impl Default for Token2 {
+    fn default() -> Self {
+        Self { text: "Placeholder".into(), line: 0, col: 0 }
+    }
+}
+
+impl Deref for Token2 {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.text
+    }
+}
+
+impl<'a, TK> From<&Token<'a, TK>> for Token2
+where
+    TK: Logos<'a, Source = str, Error = GraceErrorKind, Extras = LexerExtras>
+        + Default
+        + Clone
+        + PartialEq
+        + Debug,
+{
+    fn from(value: &Token<'a, TK>) -> Self {
+        Self { text: value.text.to_string(), line: value.line, col: value.col }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrattAssociativity {
@@ -61,18 +96,18 @@ where
     ) -> Option<Self>;
     fn parse_prefix(
         state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-        op: String,
-        rhs: Self,
+        min_bp: isize,
+        op: Token2,
     ) -> Option<Self>;
     fn parse_postfix(
         state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
-        op: String,
+        op: Token2,
         lhs: Self,
     ) -> Option<Self>;
     fn parse_infix(
         state: &mut ParserState<'a, Self::TokenKind, Self::Root>,
         min_bp: isize,
-        op: String,
+        op: Token2,
         lhs: Self,
     ) -> Option<Self>;
 }
@@ -103,9 +138,9 @@ where
                 break;
             }
 
-            let text = token.text.to_string();
+            let token = token.into();
             state.advance();
-            lhs = L::parse_postfix(state, text, lhs)?;
+            lhs = L::parse_postfix(state, token, lhs)?;
             continue;
         }
 
@@ -127,9 +162,9 @@ where
                 non_assoc = Some(left);
             }
 
-            let text = token.text.to_string();
+            let token = token.into();
             state.advance();
-            lhs = L::parse_infix(state, right, text, lhs)?;
+            lhs = L::parse_infix(state, right, token, lhs)?;
             continue;
         }
 
@@ -152,10 +187,9 @@ where
 {
     let token = state.get_token()?;
     if let Some(binding) = L::prefix_binding(token) {
-        let text = token.text.to_string();
+        let token = token.into();
         state.advance();
-        let rhs = parse_expr(state, binding.right_power())?;
-        return L::parse_prefix(state, text, rhs);
+        return L::parse_prefix(state, binding.right_power(), token);
     }
 
     L::parse_atom(state)

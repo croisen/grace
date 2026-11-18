@@ -2,6 +2,7 @@ use core::f64::consts::E;
 
 pub mod grade;
 
+use crate::api::concept::Concept;
 use crate::api::fsrs::grade::Grade;
 
 static FSRS6: &[f64] = &[
@@ -54,15 +55,4 @@ impl Fsrs {
     fn init_difficulty(grade: Grade) -> f64 {
         FSRS6[4] - E.powf(FSRS6[5] * (grade - 1) as f64) + 1.0
     }
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum Concept {
-    VarDecl,
-    FunctionDecl,
-    Ifs,
-    ElseIfs,
-    ForLoop,
-    WhileLoop,
-    Switch,
 }

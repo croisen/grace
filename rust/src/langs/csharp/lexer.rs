@@ -3,50 +3,19 @@ use logos::{Logos, skip};
 use crate::core::errors::kind::GraceErrorKind;
 use crate::core::lexers::{LexerExtras, Token, reserved_keyword};
 
-pub type CSToken<'a> = Token<'a, CSTokenKind>;
+pub type CSharpToken<'a> = Token<'a, CSharpTokenKind>;
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = GraceErrorKind, extras = LexerExtras)]
-pub enum CSTokenKind {
+pub enum CSharpTokenKind {
     StrictKeyword,
 
-    #[token("const", reserved_keyword)]
-    #[token("goto", reserved_keyword)]
     ReservedKeyword,
 
     #[token(".")]
     MemberAccess,
 
-    #[token("!")]
-    #[token("++")]
-    #[token("--")]
-    #[token("?)")]
-    #[token("+")]
-    #[token("-")]
-    #[token("*")]
-    #[token("/")]
-    #[token("<<")]
-    #[token(">>")]
-    #[token("<")]
-    #[token("<=")]
-    #[token(">=")]
-    #[token(">")]
-    #[token("==")]
-    #[token("!=")]
-    #[token("&")]
-    #[token("|")]
-    #[token("^")]
-    #[token("&&")]
-    #[token("||")]
-    #[token("+=")]
-    #[token("-=")]
-    #[token("*=")]
-    #[token("/=")]
-    #[token("%=")]
-    #[token("<<=")]
-    #[token("=>>")]
-    #[regex("=")]
-    Operators,
+    Operator,
 
     #[token("(")]
     #[token(")")]

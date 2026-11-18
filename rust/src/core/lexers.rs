@@ -1,7 +1,5 @@
 use std::collections::HashMap;
-use std::error::Error;
-use std::fmt::{Debug, Display, Formatter, Result as FResult};
-use std::num::{ParseFloatError, ParseIntError};
+use std::fmt::Debug;
 
 use logos::{Lexer, Logos};
 

@@ -3,50 +3,19 @@ use logos::{Logos, skip};
 use crate::core::errors::kind::GraceErrorKind;
 use crate::core::lexers::{LexerExtras, Token, reserved_keyword};
 
-pub type JSToken<'a> = Token<'a, JSTokenKind>;
+pub type JavaScriptToken<'a> = Token<'a, JavaScriptTokenKind>;
 
 #[derive(Default, Debug, Clone, PartialEq, Logos)]
 #[logos(error = GraceErrorKind, extras = LexerExtras)]
-pub enum JSTokenKind {
+pub enum JavaScriptTokenKind {
     StrictKeyword,
 
-    #[token("const", reserved_keyword)]
-    #[token("goto", reserved_keyword)]
     ReservedKeyword,
 
     #[token(".")]
     MemberAccess,
 
-    #[token("!")]
-    #[token("++")]
-    #[token("--")]
-    #[token("?)")]
-    #[token("+")]
-    #[token("-")]
-    #[token("*")]
-    #[token("/")]
-    #[token("<<")]
-    #[token(">>")]
-    #[token("<")]
-    #[token("<=")]
-    #[token(">=")]
-    #[token(">")]
-    #[token("==")]
-    #[token("!=")]
-    #[token("&")]
-    #[token("|")]
-    #[token("^")]
-    #[token("&&")]
-    #[token("||")]
-    #[token("+=")]
-    #[token("-=")]
-    #[token("*=")]
-    #[token("/=")]
-    #[token("%=")]
-    #[token("<<=")]
-    #[token("=>>")]
-    #[regex("=")]
-    Operators,
+    Operator,
 
     #[token("(")]
     #[token(")")]

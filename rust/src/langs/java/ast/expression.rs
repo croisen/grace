@@ -1,5 +1,5 @@
 use crate::core::parser::pratt::{
-    PrattAssociativity, PrattLanguage, parse_expr,
+    PrattAssociativity, PrattLanguage, Token2, parse_expr,
 };
 use crate::langs::java::ast::member::JavaMember;
 use crate::langs::java::ast::parameter::JavaParameter;
@@ -9,8 +9,8 @@ use crate::langs::java::lexer::{JavaToken, JavaTokenKind};
 
 #[derive(Debug, Clone)]
 pub enum JavaExpression {
-    Literal(String),
-    Identifier(String),
+    Literal(Token2),
+    Identifier(Token2),
     MethodCall(JavaMethodCall),
     FieldAccess(JavaFieldAccess),
     ArrayAccess(JavaArrayAccess),
@@ -20,17 +20,17 @@ pub enum JavaExpression {
     This,
     Super,
     UnaryOp {
-        op: String,
+        op: Token2,
         expr: Box<JavaExpression>,
         is_prefix: bool,
     },
     BinaryOp {
-        op: String,
+        op: Token2,
         left: Box<JavaExpression>,
         right: Box<JavaExpression>,
     },
     Assignment {
-        op: String,
+        op: Token2,
         left: Box<JavaExpression>,
         right: Box<JavaExpression>,
     },
@@ -40,7 +40,7 @@ pub enum JavaExpression {
         r#else: Box<JavaExpression>,
     },
     Cast {
-        target_type: String,
+        target_type: Token2,
         expression: Box<JavaExpression>,
     },
     Lambda(JavaLambda),
@@ -48,7 +48,7 @@ pub enum JavaExpression {
 
 impl JavaExpression {
     pub fn new<'a>(state: &mut JavaParserState<'a>) -> Self {
-        parse_expr(state, 0).unwrap_or(Self::Identifier("Placeholder".into()))
+        parse_expr(state, 0).unwrap_or(Self::Identifier(Token2::default()))
     }
 }
 
@@ -63,8 +63,8 @@ impl<'a> PrattLanguage<'a> for JavaExpression {
 
     fn parse_prefix(
         state: &mut JavaParserState<'a>,
-        op: String,
-        rhs: Self,
+        min_bp: isize,
+        op: Token2,
     ) -> Option<Self> {
         None
     }
@@ -72,7 +72,7 @@ impl<'a> PrattLanguage<'a> for JavaExpression {
     fn parse_infix(
         state: &mut JavaParserState<'a>,
         min_bp: isize,
-        op: String,
+        op: Token2,
         lhs: Self,
     ) -> Option<Self> {
         None
@@ -80,7 +80,7 @@ impl<'a> PrattLanguage<'a> for JavaExpression {
 
     fn parse_postfix(
         state: &mut JavaParserState<'a>,
-        op: String,
+        op: Token2,
         lhs: Self,
     ) -> Option<Self> {
         None

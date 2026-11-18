@@ -1,5 +1,5 @@
 use crate::core::parser::pratt::{
-    PrattAssociativity, PrattLanguage, parse_expr,
+    PrattAssociativity, PrattLanguage, Token2, parse_expr,
 };
 use crate::langs::sql::ast::statements::query::SQLSelect;
 use crate::langs::sql::ast::{SQLAst, SQLParserState};
@@ -7,19 +7,19 @@ use crate::langs::sql::lexer::{SQLToken, SQLTokenKind};
 
 #[derive(Debug, Clone)]
 pub enum SQLExpression {
-    Literal(String),
-    Identifier(String),
+    Literal(Token2),
+    Identifier(Token2),
     FunctionCall {
-        name: String,
+        name: Token2,
         args: Vec<SQLExpression>,
     },
     UnaryOp {
-        op: String,
+        op: Token2,
         expr: Box<SQLExpression>,
         is_prefix: bool,
     },
     BinaryOp {
-        op: String,
+        op: Token2,
         left: Box<SQLExpression>,
         right: Box<SQLExpression>,
     },
@@ -42,7 +42,7 @@ pub enum SQLExpression {
 impl SQLExpression {
     pub fn new<'a>(state: &mut SQLParserState<'a>) -> Self {
         parse_expr::<Self>(state, 0)
-            .unwrap_or(Self::Identifier("Placeholder".into()))
+            .unwrap_or(Self::Identifier(Token2::default()))
     }
 
     fn parse_between<'a>(
@@ -118,7 +118,7 @@ impl SQLExpression {
     fn parse_negated<'a>(
         state: &mut SQLParserState<'a>,
         min_bp: isize,
-        op: String,
+        op: Token2,
         lhs: Self,
     ) -> Option<Self> {
         if state.token_eat_text_ins("in") {
@@ -151,7 +151,9 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
         }
 
         if state.token_eat_kind(SQLTokenKind::Identifier) {
-            return Some(Self::Identifier(state.token_text().unwrap().into()));
+            return Some(Self::Identifier(
+                state.token_current().unwrap().into(),
+            ));
         }
 
         if state.token_eat_kinds(&[
@@ -159,7 +161,7 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
             SQLTokenKind::Integer,
             SQLTokenKind::Float,
         ]) {
-            return Some(Self::Literal(state.token_text().unwrap().into()));
+            return Some(Self::Literal(state.token_current().unwrap().into()));
         }
 
         if state.token_eat_text_ins("select") {
@@ -171,17 +173,21 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
     }
 
     fn parse_prefix(
-        _state: &mut SQLParserState<'a>,
-        op: String,
-        rhs: Self,
+        state: &mut SQLParserState<'a>,
+        min_bp: isize,
+        op: Token2,
     ) -> Option<Self> {
-        Some(Self::UnaryOp { op, expr: rhs.into(), is_prefix: true })
+        Some(Self::UnaryOp {
+            op,
+            expr: parse_expr::<Self>(state, min_bp)?.into(),
+            is_prefix: true,
+        })
     }
 
     fn parse_infix(
         state: &mut SQLParserState<'a>,
         min_bp: isize,
-        op: String,
+        op: Token2,
         lhs: Self,
     ) -> Option<Self> {
         if op.eq_ignore_ascii_case("not") {
@@ -202,17 +208,17 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
 
     fn parse_postfix(
         state: &mut SQLParserState<'a>,
-        op: String,
+        op: Token2,
         lhs: Self,
     ) -> Option<Self> {
         // not like this could happen but we're gonna be precise here, but our postfix operator is only
         // functions right now
-        if op != "(" {
+        if op.text != "(" {
             state.record_unexpected_token();
             return None;
         }
 
-        let Self::Identifier(name) = &lhs else {
+        let Self::Identifier(name) = lhs else {
             state.seek_offset(-1);
             state.record_custom("Function callee should be an identifier");
             state.seek_offset(1);
@@ -237,7 +243,7 @@ impl<'a> PrattLanguage<'a> for SQLExpression {
             state.advance();
         }
 
-        Some(Self::FunctionCall { name: name.clone(), args })
+        Some(Self::FunctionCall { name, args })
     }
 
     fn prefix_binding(token: &SQLToken<'a>) -> Option<PrattAssociativity> {

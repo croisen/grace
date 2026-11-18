@@ -1,9 +1,13 @@
 # GRACE - Practice language syntax
 
-Practice language syntax via instructions given in flashcards
+Practice language syntax via instructions given in flashcards.
 
 ## Available languages
 
-- [ ] Java
-- [ ] Rust
-- [ ] SQL
+- [x] C
+- [ ] C#
+- [ ] C++
+- [x] Java
+- [ ] JavaScript
+- [x] Rust
+- [x] SQL

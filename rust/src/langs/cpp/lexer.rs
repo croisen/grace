@@ -10,43 +10,12 @@ pub type CppToken<'a> = Token<'a, CppTokenKind>;
 pub enum CppTokenKind {
     StrictKeyword,
 
-    #[token("const", reserved_keyword)]
-    #[token("goto", reserved_keyword)]
     ReservedKeyword,
 
     #[token(".")]
     MemberAccess,
 
-    #[token("!")]
-    #[token("++")]
-    #[token("--")]
-    #[token("?)")]
-    #[token("+")]
-    #[token("-")]
-    #[token("*")]
-    #[token("/")]
-    #[token("<<")]
-    #[token(">>")]
-    #[token("<")]
-    #[token("<=")]
-    #[token(">=")]
-    #[token(">")]
-    #[token("==")]
-    #[token("!=")]
-    #[token("&")]
-    #[token("|")]
-    #[token("^")]
-    #[token("&&")]
-    #[token("||")]
-    #[token("+=")]
-    #[token("-=")]
-    #[token("*=")]
-    #[token("/=")]
-    #[token("%=")]
-    #[token("<<=")]
-    #[token("=>>")]
-    #[regex("=")]
-    Operators,
+    Operator,
 
     #[token("(")]
     #[token(")")]

@@ -1,16 +1,30 @@
+use crate::api::concept::Concept;
 use crate::api::drills::{
     generic_operator, generic_varname1, generic_varname2,
 };
 
+pub mod check;
+
 #[derive(Default, Debug, Clone)]
 #[flutter_rust_bridge::frb(non_opaque)]
 pub struct JavaDrill {
-    pub conditions: Vec<String>,
+    pub concept: Concept,
+    pub conditions: Vec<(bool, String)>,
     pub answer: String,
     pub ident_level: usize,
 }
 
 impl JavaDrill {
+    #[inline]
+    fn set_concept(&mut self, concept: Concept) {
+        self.concept = concept;
+    }
+
+    #[inline]
+    fn new_condition(&mut self, condition: impl Into<String>) {
+        self.conditions.push((false, condition.into()));
+    }
+
     #[inline]
     fn increase_ident(&mut self) {
         self.ident_level += 1;
@@ -33,7 +47,7 @@ impl JavaDrill {
     fn print(&mut self, thing: &str) {
         self.indent();
         self.answer.push_str(&format!("System.out.println({thing});\n"));
-        self.conditions.push(format!("  Print out {thing}"))
+        self.new_condition(format!("  Print out {thing}"))
     }
 
     fn new_class(&mut self, name: impl AsRef<str>) {
@@ -49,7 +63,6 @@ impl JavaDrill {
     }
 
     fn new_main(&mut self) {
-        // self.conditions.push(JavaCondition::HaveMain);
         self.indent();
         self.answer.push_str("public static void main(String[] args) {\n");
         self.increase_ident();
@@ -65,18 +78,17 @@ impl JavaDrill {
         self.indent();
         self.answer.push_str(&format!("if ({var1} {comp} {var2}) {{\n"));
         self.increase_ident();
-        self.conditions.push(format!(
-            "Make an if statement that compares {var1} and {var2}"
+        self.new_condition(format!(
+            "Make an if statement that compares {var1} and {var2} using the {comp} operator"
         ));
-        self.conditions.push(format!("Use the {comp} operator"));
-        self.conditions.push("Inside the if statement do".into());
+        self.new_condition("Inside the if statement do");
     }
 
     fn new_else_statement(&mut self) {
         self.decrease_ident_with_brace();
         self.answer.push_str(&format!(" else {{\n"));
-        self.conditions.push(
-            "Add an else statement to the previous if statement and do".into(),
+        self.new_condition(
+            "Add an else statement to the previous if statement and do",
         );
         self.increase_ident();
     }
@@ -91,6 +103,7 @@ impl JavaDrill {
 #[flutter_rust_bridge::frb(sync)]
 pub fn java_if_statement() -> JavaDrill {
     let mut drill = JavaDrill::default();
+    drill.set_concept(Concept::Ifs);
     drill.new_class("Main");
     drill.new_main();
 
@@ -106,13 +119,6 @@ pub fn java_if_statement() -> JavaDrill {
 
     drill.close_main();
     drill.close_class();
-
-    println!();
-    println!("{}", drill.answer);
-    println!();
-    for cond in &drill.conditions {
-        println!("- {cond}");
-    }
 
     drill
 }

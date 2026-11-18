@@ -1,7 +1,9 @@
 use crate::core::parser::output::ParserOutput;
 use crate::core::parser::state::ParserState;
 use crate::langs::sql::ast::statements::ddl::{SQLAlter, SQLCreate, SQLDrop};
-use crate::langs::sql::ast::statements::dml::{Delete, SQLInsert, SQLUpdate};
+use crate::langs::sql::ast::statements::dml::{
+    SQLDelete, SQLInsert, SQLUpdate,
+};
 use crate::langs::sql::ast::statements::query::{
     SQLGroupByClause, SQLHavingClause, SQLJoinClause, SQLLimitClause,
     SQLOrderByClause, SQLSelect,
@@ -24,22 +26,18 @@ pub enum SQLAst {
 
     Insert(SQLInsert),
     Update(SQLUpdate),
-    Delete(Delete),
+    Delete(SQLDelete),
 
     Select(SQLSelect),
-    Join(SQLJoinClause),
-    GroupBy(SQLGroupByClause),
-    Having(SQLHavingClause),
-    OrderBy(SQLOrderByClause),
-    Limit(SQLLimitClause),
 
+    // Do we really use this?
     Transaction(SQLTransaction),
     SetNames(SQLSetNames),
 }
 
 impl SQLAst {
-    pub fn new<'a>(source: &'a str) -> ParserOutput<Self> {
-        let mut state = ParserState::<'a, SQLTokenKind, Self>::new(source);
+    pub fn new(source: &str) -> ParserOutput<Self> {
+        let mut state = ParserState::<SQLTokenKind, Self>::new(source);
         while state.not_at_end() {
             if !state.token_expect_kind(SQLTokenKind::StrictKeyword) {
                 state.advance();
@@ -52,13 +50,17 @@ impl SQLAst {
                 let d = SQLDrop::new(&mut state);
                 state.root_push(d);
             } else if state.token_eat_text_ins("alter") {
-                state.record_unexpected_token();
+                let a = SQLAlter::new(&mut state);
+                state.root_push(a);
             } else if state.token_eat_text_ins("insert") {
-                state.record_unexpected_token();
+                let i = SQLInsert::new(&mut state);
+                state.root_push(i);
             } else if state.token_eat_text_ins("update") {
-                state.record_unexpected_token();
+                let u = SQLUpdate::new(&mut state);
+                state.root_push(u);
             } else if state.token_eat_text_ins("delete") {
-                state.record_unexpected_token();
+                let d = SQLDelete::new(&mut state);
+                state.root_push(d);
             } else if state.token_eat_text_ins("select") {
                 let s = SQLSelect::new(&mut state);
                 state.root_push(s);

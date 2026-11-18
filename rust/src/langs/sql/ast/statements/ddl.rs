@@ -19,35 +19,35 @@ impl SQLCreate {
             body: SQLCreateBody::Database,
         };
 
-        if state.token_eat_text_ins("database") {
+        if state.token_eat_text_ins("DATABASE") {
             s.if_not_exists(state);
             s.name(state);
             s.body = SQLCreateBody::Database; // not really necessary
-        } else if state.token_eat_text_ins("table") {
+        } else if state.token_eat_text_ins("TABLE") {
             s.if_not_exists(state);
             s.name(state);
             s.body = SQLCreateBody::table(state);
-        } else if state.token_eat_text_ins("view") {
+        } else if state.token_eat_text_ins("VIEW") {
             s.if_not_exists(state);
             s.name(state);
-            state.token_expect_text_ins("as");
+            state.token_expect_text_ins("AS");
             s.body = SQLCreateBody::view(state);
-        } else if state.token_eat_text_ins("or") {
+        } else if state.token_eat_text_ins("OR") {
             state.advance();
-            state.token_expect_text_ins("replace");
+            state.token_expect_text_ins("REPLACE");
             state.advance();
-            state.token_expect_text_ins("view");
+            state.token_expect_text_ins("VIEW");
             s.if_not_exists = true; // cause we're replacing it anyway
             s.name(state);
-            state.token_expect_text_ins("as");
+            state.token_expect_text_ins("AS");
             s.body = SQLCreateBody::view(state);
-        } else if state.token_eat_text_ins("index") {
+        } else if state.token_eat_text_ins("INDEX") {
             s.if_not_exists(state);
             s.name(state);
             s.body = SQLCreateBody::index_(state, false);
-        } else if state.token_eat_text_ins("unique") {
+        } else if state.token_eat_text_ins("UNIQUE") {
             state.advance();
-            state.token_expect_text_ins("index");
+            state.token_expect_text_ins("INDEX");
             s.if_not_exists(state);
             s.name(state);
             s.body = SQLCreateBody::index_(state, true);
@@ -60,17 +60,17 @@ impl SQLCreate {
 
     fn if_not_exists(&mut self, state: &mut SQLParserState) {
         state.advance();
-        if !state.token_eat_text_ins("if") {
+        if !state.token_eat_text_ins("IF") {
             return;
         }
 
         state.advance();
-        if state.token_eat_text_ins("not") {
+        if state.token_eat_text_ins("NOT") {
             state.advance();
             self.if_not_exists = true;
         }
 
-        if state.token_expect_text_ins("exists") {
+        if state.token_expect_text_ins("EXISTS") {
             state.advance();
         }
     }
@@ -102,18 +102,17 @@ pub enum SQLCreateBody {
 impl SQLCreateBody {
     pub fn table(state: &mut SQLParserState) -> Self {
         let mut v = vec![];
-        // no need for advance since self.name() already puts it after the name
-        if state.token_expect_text_ins("(") {
+        if state.token_expect_text_sen("(") {
             state.advance();
         }
 
         while state.not_at_end() {
             v.push(SQLColumnDefinition::new(state));
-            if state.token_eat_texts_ins(&[")", ";"]) {
+            if state.token_eat_texts_sen(&[")", ";"]) {
                 break;
             }
 
-            if state.token_expect_text_ins(",") {
+            if state.token_expect_text_sen(",") {
                 if state.token_peek_at_text(1) == Some(")") {
                     state.record_trailing_comma();
                     state.advance();
@@ -134,8 +133,7 @@ impl SQLCreateBody {
     pub fn index_(state: &mut SQLParserState, unique: bool) -> Self {
         let mut target_table = String::new();
         let mut columns = vec![];
-        // no need for advance since self.name() already puts it after the name
-        if state.token_expect_text_ins("on") {
+        if state.token_expect_text_ins("ON") {
             state.advance();
         }
 
@@ -144,7 +142,7 @@ impl SQLCreateBody {
         }
 
         state.advance();
-        if state.token_expect_text_ins("(") {
+        if state.token_expect_text_sen("(") {
             state.advance();
         }
 
@@ -154,11 +152,11 @@ impl SQLCreateBody {
                 state.advance();
             }
 
-            if state.token_eat_texts_ins(&[")", ";"]) {
+            if state.token_eat_texts_sen(&[")", ";"]) {
                 break;
             }
 
-            if state.token_expect_text_ins(",") {
+            if state.token_expect_text_sen(",") {
                 if state.token_peek_at_text(1) == Some(")") {
                     state.record_trailing_comma();
                     state.advance();
@@ -212,7 +210,7 @@ impl SQLColumnDefinition {
 
         state.advance();
         while state.not_at_end() {
-            if state.token_eat_texts_ins(&[",", ")", ";"]) {
+            if state.token_eat_texts_sen(&[",", ")", ";"]) {
                 break;
             }
 
@@ -241,35 +239,35 @@ pub enum SQLColumnRestraint {
 
 impl SQLColumnRestraint {
     pub fn new(state: &mut SQLParserState) -> Option<Self> {
-        if state.token_eat_text_ins("primary") {
+        if state.token_eat_text_ins("PRIMARY") {
             state.advance();
-            state.token_expect_text_ins("key");
+            state.token_expect_text_ins("KEY");
             Some(Self::PrimaryKey)
-        } else if state.token_eat_text_ins("foreign") {
+        } else if state.token_eat_text_ins("FOREIGN") {
             state.advance();
-            state.token_expect_text_ins("key");
+            state.token_expect_text_ins("KEY");
             Some(Self::ForeignKey)
-        } else if state.token_eat_text_ins("unique") {
+        } else if state.token_eat_text_ins("UNIQUE") {
             state.advance();
             // TODO: I forgot if this is UNIQUE KEY or just UNIQUE
-            state.token_eat_text_ins("key"); // change this to expect if the former
+            state.token_eat_text_ins("KEY"); // change this to expect if the former
             Some(Self::Unique)
-        } else if state.token_eat_text_ins("not") {
+        } else if state.token_eat_text_ins("NOT") {
             state.advance();
-            state.token_expect_text_ins("null");
+            state.token_expect_text_ins("NULL");
             Some(Self::NotNull)
-        } else if state.token_eat_text_ins("null") {
+        } else if state.token_eat_text_ins("NULL") {
             Some(Self::Nullable)
-        } else if state.token_eat_text_ins("auto") {
+        } else if state.token_eat_text_ins("AUTO") {
             state.advance();
-            state.token_expect_text_ins("increment");
+            state.token_expect_text_ins("INCREMENT");
             Some(Self::AutoIncrement)
-        } else if state.token_eat_text_ins("auto_increment") {
+        } else if state.token_eat_text_ins("AUTO_INCREMENT") {
             Some(Self::AutoIncrement)
-        } else if state.token_eat_text_ins("default") {
+        } else if state.token_eat_text_ins("DEFAULT") {
             state.advance();
             Some(Self::Default(SQLExpression::new(state)))
-        } else if state.token_eat_text_ins("check") {
+        } else if state.token_eat_text_ins("CHECK") {
             state.advance();
             Some(Self::Check(SQLExpression::new(state)))
         } else {
@@ -296,13 +294,13 @@ impl SQLDrop {
 
         state.advance();
 
-        if state.token_eat_text_ins("database") {
+        if state.token_eat_text_ins("DATABASE") {
             s.r#type = SQLDropType::Database; // not really necessary
-        } else if state.token_eat_text_ins("table") {
+        } else if state.token_eat_text_ins("TABLE") {
             s.r#type = SQLDropType::Table;
-        } else if state.token_eat_text_ins("view") {
+        } else if state.token_eat_text_ins("VIEW") {
             s.r#type = SQLDropType::View;
-        } else if state.token_eat_text_ins("index") {
+        } else if state.token_eat_text_ins("INDEX") {
             s.r#type = SQLDropType::Index;
         } else {
             state.record_unexpected_token();
@@ -316,19 +314,19 @@ impl SQLDrop {
 
     fn if_exists(&mut self, state: &mut SQLParserState) {
         state.advance();
-        if !state.token_eat_text_ins("if") {
+        if !state.token_eat_text_ins("IF") {
             return;
         }
 
         state.advance();
-        if state.token_eat_text_ins("not") {
+        if state.token_eat_text_ins("NOT") {
             state.advance();
             self.if_exists = false;
         } else {
             self.if_exists = true;
         }
 
-        if state.token_expect_text_ins("exists") {
+        if state.token_expect_text_ins("EXISTS") {
             state.advance();
         }
     }
@@ -363,9 +361,121 @@ pub struct SQLAlter {
     pub action: Option<SQLAlterAction>,
 }
 
+impl SQLAlter {
+    pub fn new(state: &mut SQLParserState) -> Self {
+        state.advance();
+        let mut s = Self { name: String::new(), action: None };
+
+        if !state.token_expect_text_ins("TABLE") {
+            return s;
+        }
+
+        state.advance();
+        if !state.token_expect_kind(SQLTokenKind::Identifier) {
+            return s;
+        }
+
+        s.name = state.token_text().unwrap().into();
+        state.advance();
+        s.action = SQLAlterAction::new(state);
+        s
+    }
+}
+
+impl From<SQLAlter> for SQLAst {
+    fn from(value: SQLAlter) -> Self {
+        Self::Alter(value)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum SQLAlterAction {
-    AddColumn(String, Option<String>),
+    AddColumn(String, String),
     DropColumn(String),
-    RenameTo(String),
+    RenameTo(String, String),
+}
+
+impl SQLAlterAction {
+    pub fn new(state: &mut SQLParserState) -> Option<Self> {
+        if state.token_eat_text_ins("ADD") {
+            state.advance();
+            Some(Self::add(state))
+        } else if state.token_eat_text_ins("DROP") {
+            state.advance();
+            Some(Self::drop(state))
+        } else if state.token_eat_text_ins("RENAME") {
+            state.advance();
+            Some(Self::rename(state))
+        } else {
+            state.record_unexpected_token();
+            None
+        }
+    }
+
+    fn add(state: &mut SQLParserState) -> Self {
+        let mut name = String::new();
+        let mut r#type = String::new();
+        if state.token_expect_text_ins("COLUMN") {
+            return Self::AddColumn(name, r#type);
+        }
+
+        state.advance();
+        if !state.token_expect_kind(SQLTokenKind::Identifier) {
+            return Self::AddColumn(name, r#type);
+        }
+
+        name = state.token_text().unwrap().into();
+        state.advance();
+        r#type = state.token_text().unwrap().into();
+        state.advance();
+
+        Self::AddColumn(name, r#type)
+    }
+
+    fn drop(state: &mut SQLParserState) -> Self {
+        let mut name = String::new();
+        if state.token_expect_text_ins("COLUMN") {
+            return Self::DropColumn(name);
+        }
+
+        state.advance();
+        if !state.token_expect_kind(SQLTokenKind::Identifier) {
+            return Self::DropColumn(name);
+        }
+
+        name = state.token_text().unwrap().into();
+        state.advance();
+
+        Self::DropColumn(name)
+    }
+
+    fn rename(state: &mut SQLParserState) -> Self {
+        let mut name = String::new();
+        let mut new = String::new();
+        if state.token_expect_text_ins("COLUMN") {
+            return Self::RenameTo(name, new);
+        }
+
+        state.advance();
+        if !state.token_expect_kind(SQLTokenKind::Identifier) {
+            return Self::RenameTo(name, new);
+        }
+
+        name = state.token_text().unwrap().into();
+        state.advance();
+
+        if !state.token_eat_text_ins("TO") {
+            return Self::RenameTo(name, new);
+        }
+
+        state.advance();
+        if !state.token_expect_kind(SQLTokenKind::Identifier) {
+            return Self::RenameTo(name, new);
+        }
+
+        new = state.token_text().unwrap().into();
+        state.advance();
+
+        Self::RenameTo(name, new)
+    }
 }

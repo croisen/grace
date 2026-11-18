@@ -35,7 +35,7 @@ impl SQLSelect {
         while state.not_at_end() {
             s.items.push(SQLSelectItem::new(state));
             if state.token_eat_kind(SQLTokenKind::StrictKeyword)
-                || state.token_eat_texts_ins(&["from", "where"])
+                && state.token_eat_texts_ins(&["FROM", "WHERE"])
             {
                 break;
             }
@@ -43,7 +43,7 @@ impl SQLSelect {
             if state.token_expect_text_ins(",") {
                 state.advance();
                 if state.token_eat_kind(SQLTokenKind::StrictKeyword)
-                    || state.token_eat_texts_ins(&["from", "where"])
+                    || state.token_eat_texts_ins(&["FROM", "WHERE"])
                 {
                     state.record_trailing_comma();
                     break;
@@ -55,15 +55,16 @@ impl SQLSelect {
             state.advance();
         }
 
-        if state.token_eat_text_ins("from") {
+        if state.token_eat_text_ins("FROM") {
             state.advance();
             state.token_expect_kind(SQLTokenKind::Identifier);
             s.from = state.token_text().map(|t| t.to_string());
             state.advance();
         }
 
+        // actually this should be separate, not a catch all loop
         while state.not_at_end() {
-            if state.token_eat_text_ins("where") {
+            if state.token_eat_text_ins("WHERE") {
                 if s.r#where.is_none() {
                     state.advance();
                     s.r#where = Some(SQLExpression::new(state));
@@ -75,9 +76,6 @@ impl SQLSelect {
 
                 continue;
             }
-
-            /* TODO */
-            // the rest...
 
             break;
         }

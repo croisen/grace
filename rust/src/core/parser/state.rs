@@ -18,7 +18,6 @@ where
     pub tokens: Vec<Token<'a, TK>>,
     pub index: usize,
     pub root: Vec<L>,
-    pub checkpoint: Option<usize>,
     pub errors: Vec<GraceError>,
 }
 
@@ -32,7 +31,7 @@ where
 {
     pub fn new(source: &'a str) -> Self {
         let (tokens, errors) = Token::tokenize(source);
-        Self { tokens, index: 0, errors, checkpoint: None, root: vec![] }
+        Self { tokens, index: 0, errors, root: vec![] }
     }
 
     pub fn root_push(&mut self, item: impl Into<L>) {
@@ -49,18 +48,6 @@ where
 
     pub fn not_at_end(&self) -> bool {
         self.index < self.tokens.len()
-    }
-
-    pub fn checkpoint_clear(&mut self) {
-        self.checkpoint = None;
-    }
-
-    pub fn checkpoint_set(&mut self, index: usize) {
-        self.checkpoint = Some(index);
-    }
-
-    pub fn checkpoint_get(&mut self) -> usize {
-        self.checkpoint.unwrap_or(self.index)
     }
 
     pub fn get_token(&mut self) -> Option<&Token<'a, TK>> {

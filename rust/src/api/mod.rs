@@ -1,6 +1,5 @@
 pub mod concept;
 pub mod drills;
-pub mod fsrs;
 
 #[flutter_rust_bridge::frb(init)]
 pub fn init_app() {

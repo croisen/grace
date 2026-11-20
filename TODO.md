@@ -1,14 +1,20 @@
 # TODO
 
-- Make a rust drill in rust/src/api/rust/ based on the java drill on
-  rust/src/api/java/mod.rs
-- Keep track of what drill one is for via the DrillLanguage enum in
-  rust/src/api/mod.rs
-- Make the app's main screen in flutter have cards that act like a dropdown
-  menu to be able to see the current retainability of the concepts chosen
-  for the drill, along with the due date
-  - This is done by checking the DrillMemory via the retrievability and
-  due_date_str methods in rust/src/api/mod.rs
-- Find a way to save DrillCollection in rust/src/api/mod.rs to a database via
-  flutter's sqlite3 ffi package or sqflite
-- Save the current theme selected via shared_preferences
+- [ ] GUI
+  - [x] App themes
+    - [x] Light
+    - [x] Dark
+  - [x] Make new drills
+  - [ ] Save drills
+  - [ ] Show retainability percent
+  - [ ] Show due date of when to review
+- [x] Generating drills
+  - [x] Java
+  - [x] Rust
+  - [x] SQL
+- [x] Parser + Abstract Syntax Tree
+  - [x] Error free for the pre-generated answer
+  - [x] Still parses after non-fatal errors
+- [x] FSRS
+  - [x] Check retainability after a few days
+  - [x] Set due dates to review

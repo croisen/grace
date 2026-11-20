@@ -111,15 +111,15 @@ impl DrillMemory {
             .next_states_with_elapsed_days(self.memory, DESIRED_RETENTION, days)
             .unwrap();
 
-        let grade = match grade {
+        let next = match grade {
             Grade::Again => next.again,
             Grade::Hard => next.hard,
             Grade::Good => next.good,
             Grade::Easy => next.easy,
         };
 
-        self.memory = Some(grade.memory);
-        self.due_date = now + (grade.interval as i64 * 86400);
+        self.memory = Some(next.memory);
+        self.due_date = now + (next.interval as i64 * 86400);
         self.last_review = Some(now);
     }
 

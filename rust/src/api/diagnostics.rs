@@ -15,6 +15,7 @@ pub struct Diagnostic {
 }
 
 impl Diagnostic {
+    #[flutter_rust_bridge::frb(sync)]
     pub fn to_string(&self) -> String {
         let (Some(line), Some(col)) = (self.line, self.col) else {
             return format!("[] {}", self.message);

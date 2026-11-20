@@ -9,7 +9,6 @@ pub mod diagnostics;
 pub mod grade;
 
 pub mod java;
-pub mod old_rust;
 pub mod rust;
 pub mod sql;
 

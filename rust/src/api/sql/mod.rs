@@ -27,6 +27,7 @@ pub enum SqlConcept {
 }
 
 impl SqlConcept {
+    #[flutter_rust_bridge::frb(sync)]
     pub fn to_string(&self) -> String {
         match self {
             Self::Select => "Select Statements",

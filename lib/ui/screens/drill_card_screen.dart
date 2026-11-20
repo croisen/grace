@@ -2,15 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-// Real generators
-import 'package:grace/rust/api/drills/rust/variable.dart';
-import 'package:grace/rust/api/drills/rust/if_statement.dart';
-import 'package:grace/rust/api/drills/rust/else_if.dart';
-import 'package:grace/rust/api/drills/rust/match_statement.dart';
-import 'package:grace/rust/api/drills/rust/while_statement.dart';
-import 'package:grace/rust/api/drills/rust/for_statement.dart';
-import 'package:grace/rust/api/drills/rust/loop_statement.dart';
-import 'package:grace/rust/api/drills/rust/function.dart';
+// Consolidated Rust drill API
+import 'package:grace/rust/api/rust.dart';
 
 import '../widgets/terminal_editor.dart';
 

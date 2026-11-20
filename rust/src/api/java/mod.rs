@@ -20,7 +20,7 @@ pub enum JavaConcept {
 }
 
 impl JavaConcept {
-    #[flutter_rust_bridge::frb(non_opaque)]
+    #[flutter_rust_bridge::frb(non_opaque, sync)]
     pub fn to_string(&self) -> String {
         match self {
             Self::VarDecl => "Variable Declaration".into(),

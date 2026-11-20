@@ -11,13 +11,11 @@ name = "rust-lib-grace"
 path = "src/main.rs"
 
 [dependencies]
-anyhow = { version = "1.0.104", default-features = false, features = ["std"] }
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 flutter_rust_bridge = "=2.13.0"
 fsrs = { version = "7.0.0", default-features = false }
 libc = { version = "0.2.189", default-features = false, features = ["align", "const-extern-fn", "extra_traits", "use_std"] }
-logos = { version = "0.16.1", default-features = false, features = ["export_derive", "logos-derive", "state_machine_codegen", "std"] }
-oak = { git = "https://github.com/yggdrasil-language/oak.rs" }
+oak-core = { git = "https://github.com/yggdrasil-language/oak.rs" }
 oak-c = { git = "https://github.com/yggdrasil-language/oak.rs" }
 oak-csharp = { git = "https://github.com/yggdrasil-language/oak.rs" }
 oak-cpp = { git = "https://github.com/yggdrasil-language/oak.rs" }
@@ -30,6 +28,7 @@ oak-python = { git = "https://github.com/yggdrasil-language/oak.rs" }
 oak-rust = { git = "https://github.com/yggdrasil-language/oak.rs" }
 oak-sql = { git = "https://github.com/yggdrasil-language/oak.rs" }
 rand = { version = "0.10.3", default-features = false, features = ["chacha", "serde", "thread_rng"] }
+unicode-segmentation = { version = "1", default-features = false }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

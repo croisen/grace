@@ -1,6 +1,6 @@
 use std::ops::Sub;
 
-use oak::OakErrorKind;
+use oak_core::OakErrorKind;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Grade {

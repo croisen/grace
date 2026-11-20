@@ -1,6 +1,7 @@
-use rand::RngExt;
 use flutter_rust_bridge::frb;
-use crate::api::drills::rust::distinct_callsigns;
+use rand::RngExt;
+
+use crate::api::rust::distinct_callsigns;
 
 #[derive(Debug, Clone)]
 pub struct FunctionDrill {
@@ -40,9 +41,7 @@ fn function_one_param_return() -> FunctionDrill {
 
     // Idiomatic: expression-style return (no explicit `return`)
     FunctionDrill {
-        answer: format!(
-            "fn {name}({param}: i32) -> i32 {{\n    {param}\n}}"
-        ),
+        answer: format!("fn {name}({param}: i32) -> i32 {{\n    {param}\n}}"),
         conditions: format!(
             "- make a function.\n\
              - function must be named \"{name}\".\n\

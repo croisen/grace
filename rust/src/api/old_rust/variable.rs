@@ -1,6 +1,6 @@
 use rand::RngExt;
 
-use crate::api::drills::rust::callsign;
+use crate::api::rust::callsign;
 
 #[derive(Debug, Clone)]
 pub struct VariableDrill {

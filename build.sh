@@ -142,12 +142,12 @@ case "${1:-}" in
         ;;
     "run-rustr")
         pushd "${SCRIPT_PATH}"/rust
-        cargo run --release -Z build-std --bin rust-lib-grace
+        cargo run --release -Z build-std=core,alloc,std,panic_abort --bin rust-lib-grace
         popd
         ;;
     "run-rustd")
         pushd "${SCRIPT_PATH}"/rust
-        RUST_BACKTRACE=1 cargo run -Z build-std --bin rust-lib-grace
+        RUST_BACKTRACE=1 cargo run -Z build-std=core,alloc,std,panic_abort --bin rust-lib-grace
         popd
         ;;
     *)

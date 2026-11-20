@@ -1,6 +1,7 @@
-use rand::RngExt;
 use flutter_rust_bridge::frb;
-use crate::api::drills::rust::variable::generate_distinct_variables;
+use rand::RngExt;
+
+use crate::api::rust::variable::generate_distinct_variables;
 
 #[derive(Debug, Clone)]
 pub struct ElseIfDrill {

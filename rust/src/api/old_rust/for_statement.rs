@@ -1,6 +1,7 @@
-use rand::RngExt;
 use flutter_rust_bridge::frb;
-use crate::api::drills::rust::distinct_callsigns;
+use rand::RngExt;
+
+use crate::api::rust::distinct_callsigns;
 
 #[derive(Debug, Clone)]
 pub struct ForStatementDrill {

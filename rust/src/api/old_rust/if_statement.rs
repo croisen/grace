@@ -1,7 +1,7 @@
 use flutter_rust_bridge::frb;
 use rand::RngExt;
 
-use crate::api::rust::variable::generate_variable;
+use crate::api::old_rust::variable::generate_variable;
 
 #[derive(Debug, Clone)]
 pub struct IfStatementDrill {

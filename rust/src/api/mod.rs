@@ -24,8 +24,10 @@ pub struct DrillCollection {
 
 impl DrillCollection {
     #[flutter_rust_bridge::frb(sync)]
-    pub fn new(name: String, concepts: Vec<String>) -> Self {
-        let drill = concepts.into_iter().map(DrillMemory::new).collect();
+    pub fn new(name: String, list: Vec<(DrillLanguage, String)>) -> Self {
+        let drill =
+            list.into_iter().map(|(l, c)| DrillMemory::new(l, c)).collect();
+
         Self { name, collection: drill }
     }
 
@@ -43,9 +45,10 @@ impl DrillCollection {
     }
 }
 
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(ignore_all, opaque)]
 pub struct DrillMemory {
+    pub lang: DrillLanguage,
     pub concept: String,
     pub memory: Option<MemoryState>,
     pub last_review: Option<i64>,
@@ -54,9 +57,13 @@ pub struct DrillMemory {
 
 impl DrillMemory {
     #[flutter_rust_bridge::frb(sync)]
-    pub fn new(concept: String) -> Self {
+    pub fn new(lang: DrillLanguage, concept: String) -> Self {
         let now = local_now();
-        Self { concept, memory: None, last_review: None, due_date: now }
+        Self { lang, concept, memory: None, last_review: None, due_date: now }
+    }
+
+    pub fn lang(&self) -> DrillLanguage {
+        self.lang
     }
 
     #[flutter_rust_bridge::frb(sync)]
@@ -134,6 +141,13 @@ impl DrillMemory {
             if val == 1 { unit.into() } else { format!("{unit}s") }
         )
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum DrillLanguage {
+    JAVA,
+    RUST,
+    SQL,
 }
 
 #[flutter_rust_bridge::frb(init)]

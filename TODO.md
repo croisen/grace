@@ -5,7 +5,7 @@
     - [x] Light
     - [x] Dark
   - [x] Make new drills
-  - [ ] Save drills
+  - [x] Save drills
   - [ ] Show retainability percent
   - [ ] Show due date of when to review
 - [x] Generating drills

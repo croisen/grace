@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:grace/rust/api/rust/if_statement.dart';
-import 'package:grace/rust/api/rust/else_if.dart';
-import 'package:grace/rust/api/rust/match_statement.dart';
-import 'package:grace/rust/api/rust/while_statement.dart';
-import 'package:grace/rust/api/rust/for_statement.dart';
-import 'package:grace/rust/api/rust/loop_statement.dart';
-import 'package:grace/rust/api/rust/function.dart';
 import 'package:flutter_highlight/themes/gruvbox-dark.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:grace/rust/api/rust.dart';
 import 'package:highlight/languages/rust.dart';
 
 class DrillScreen extends StatefulWidget {
@@ -21,46 +15,47 @@ class _DrillScreenState extends State<DrillScreen> {
   final controller = CodeController(language: rust);
 
   String conditions = 'Pick a concept above to start a drill.';
+  List<(bool, String)> actualConditions = [];
   String expectedAnswer = '';
   String? feedback;
 
   void loadDrill(String concept) {
-    late final String newConditions;
+    late final List<(bool, String)> newConditions;
     late final String newAnswer;
 
     switch (concept) {
       case 'if':
-        final d = generateIfStatement();
+        final d = rustIfStatement();
         newConditions = d.conditions;
         newAnswer = d.answer;
         break;
-      case 'else if':
-        final d = generateElseIf();
-        newConditions = d.conditions;
-        newAnswer = d.answer;
-        break;
+      // case 'else if':
+      //   final d = rustEl();
+      //   newConditions = d.conditions;
+      //   newAnswer = d.answer;
+      //   break;
       case 'match':
-        final d = generateMatchStatement();
+        final d = rustMatchStatement();
         newConditions = d.conditions;
         newAnswer = d.answer;
         break;
       case 'while':
-        final d = generateWhileStatement();
+        final d = rustWhileLoop();
         newConditions = d.conditions;
         newAnswer = d.answer;
         break;
       case 'for':
-        final d = generateForStatement();
+        final d = rustForLoop();
         newConditions = d.conditions;
         newAnswer = d.answer;
         break;
       case 'loop':
-        final d = generateLoopStatement();
+        final d = rustLoop();
         newConditions = d.conditions;
         newAnswer = d.answer;
         break;
       case 'function':
-        final d = generateFunction();
+        final d = rustFunctionDeclaration();
         newConditions = d.conditions;
         newAnswer = d.answer;
         break;
@@ -69,7 +64,7 @@ class _DrillScreenState extends State<DrillScreen> {
     }
 
     setState(() {
-      conditions = newConditions;
+      actualConditions = newConditions;
       expectedAnswer = newAnswer;
       controller.text = '';
       feedback = null;
@@ -112,7 +107,12 @@ class _DrillScreenState extends State<DrillScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            Text(conditions, style: const TextStyle(fontSize: 15, height: 1.4)),
+
+            ...actualConditions.map(
+              (c) =>
+                  Text(c.$2, style: const TextStyle(fontSize: 15, height: 1.4)),
+            ),
+
             const SizedBox(height: 16),
             Expanded(
               child: CodeTheme(

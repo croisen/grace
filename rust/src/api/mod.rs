@@ -1,5 +1,6 @@
 use chrono::Local;
-use fsrs::{FSRS, MemoryState};
+use fsrs::FSRS;
+pub use fsrs::MemoryState;
 use rand::random_range;
 
 use crate::api::grade::Grade;
@@ -12,41 +13,70 @@ pub mod java;
 pub mod rust;
 pub mod sql;
 
-pub static DESIRED_RETENTION: f32 = 0.9;
+static DESIRED_RETENTION: f32 = 0.9;
 
 #[derive(Default, Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore_all, opaque)]
+#[flutter_rust_bridge::frb(opaque)]
 pub struct DrillCollection {
+    pub id: usize,
     pub name: String,
     pub collection: Vec<DrillMemory>,
 }
 
 impl DrillCollection {
     #[flutter_rust_bridge::frb(sync)]
-    pub fn new(name: String, list: Vec<(DrillLanguage, String)>) -> Self {
-        let drill =
-            list.into_iter().map(|(l, c)| DrillMemory::new(l, c)).collect();
-
-        Self { name, collection: drill }
+    pub fn new(id: usize, name: String, collection: Vec<DrillMemory>) -> Self {
+        Self { id, name, collection }
     }
 
     #[flutter_rust_bridge::frb(sync)]
-    pub fn sort_by_retainability(&mut self) {
+    pub fn new_with_default(
+        name: String,
+        lang: DrillLanguage,
+        list: Vec<String>,
+    ) -> Self {
+        let drill = list
+            .into_iter()
+            .map(|c| DrillMemory::new_with_default(lang, c))
+            .collect();
+
+        Self { id: 0, name, collection: drill }
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn due_concept(&self) -> Option<String> {
         let now = local_now();
-        self.collection.sort_by(|a, b| {
-            a.retrievability(now).total_cmp(&b.retrievability(now))
-        });
+        self.collection
+            .iter()
+            .filter(|s| s.is_due())
+            .min_by(|a, b| {
+                a.retrievability(now).total_cmp(&b.retrievability(now))
+            })
+            .map(|drill| drill.concept.clone())
     }
 
     #[flutter_rust_bridge::frb(sync)]
-    pub fn sort_by_concept(&mut self) {
-        self.collection.sort_by(|a, b| a.concept.cmp(&b.concept));
+    pub fn set_id(&mut self, id: usize) {
+        self.id = id;
+        for drill in &mut self.collection {
+            drill.col_id = id;
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn review_drill(&mut self, concept: String, grade: Grade) {
+        if let Some(drill) =
+            self.collection.iter_mut().find(|d| d.concept == concept)
+        {
+            drill.review_if_due(grade);
+        }
     }
 }
 
 #[derive(Debug, Clone)]
-#[flutter_rust_bridge::frb(ignore_all, opaque)]
+#[flutter_rust_bridge::frb(non_opaque)]
 pub struct DrillMemory {
+    pub col_id: usize, // collection_id
     pub lang: DrillLanguage,
     pub concept: String,
     pub memory: Option<MemoryState>,
@@ -56,13 +86,26 @@ pub struct DrillMemory {
 
 impl DrillMemory {
     #[flutter_rust_bridge::frb(sync)]
-    pub fn new(lang: DrillLanguage, concept: String) -> Self {
-        let now = local_now();
-        Self { lang, concept, memory: None, last_review: None, due_date: now }
+    pub fn new(
+        id: usize,
+        lang: DrillLanguage,
+        concept: String,
+        memory: Option<MemoryState>,
+        last_review: Option<i64>,
+        due_date: i64,
+    ) -> Self {
+        Self { col_id: id, lang, concept, memory, last_review, due_date }
     }
 
-    pub fn lang(&self) -> DrillLanguage {
-        self.lang
+    pub fn new_with_default(lang: DrillLanguage, concept: String) -> Self {
+        Self {
+            col_id: 0,
+            lang,
+            concept,
+            memory: None,
+            last_review: None,
+            due_date: local_now(),
+        }
     }
 
     #[flutter_rust_bridge::frb(sync)]
@@ -73,6 +116,7 @@ impl DrillMemory {
         self.memory.map(|m| fsrs.current_retrievability(m, days)).unwrap_or(0.0)
     }
 
+    #[flutter_rust_bridge::frb(sync)]
     pub fn due_date_str(&self) -> String {
         let now = local_now();
         let elapsed = self.due_date - now;
@@ -88,19 +132,16 @@ impl DrillMemory {
         self.due_date <= Local::now().timestamp()
     }
 
-    #[flutter_rust_bridge::frb(sync)]
-    pub fn review(&mut self, grade: Grade) {
+    fn review(&mut self, grade: Grade) {
         self._review(grade);
     }
 
-    #[flutter_rust_bridge::frb(sync)]
-    pub fn review_if_due(&mut self, grade: Grade) {
+    fn review_if_due(&mut self, grade: Grade) {
         if self.is_due() {
-            self._review(grade);
+            self.review(grade);
         }
     }
 
-    #[inline]
     fn _review(&mut self, grade: Grade) {
         let fsrs = FSRS::default();
         let now = local_now();
@@ -140,6 +181,13 @@ impl DrillMemory {
             if val == 1 { unit.into() } else { format!("{unit}s") }
         )
     }
+}
+
+#[flutter_rust_bridge::frb(mirror(MemoryState))]
+pub struct _MemoryState {
+    pub stability: f32,
+    pub difficulty: f32,
+    pub stability_fast: f32,
 }
 
 #[derive(Debug, Clone, Copy)]

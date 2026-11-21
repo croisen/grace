@@ -60,7 +60,6 @@ case "${1:-}" in
         "${SCRIPT}" sign
         ;;
     "run")
-        rm -r "${SCRIPT_PATH}"/lib/rust/
         "${SCRIPT}" licenses
         "${SCRIPT}" generate
         flutter run --verbose

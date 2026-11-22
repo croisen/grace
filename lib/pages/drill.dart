@@ -1,25 +1,28 @@
+import 'package:grace/widgets/drill_card.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:grace/rust/api.dart';
 import 'package:grace/utils/database/mod.dart';
 
 class DrillsScreen extends StatefulWidget {
-  DrillsScreen({super.key});
-  final state = _DrillsScreen();
-
-  void refresh() {
-    state.refresh();
-  }
+  const DrillsScreen({super.key});
 
   @override
-  State<DrillsScreen> createState() => state;
+  State<DrillsScreen> createState() => _DrillsScreen();
 }
 
 class _DrillsScreen extends State<DrillsScreen> {
   late Future<List<DrillCollection>> _collections;
+
   @override
   void initState() {
     super.initState();
     _loadCollections();
+  }
+
+  @override
+  void setState(void Function() f) {
+    _loadCollections();
+    super.setState(f);
   }
 
   void _loadCollections() {
@@ -27,7 +30,7 @@ class _DrillsScreen extends State<DrillsScreen> {
   }
 
   Future<void> refresh() async {
-    setState(_loadCollections);
+    setState(() {});
     await _collections;
   }
 
@@ -57,15 +60,14 @@ class _DrillsScreen extends State<DrillsScreen> {
 
         return RefreshIndicator(
           onRefresh: refresh,
-          child: ListView.builder(
+          child: ListView.separated(
+            padding: .symmetric(vertical: 5, horizontal: 10),
             itemCount: collections.length,
             itemBuilder: (context, idx) {
               final col = collections[idx];
-              return ListTile(
-                title: Text(col.name),
-                subtitle: Text('${col.collection.length} drills'),
-              );
+              return DrillCard(col: col, refreshHome: refresh);
             },
+            separatorBuilder: (context, idx) => const SizedBox(height: 10),
           ),
         );
       },

@@ -63,6 +63,23 @@ class DatabaseHelper {
     });
   }
 
+  Future<void> deleteCollection(DrillCollection c) async {
+    final database = await db;
+    return await database.transaction((txn) async {
+      await txn.delete(
+        'drills',
+        where: 'col_id = ?',
+        whereArgs: [c.id.toInt()],
+      );
+
+      await txn.delete(
+        'collections',
+        where: 'id = ?',
+        whereArgs: [c.id.toInt()],
+      );
+    });
+  }
+
   Future<void> saveCollection(DrillCollection c) async {
     final database = await db;
     return await database.transaction((txn) async {

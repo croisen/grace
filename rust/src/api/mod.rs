@@ -68,7 +68,7 @@ impl DrillCollection {
         if let Some(drill) =
             self.collection.iter_mut().find(|d| d.concept == concept)
         {
-            drill.review_if_due(grade);
+            drill.review(grade);
         }
     }
 }

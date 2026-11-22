@@ -12,21 +12,19 @@ pub enum JavaConcept {
     VarDecl = 0,
     FunctionDecl = 1,
     Ifs = 2,
-    ElseIfs = 3,
-    ForLoop = 4,
-    WhileLoop = 5,
-    DoWhile = 6,
-    Switch = 7,
+    ForLoop = 3,
+    WhileLoop = 4,
+    DoWhile = 5,
+    Switch = 6,
 }
 
 impl JavaConcept {
-    #[flutter_rust_bridge::frb(non_opaque, sync)]
+    #[flutter_rust_bridge::frb(sync)]
     pub fn to_string(&self) -> String {
         match self {
             Self::VarDecl => "Variable Declaration".into(),
             Self::FunctionDecl => "Function Declaration".into(),
             Self::Ifs => "If Statements".into(),
-            Self::ElseIfs => "If Else If Statements".into(),
             Self::ForLoop => "For Loops".into(),
             Self::WhileLoop => "While Loops".into(),
             Self::DoWhile => "Do While Loops".into(),
@@ -34,17 +32,30 @@ impl JavaConcept {
         }
     }
 
+    #[flutter_rust_bridge::frb(sync)]
     pub fn from_string(s: String) -> Self {
         match s.as_str() {
             "Variable Declaration" => Self::VarDecl,
             "Function Declaration" => Self::FunctionDecl,
             "If Statements" => Self::Ifs,
-            "If Else If Statements" => Self::ElseIfs,
             "For Loops" => Self::ForLoop,
             "While Loops" => Self::WhileLoop,
             "Do While Loops" => Self::DoWhile,
             "Switch Case Statements" => Self::Switch,
             _ => Self::VarDecl,
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn make_drill(&self) -> JavaDrill {
+        match self {
+            Self::VarDecl => java_variable_declaration(),
+            Self::FunctionDecl => java_function_declaration(),
+            Self::Ifs => java_if_statement(),
+            Self::ForLoop => java_for_loop(),
+            Self::WhileLoop => java_while_loop(),
+            Self::DoWhile => java_do_while_loop(),
+            JavaConcept::Switch => java_switch_statement(),
         }
     }
 }
@@ -211,6 +222,38 @@ impl JavaDrill {
         ));
     }
 
+    fn new_do_while_loop(
+        &mut self,
+        var: &str,
+        init: &str,
+        comp: &str,
+        stop: &str,
+    ) {
+        self.indent();
+        self.answer.push_str(&format!("int {var} = {init};\n"));
+
+        self.new_condition(format!(
+            "Declare an integer variable named {var} and initialize it to {init}"
+        ));
+
+        self.indent();
+        self.answer.push_str("do {\n");
+
+        self.increase_ident();
+
+        self.new_condition("Create a do-while loop");
+        self.new_condition("Inside the do-while loop do");
+
+        self.new_condition(format!(
+            "Make the loop continue while `{var} {comp} {stop}`"
+        ));
+    }
+
+    fn close_do_while_loop(&mut self, var: &str, comp: &str, stop: &str) {
+        self.decrease_ident_with_brace();
+        self.answer.push_str(&format!(" while ({var} {comp} {stop});\n"));
+    }
+
     fn new_case(&mut self, value: &str) {
         self.indent();
         self.answer.push_str(&format!("case {value}:\n"));
@@ -269,6 +312,37 @@ impl JavaDrill {
 }
 
 #[flutter_rust_bridge::frb(sync)]
+pub fn java_variable_declaration() -> JavaDrill {
+    let mut drill = JavaDrill::default();
+    drill.set_concept(JavaConcept::VarDecl);
+
+    drill.new_class("Main");
+    drill.new_main();
+
+    let variables = [
+        ("int", "age", "21"),
+        ("double", "price", "19.99"),
+        ("String", "name", "\"John\""),
+    ];
+
+    for (var_type, name, value) in variables {
+        drill.indent();
+        drill.answer.push_str(&format!("{var_type} {name} = {value};\n"));
+
+        drill.new_condition(format!(
+            "Declare a variable named {name} of type {var_type} and initialize it to {value}"
+        ));
+
+        drill.print(name);
+    }
+
+    drill.close_main();
+    drill.close_class();
+
+    drill
+}
+
+#[flutter_rust_bridge::frb(sync)]
 pub fn java_if_statement() -> JavaDrill {
     let mut drill = JavaDrill::default();
     drill.set_concept(JavaConcept::Ifs);
@@ -313,6 +387,47 @@ pub fn java_for_loop() -> JavaDrill {
     drill.print(var);
 
     drill.close_for_loop();
+
+    drill.close_main();
+    drill.close_class();
+
+    drill
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn java_do_while_loop() -> JavaDrill {
+    let mut drill = JavaDrill::default();
+    drill.set_concept(JavaConcept::DoWhile);
+
+    drill.new_class("Main");
+    drill.new_main();
+
+    let var = generic_iterator();
+    let init = "0";
+    let comp = generic_operator();
+    let stop = random_range(5..42).to_string();
+
+    if comp.contains('>') {
+        drill.new_do_while_loop(var, &stop, comp, init);
+
+        drill.print(var);
+
+        drill.indent();
+        drill.answer.push_str(&format!("{var}--;\n"));
+
+        drill.new_condition(format!("Decrement {var} by 1"));
+    } else {
+        drill.new_do_while_loop(var, init, comp, &stop);
+
+        drill.print(var);
+
+        drill.indent();
+        drill.answer.push_str(&format!("{var}++;\n"));
+
+        drill.new_condition(format!("Increment {var} by 1"));
+    }
+
+    drill.close_do_while_loop(var, comp, &stop);
 
     drill.close_main();
     drill.close_class();

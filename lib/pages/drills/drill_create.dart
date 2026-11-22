@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:grace/rust/api.dart';
 import 'package:grace/rust/api/java.dart';
 import 'package:grace/rust/api/rust.dart';
@@ -6,8 +8,9 @@ import 'package:grace/utils/database/mod.dart';
 import 'package:material_ui/material_ui.dart';
 
 class DrillCreate extends StatefulWidget {
-  const DrillCreate({super.key, required this.lang});
+  const DrillCreate({super.key, required this.lang, required this.comp});
   final DrillLanguage lang;
+  final Completer<void> comp;
 
   @override
   State<DrillCreate> createState() => _DrillCreate();
@@ -16,6 +19,7 @@ class DrillCreate extends StatefulWidget {
 class _DrillCreate extends State<DrillCreate> {
   late Map<String, bool> concepts;
   late TextEditingController cname;
+  bool complete = false;
 
   @override
   void initState() {
@@ -42,6 +46,7 @@ class _DrillCreate extends State<DrillCreate> {
   }
 
   void _saveDrill() async {
+    complete = true;
     final name = cname.text;
     final c = concepts.entries
         .map((c) => (c.value) ? c.key : null)
@@ -55,48 +60,56 @@ class _DrillCreate extends State<DrillCreate> {
     );
 
     await DatabaseHelper.instance.newCollection(drill);
+    widget.comp.complete();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('New Drill Collection')),
-      body: ListView(
-        padding: const .all(16),
-        children: [
-          TextField(
-            controller: cname,
-            decoration: const InputDecoration(
-              labelText: 'Collection Name',
-              border: OutlineInputBorder(),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop && !widget.comp.isCompleted && !complete) {
+          widget.comp.complete();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('New Drill Collection')),
+        body: ListView(
+          padding: const .all(16),
+          children: [
+            TextField(
+              controller: cname,
+              decoration: const InputDecoration(
+                labelText: 'Collection Name',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const Divider(),
-          Text('Concepts to include', style: theme.textTheme.headlineLarge),
-          ...concepts.entries.map(
-            (k) => CheckboxListTile(
-              title: Text(k.key),
-              value: k.value,
-              onChanged: (v) => setState(() => concepts[k.key] = v ?? false),
-              controlAffinity: .leading,
+            const Divider(),
+            Text('Concepts to include', style: theme.textTheme.headlineLarge),
+            ...concepts.entries.map(
+              (k) => CheckboxListTile(
+                title: Text(k.key),
+                value: k.value,
+                onChanged: (v) => setState(() => concepts[k.key] = v ?? false),
+                controlAffinity: .leading,
+              ),
             ),
-          ),
 
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                _saveDrill();
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('Create'),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  _saveDrill();
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Create'),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -51,6 +51,7 @@ impl SqlConcept {
         .into()
     }
 
+    #[flutter_rust_bridge::frb(sync)]
     pub fn from_string(s: String) -> Self {
         match s.as_str() {
             "Select Statements" => Self::Select,
@@ -71,6 +72,29 @@ impl SqlConcept {
             "Drop Column" => Self::DropColumn,
             "Rename Table" => Self::RenameTable,
             _ => Self::Select,
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn make_drill(&self) -> SqlDrill {
+        match self {
+            Self::Select => sql_select(),
+            Self::Where => sql_where(),
+            Self::OrderBy => sql_order_by(),
+            Self::GroupBy => sql_group_by(),
+            Self::Having => sql_having(),
+            Self::Join => sql_join(),
+            Self::Aggregate => sql_aggregate(),
+            Self::Insert => sql_insert(),
+            Self::Update => sql_update(),
+            Self::Delete => sql_delete(),
+            Self::CreateTable => sql_create_table(),
+            Self::AlterTable => sql_alter_table(),
+            Self::DropTable => sql_drop_table(),
+            Self::TruncateTable => sql_truncate_table(),
+            Self::AddColumn => sql_add_column(),
+            Self::DropColumn => sql_drop_column(),
+            Self::RenameTable => sql_rename_table(),
         }
     }
 }

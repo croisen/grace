@@ -5,7 +5,9 @@ import 'package:grace/utils/colors/nord.dart' as nord;
 import 'package:grace/utils/colors/one_dark.dart' as one_dark;
 import 'package:grace/utils/colors/solarized.dart' as solarized;
 import 'package:grace/utils/colors/tokyo_night.dart' as tokyo_night;
+import 'package:grace/utils/settings.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:provider/provider.dart';
 
 enum GraceTheme {
   catpuccin,
@@ -20,10 +22,16 @@ enum GraceTheme {
 enum GraceColor { red, yellow, green, blue, violet }
 
 class GraceAppTheme {
+  final ThemeMode appMode;
+  final Brightness platformMode;
   final GraceTheme theme;
   final GraceColor color;
+  final Settings s;
 
-  const GraceAppTheme({required this.theme, required this.color});
+  GraceAppTheme({required this.s, required this.platformMode})
+    : appMode = s.mode,
+      theme = s.theme,
+      color = s.color;
 
   ThemeData themeLight() {
     final scheme = switch (theme) {
@@ -53,15 +61,25 @@ class GraceAppTheme {
     return _theme(scheme, .dark);
   }
 
-  Color color_(Brightness mode, GraceColor color) {
+  Color color_(GraceColor color) {
+    final m = mode_();
+
     return switch (theme) {
-      .catpuccin => catpuccin.color(mode, color),
-      .dracula => dracula.color(mode, color),
-      .gruvbox => gruvbox.color(mode, color),
-      .nord => nord.color(mode, color),
-      .onedark => one_dark.color(mode, color),
-      .solarized => solarized.color(mode, color),
-      .tokyonight => tokyo_night.color(mode, color),
+      .catpuccin => catpuccin.color(m, color),
+      .dracula => dracula.color(m, color),
+      .gruvbox => gruvbox.color(m, color),
+      .nord => nord.color(m, color),
+      .onedark => one_dark.color(m, color),
+      .solarized => solarized.color(m, color),
+      .tokyonight => tokyo_night.color(m, color),
+    };
+  }
+
+  Brightness mode_() {
+    return switch (appMode) {
+      .system => platformMode,
+      .light => Brightness.light,
+      .dark => Brightness.dark,
     };
   }
 
@@ -73,15 +91,20 @@ class GraceAppTheme {
         backgroundColor: s.primary,
         foregroundColor: s.onPrimary,
       ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: s.primary,
-        foregroundColor: s.onPrimary,
-      ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: s.surfaceContainerHighest,
         unselectedItemColor: s.onSurfaceVariant,
         selectedItemColor: s.primary,
       ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: s.primary,
+        foregroundColor: s.onPrimary,
+      ),
+      listTileTheme: ListTileThemeData(
+        tileColor: s.surfaceContainerHighest,
+        textColor: s.onSurfaceVariant,
+      ),
+      scaffoldBackgroundColor: s.surface,
     );
   }
 }

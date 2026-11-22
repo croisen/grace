@@ -9,18 +9,15 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = Provider.of<Settings>(context, listen: true);
-    final a = MediaQuery.platformBrightnessOf(context);
-    final t = GraceAppTheme(theme: p.theme, color: p.color);
-    final b = switch (p.mode) {
-      .system => a,
-      .light => Brightness.light,
-      .dark => Brightness.dark,
-    };
+    final b = MediaQuery.platformBrightnessOf(context);
+    final t = GraceAppTheme(s: p, platformMode: b);
 
     return ListView(
       children: [
         ListTile(
-          leading: Icon((b == .dark) ? Icons.dark_mode : Icons.light_mode),
+          leading: Icon(
+            t.mode_() == .dark ? Icons.dark_mode : Icons.light_mode,
+          ),
           title: const Text('App Mode'),
         ),
         RadioGroup<ThemeMode>(
@@ -44,7 +41,7 @@ class SettingsScreen extends StatelessWidget {
             width: 27,
             height: 27,
             decoration: BoxDecoration(
-              color: t.color_(b, p.color),
+              color: t.color_(p.color),
               shape: BoxShape.circle,
             ),
           ),
@@ -55,6 +52,7 @@ class SettingsScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: .start,
             spacing: 20,
+
             children: GraceColor.values
                 .map(
                   (c) => GestureDetector(
@@ -63,7 +61,7 @@ class SettingsScreen extends StatelessWidget {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: t.color_(b, c),
+                        color: t.color_(c),
                         shape: BoxShape.circle,
                         border: p.color == c
                             ? Border.all(color: Colors.white, width: 3)

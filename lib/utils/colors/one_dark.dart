@@ -11,7 +11,7 @@ final violetDark = Color(0xff8a3fa0);
 
 final baseDark = Color(0xff181a1f);
 final surfaceDark = Color(0xff282c34);
-final onSurfaceDark = Color(0xffabb2bf);
+final onSurfaceDark = Color(0xfffbf1c7);
 
 Color color(Brightness mode, GraceColor color) {
   return switch (color) {

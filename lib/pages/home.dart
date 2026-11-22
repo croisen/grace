@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:grace/pages/drill.dart';
 import 'package:grace/pages/drills/language_select.dart';
 import 'package:grace/pages/settings.dart';
@@ -12,20 +14,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreen extends State<HomeScreen> {
+  Key _key = UniqueKey();
   int page = 0;
 
   @override
   Widget build(BuildContext context) {
-    final home = DrillsScreen();
     return Scaffold(
       appBar: AppBar(title: const Text('Grace')),
-      body: (page == 0) ? home : const SettingsScreen(),
+      body: (page == 0) ? DrillsScreen(key: _key) : const SettingsScreen(),
       floatingActionButton: (page == 0)
           ? FloatingActionButton(
-              onPressed: () => pagePush(
-                context,
-                (context) => LanguageSelect(),
-              ).then((_) async => home.refresh()),
+              onPressed: () async {
+                final comp = Completer<void>();
+                pagePush(context, (context) => LanguageSelect(comp: comp));
+                await comp.future;
+                _key = UniqueKey();
+                setState(() => {});
+              },
               child: const Icon(Icons.add),
             )
           : null,

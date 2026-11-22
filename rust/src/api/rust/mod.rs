@@ -12,21 +12,19 @@ pub enum RustConcept {
     VarDecl = 0,
     FunctionDecl = 1,
     Ifs = 2,
-    ElseIfs = 3,
-    ForLoop = 4,
-    WhileLoop = 5,
-    Loop = 6,
-    Match = 7,
+    ForLoop = 3,
+    WhileLoop = 4,
+    Loop = 5,
+    Match = 6,
 }
 
 impl RustConcept {
-    #[flutter_rust_bridge::frb(non_opaque, sync)]
+    #[flutter_rust_bridge::frb(sync)]
     pub fn to_string(&self) -> String {
         match self {
             Self::VarDecl => "Variable Declaration".into(),
             Self::FunctionDecl => "Function Declaration".into(),
             Self::Ifs => "If Statements".into(),
-            Self::ElseIfs => "If Else If Statements".into(),
             Self::ForLoop => "For Loops".into(),
             Self::WhileLoop => "While Loops".into(),
             Self::Loop => "Loop Statements".into(),
@@ -34,17 +32,30 @@ impl RustConcept {
         }
     }
 
+    #[flutter_rust_bridge::frb(sync)]
     pub fn from_string(s: String) -> Self {
         match s.as_str() {
             "Variable Declaration" => Self::VarDecl,
             "Function Declaration" => Self::FunctionDecl,
             "If Statements" => Self::Ifs,
-            "If Else If Statements" => Self::ElseIfs,
             "For Loops" => Self::ForLoop,
             "While Loops" => Self::WhileLoop,
             "Loop Statements" => Self::Loop,
             "Match Statements" => Self::Match,
             _ => Self::VarDecl,
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn make_drill(&self) -> RustDrill {
+        match self {
+            Self::VarDecl => rust_variable_declaration(),
+            Self::FunctionDecl => rust_function_declaration(),
+            Self::Ifs => rust_if_statement(),
+            Self::ForLoop => rust_for_loop(),
+            Self::WhileLoop => rust_while_loop(),
+            Self::Loop => rust_loop(),
+            Self::Match => rust_match_statement(),
         }
     }
 }
@@ -298,6 +309,57 @@ impl RustDrill {
         self.decrease_ident_with_brace();
         self.answer.push_str("\n");
     }
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn rust_variable_declaration() -> RustDrill {
+    let mut drill = RustDrill::default();
+
+    drill.set_concept(RustConcept::VarDecl);
+
+    drill.new_main();
+
+    // Immutable variable with inferred type
+    drill.indent();
+    drill.answer.push_str("let age = 21;\n");
+
+    drill.new_condition(
+        "Declare an immutable variable named age and initialize it to 21",
+    );
+
+    drill.print("age");
+
+    // Mutable variable
+    drill.indent();
+    drill.answer.push_str("let mut score = 100;\n");
+
+    drill.new_condition(
+        "Declare a mutable integer variable named score and initialize it to 100"
+    );
+
+    drill.print("score");
+
+    // Explicit type annotation
+    drill.indent();
+    drill.answer.push_str("let price: f64 = 19.99;\n");
+
+    drill.new_condition(
+        "Declare an immutable variable named price with an explicit f64 type and initialize it to 19.99"
+    );
+
+    drill.print("price");
+
+    // Reassign mutable variable
+    drill.indent();
+    drill.answer.push_str("score = 150;\n");
+
+    drill.new_condition("Reassign score to 150");
+
+    drill.print("score");
+
+    drill.close_main();
+
+    drill
 }
 
 #[flutter_rust_bridge::frb(sync)]

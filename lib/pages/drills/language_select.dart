@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:grace/pages/drills/drill_create.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:grace/utils/route.dart';
 
 class LanguageSelect extends StatelessWidget {
-  const LanguageSelect({super.key});
+  final Completer<void> comp;
+  const LanguageSelect({super.key, required this.comp});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +28,10 @@ class LanguageSelect extends StatelessWidget {
             subtitle: const Text('Available'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              pageReplace(context, (context) => const DrillCreate(lang: .rust));
+              pageReplace(
+                context,
+                (context) => DrillCreate(lang: .rust, comp: comp),
+              );
             },
           ),
           const Divider(),
@@ -35,7 +41,10 @@ class LanguageSelect extends StatelessWidget {
             subtitle: const Text('Available'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              pageReplace(context, (context) => const DrillCreate(lang: .sql));
+              pageReplace(
+                context,
+                (context) => DrillCreate(lang: .sql, comp: comp),
+              );
             },
           ),
           const Divider(),
@@ -45,7 +54,10 @@ class LanguageSelect extends StatelessWidget {
             subtitle: const Text('Available'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              pageReplace(context, (context) => const DrillCreate(lang: .java));
+              pageReplace(
+                context,
+                (context) => DrillCreate(lang: .java, comp: comp),
+              );
             },
           ),
         ],

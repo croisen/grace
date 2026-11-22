@@ -10,7 +10,8 @@ class GraceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = Provider.of<Settings>(context, listen: true);
-    final theme = GraceAppTheme(theme: p.theme, color: p.color);
+    final b = MediaQuery.platformBrightnessOf(context);
+    final theme = GraceAppTheme(s: p, platformMode: b);
 
     return MaterialApp(
       title: 'Grace',

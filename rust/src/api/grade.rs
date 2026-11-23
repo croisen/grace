@@ -2,7 +2,7 @@ use std::ops::Sub;
 
 use oak_core::OakErrorKind;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Grade {
     Again = 1, // will not compile (mistake is easily known)
     Hard = 2,  // will not compile (mistake is not easily known)

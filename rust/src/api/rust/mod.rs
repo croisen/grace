@@ -1,4 +1,4 @@
-use rand::random_range;
+use rand::{random, random_range};
 
 use crate::api::{
     generic_iterator, generic_operator, generic_varname1, generic_varname2,
@@ -311,59 +311,72 @@ impl RustDrill {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn rust_variable_declaration() -> RustDrill {
+fn rust_variable_declaration() -> RustDrill {
     let mut drill = RustDrill::default();
 
     drill.set_concept(RustConcept::VarDecl);
-
     drill.new_main();
 
-    // Immutable variable with inferred type
-    drill.indent();
-    drill.answer.push_str("let age = 21;\n");
+    let exercise = random_range(0..2);
 
-    drill.new_condition(
-        "Declare an immutable variable named age and initialize it to 21",
-    );
+    match exercise {
+        0 => {
+            // Immutable variable with inferred type
+            let var = generic_varname1();
+            let val = random_range(19..63);
 
-    drill.print("age");
+            drill.indent();
+            drill.answer.push_str(&format!("let {var} = {val};\n"));
 
-    // Mutable variable
-    drill.indent();
-    drill.answer.push_str("let mut score = 100;\n");
+            drill.new_condition(format!(
+                "Declare an immutable variable named {var} and initialize it to {val}",
+            ));
 
-    drill.new_condition(
-        "Declare a mutable integer variable named score and initialize it to 100"
-    );
+            drill.print(var);
+        }
+        1 => {
+            // Mutable variable
+            drill.indent();
+            let var = generic_varname2();
+            let val = random_range(63..1412);
+            drill.answer.push_str(&format!("let mut {var} = {val};\n"));
 
-    drill.print("score");
+            drill.new_condition(format!(
+                "Declare a mutable integer variable named {var} and initialize it to {val}"
+            ));
 
-    // Explicit type annotation
-    drill.indent();
-    drill.answer.push_str("let price: f64 = 19.99;\n");
+            drill.print(var);
 
-    drill.new_condition(
-        "Declare an immutable variable named price with an explicit f64 type and initialize it to 19.99"
-    );
+            // Reassign
+            let val = random_range(63..1412);
+            drill.indent();
+            drill.answer.push_str(&format!("{var} = {val};\n"));
 
-    drill.print("price");
+            drill.new_condition(format!("Reassign {var} to {val}"));
 
-    // Reassign mutable variable
-    drill.indent();
-    drill.answer.push_str("score = 150;\n");
+            drill.print(var);
+        }
+        2 => {
+            let var = generic_varname2();
+            let val = random::<f64>();
+            drill.indent();
+            drill.answer.push_str(&format!("let {var}: f64 = {val:>4.2};\n"));
 
-    drill.new_condition("Reassign score to 150");
+            drill.new_condition(format!(
+                "Declare an immutable variable named {var} with an explicit f64 type and initialize it to {val:>4.2}"
+            ));
 
-    drill.print("score");
+            drill.print(var);
+        }
+        _ => unreachable!(),
+    }
 
     drill.close_main();
 
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn rust_if_statement() -> RustDrill {
+fn rust_if_statement() -> RustDrill {
     let mut drill = RustDrill::default();
 
     drill.set_concept(RustConcept::Ifs);
@@ -389,8 +402,7 @@ pub fn rust_if_statement() -> RustDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn rust_for_loop() -> RustDrill {
+fn rust_for_loop() -> RustDrill {
     let mut drill = RustDrill::default();
 
     drill.set_concept(RustConcept::ForLoop);
@@ -413,8 +425,7 @@ pub fn rust_for_loop() -> RustDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn rust_while_loop() -> RustDrill {
+fn rust_while_loop() -> RustDrill {
     let mut drill = RustDrill::default();
 
     drill.set_concept(RustConcept::WhileLoop);
@@ -440,8 +451,7 @@ pub fn rust_while_loop() -> RustDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn rust_loop() -> RustDrill {
+fn rust_loop() -> RustDrill {
     let mut drill = RustDrill::default();
 
     drill.set_concept(RustConcept::Loop);
@@ -464,8 +474,7 @@ pub fn rust_loop() -> RustDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn rust_match_statement() -> RustDrill {
+fn rust_match_statement() -> RustDrill {
     let mut drill = RustDrill::default();
 
     drill.set_concept(RustConcept::Match);
@@ -512,8 +521,7 @@ pub fn rust_match_statement() -> RustDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn rust_function_declaration() -> RustDrill {
+fn rust_function_declaration() -> RustDrill {
     let mut drill = RustDrill::default();
 
     drill.set_concept(RustConcept::FunctionDecl);

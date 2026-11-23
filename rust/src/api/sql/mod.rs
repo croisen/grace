@@ -309,8 +309,7 @@ impl SqlDrill {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_create_table() -> SqlDrill {
+fn sql_create_table() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::CreateTable);
 
@@ -322,8 +321,7 @@ pub fn sql_create_table() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_alter_table() -> SqlDrill {
+fn sql_alter_table() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::AlterTable);
 
@@ -340,8 +338,7 @@ pub fn sql_alter_table() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_drop_table() -> SqlDrill {
+fn sql_drop_table() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::DropTable);
 
@@ -350,8 +347,7 @@ pub fn sql_drop_table() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_truncate_table() -> SqlDrill {
+fn sql_truncate_table() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::TruncateTable);
 
@@ -360,8 +356,7 @@ pub fn sql_truncate_table() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_select() -> SqlDrill {
+fn sql_select() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Select);
 
@@ -373,8 +368,7 @@ pub fn sql_select() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_add_column() -> SqlDrill {
+fn sql_add_column() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::AddColumn);
 
@@ -392,8 +386,7 @@ pub fn sql_add_column() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_drop_column() -> SqlDrill {
+fn sql_drop_column() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::DropColumn);
 
@@ -405,16 +398,14 @@ pub fn sql_drop_column() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_rename_table() -> SqlDrill {
+fn sql_rename_table() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::RenameTable);
     drill.rename_table("old_employees", "employees");
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_where() -> SqlDrill {
+fn sql_where() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Where);
 
@@ -433,8 +424,7 @@ pub fn sql_where() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_order_by() -> SqlDrill {
+fn sql_order_by() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::OrderBy);
 
@@ -448,8 +438,7 @@ pub fn sql_order_by() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_group_by() -> SqlDrill {
+fn sql_group_by() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::GroupBy);
 
@@ -462,8 +451,7 @@ pub fn sql_group_by() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_having() -> SqlDrill {
+fn sql_having() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Having);
 
@@ -477,8 +465,7 @@ pub fn sql_having() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_join() -> SqlDrill {
+fn sql_join() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Join);
 
@@ -492,8 +479,7 @@ pub fn sql_join() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_aggregate() -> SqlDrill {
+fn sql_aggregate() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Aggregate);
 
@@ -512,8 +498,7 @@ pub fn sql_aggregate() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_insert() -> SqlDrill {
+fn sql_insert() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Insert);
 
@@ -525,8 +510,7 @@ pub fn sql_insert() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_update() -> SqlDrill {
+fn sql_update() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Update);
 
@@ -538,8 +522,7 @@ pub fn sql_update() -> SqlDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn sql_delete() -> SqlDrill {
+fn sql_delete() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Delete);
 

@@ -1,12 +1,14 @@
 use rand::random_range;
 
+use crate::api::diagnostics::Diagnostics;
+use crate::api::java::check::java_check;
 use crate::api::{
     generic_iterator, generic_operator, generic_varname1, generic_varname2,
 };
 
 pub mod check;
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Copy)]
 pub enum JavaConcept {
     #[default]
     VarDecl = 0,
@@ -61,7 +63,7 @@ impl JavaConcept {
 }
 
 #[derive(Default, Debug, Clone)]
-#[flutter_rust_bridge::frb(non_opaque)]
+#[flutter_rust_bridge::frb(opaque)]
 pub struct JavaDrill {
     pub concept: JavaConcept,
     pub conditions: Vec<(bool, String)>,
@@ -70,6 +72,11 @@ pub struct JavaDrill {
 }
 
 impl JavaDrill {
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn check(&mut self, user_code: String) -> Diagnostics {
+        java_check(self.concept, &mut self.conditions, &self.answer, &user_code)
+    }
+
     #[inline]
     fn set_concept(&mut self, concept: JavaConcept) {
         self.concept = concept;
@@ -311,8 +318,7 @@ impl JavaDrill {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn java_variable_declaration() -> JavaDrill {
+fn java_variable_declaration() -> JavaDrill {
     let mut drill = JavaDrill::default();
     drill.set_concept(JavaConcept::VarDecl);
 
@@ -325,16 +331,15 @@ pub fn java_variable_declaration() -> JavaDrill {
         ("String", "name", "\"John\""),
     ];
 
-    for (var_type, name, value) in variables {
-        drill.indent();
-        drill.answer.push_str(&format!("{var_type} {name} = {value};\n"));
+    let (var_type, name, value) = variables[random_range(0..variables.len())];
+    drill.indent();
+    drill.answer.push_str(&format!("{var_type} {name} = {value};\n"));
 
-        drill.new_condition(format!(
-            "Declare a variable named {name} of type {var_type} and initialize it to {value}"
-        ));
+    drill.new_condition(format!(
+        "Declare a variable named {name} of type {var_type} and initialize it to {value}"
+    ));
 
-        drill.print(name);
-    }
+    drill.print(name);
 
     drill.close_main();
     drill.close_class();
@@ -342,8 +347,7 @@ pub fn java_variable_declaration() -> JavaDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn java_if_statement() -> JavaDrill {
+fn java_if_statement() -> JavaDrill {
     let mut drill = JavaDrill::default();
     drill.set_concept(JavaConcept::Ifs);
     drill.new_class("Main");
@@ -365,8 +369,7 @@ pub fn java_if_statement() -> JavaDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn java_for_loop() -> JavaDrill {
+fn java_for_loop() -> JavaDrill {
     let mut drill = JavaDrill::default();
     drill.set_concept(JavaConcept::ForLoop);
 
@@ -394,8 +397,7 @@ pub fn java_for_loop() -> JavaDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn java_do_while_loop() -> JavaDrill {
+fn java_do_while_loop() -> JavaDrill {
     let mut drill = JavaDrill::default();
     drill.set_concept(JavaConcept::DoWhile);
 
@@ -435,8 +437,7 @@ pub fn java_do_while_loop() -> JavaDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn java_while_loop() -> JavaDrill {
+fn java_while_loop() -> JavaDrill {
     let mut drill = JavaDrill::default();
     drill.set_concept(JavaConcept::WhileLoop);
 
@@ -469,8 +470,7 @@ pub fn java_while_loop() -> JavaDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn java_switch_statement() -> JavaDrill {
+fn java_switch_statement() -> JavaDrill {
     let mut drill = JavaDrill::default();
     drill.set_concept(JavaConcept::Switch);
 
@@ -510,8 +510,7 @@ pub fn java_switch_statement() -> JavaDrill {
     drill
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn java_function_declaration() -> JavaDrill {
+fn java_function_declaration() -> JavaDrill {
     let mut drill = JavaDrill::default();
     drill.set_concept(JavaConcept::FunctionDecl);
 

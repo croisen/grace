@@ -14,16 +14,47 @@
   - [x] Show due date of when to review
 - [x] Generating drills
   - [x] Java
+    - [x] Do While
+    - [x] For Loop
+    - [x] Functions
+    - [x] If Statements
+    - [x] Switch Case
+    - [x] Variable Declaration
+    - [x] While Loop
   - [x] Rust
+    - [x] For Loop
+    - [x] Functions
+    - [x] If Statements
+    - [x] Loop (infinite)
+    - [x] Switch Case
+    - [x] Variable Declaration
+    - [x] While Loop
   - [x] SQL
+    - [x] 14 drills (too lazy to write it out)
 - [x] Parser + Abstract Syntax Tree
   - [x] Error free for the pre-generated answer
   - [x] Still parses after non-fatal errors
 - [ ] Checking
   - [x] Set grade based on fatal and non-fatal parsing errors
-  - [ ] Check if conditions have been fulfilled (basically the same as the
-    bottom one)
-  - [ ] Check the AST of the submitted code and generated code and grade it
+  - [ ] Check if conditions have been fulfilled
+  - [ ] Java
+    - [x] Do While
+    - [x] For Loop
+    - [ ] Functions
+    - [ ] If Statements
+    - [ ] Switch Case
+    - [ ] Variable Declaration
+    - [ ] While Loop
+  - [ ] Rust
+    - [ ] For Loop
+    - [ ] Functions
+    - [ ] If Statements
+    - [ ] Loop (infinite)
+    - [ ] Switch Case
+    - [ ] Variable Declaration
+    - [ ] While Loop
+  - [x] SQL
+    - [x] 14 drills (too lazy to write it out)
 - [x] FSRS
   - [x] Check retainability after a few days
   - [x] Set due dates to review

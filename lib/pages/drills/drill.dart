@@ -36,6 +36,7 @@ class DrillScreen extends StatefulWidget {
 class _DrillScreen extends State<DrillScreen> {
   late CodeController controller;
   late List<String> conditions;
+  late String concept;
   late String answer;
   bool finished = false;
   bool showConditions = true;
@@ -45,8 +46,8 @@ class _DrillScreen extends State<DrillScreen> {
     super.initState();
 
     final due = widget.col.dueConcept();
-    print(due);
     if (due != null) {
+      concept = due;
       switch (widget.lang) {
         case .rust:
           final drill = RustConcept.fromString(s: due).makeDrill();
@@ -114,6 +115,7 @@ class _DrillScreen extends State<DrillScreen> {
     final p = Provider.of<Settings>(context, listen: true);
     final b = MediaQuery.platformBrightnessOf(context);
     final t = GraceAppTheme(s: p, platformMode: b);
+    final theme = Theme.of(context);
 
     return sdk.Material(
       child: sdk.Localizations.override(
@@ -127,9 +129,16 @@ class _DrillScreen extends State<DrillScreen> {
           children: [
             CodeTheme(
               data: CodeThemeData(styles: _theme(t)),
-              child: CodeField(
-                controller: controller,
-                textStyle: TextStyle(fontFamily: 'monospace', fontSize: 14),
+              child: Positioned.fill(
+                child: CodeField(
+                  controller: controller,
+                  minLines: 20,
+                  maxLines: 50,
+                  expands: false,
+                  textStyle: theme.textTheme.bodyLarge?.copyWith(
+                    fontFamily: 'monospace',
+                  ),
+                ),
               ),
             ),
 
@@ -153,18 +162,12 @@ class _DrillScreen extends State<DrillScreen> {
                             children: [
                               const Icon(Icons.info_outline, size: 20),
                               const SizedBox(width: 8),
-                              const Text(
-                                'Conditions',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                ),
-                              ),
+                              const Text('Conditions'),
                               const Spacer(),
                               IconButton(
-                                icon: const Icon(Icons.close, size: 20),
+                                icon: const Icon(Icons.close),
                                 onPressed: _dismissConditions,
-                                visualDensity: VisualDensity.compact,
+                                visualDensity: VisualDensity.standard,
                               ),
                             ],
                           ),
@@ -172,10 +175,8 @@ class _DrillScreen extends State<DrillScreen> {
                           ...conditions.map(
                             (c) => Text(
                               c,
-                              style: const TextStyle(
+                              style: theme.textTheme.bodyMedium?.copyWith(
                                 fontFamily: 'monospace',
-                                fontSize: 13,
-                                height: 1.45,
                               ),
                             ),
                           ),
@@ -199,7 +200,7 @@ class _DrillScreen extends State<DrillScreen> {
         onPressed: _toggleConditions,
         child: Icon(Icons.priority_high),
       ),
-      body: Expanded(child: finished ? Text('Finished') : editor(context)),
+      body: finished ? Text('Finished') : editor(context),
     );
   }
 }

@@ -7,6 +7,7 @@ use crate::api::grade::Grade;
 
 pub mod concept;
 pub mod diagnostics;
+mod edit;
 pub mod grade;
 
 pub mod java;

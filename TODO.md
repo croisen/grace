@@ -1,13 +1,13 @@
 # TODO
 
-- [ ] GUI
+- [x] GUI
   - [x] App themes
     - [x] Light
     - [x] Dark
   - [x] Make new drills
     - [x] Show drill conditions
     - [ ] Maybe a hint about the concept or documentation (this decreases their
-      grade)
+      grade) // optional
     - [x] Submit and update FSRS parameters
   - [x] Save drills
   - [x] Show retainability percent
@@ -36,15 +36,15 @@
   - [x] Still parses after non-fatal errors
 - [ ] Checking
   - [x] Set grade based on fatal and non-fatal parsing errors
-  - [ ] Check if conditions have been fulfilled
-  - [ ] Java
+  - [x] Check if conditions have been fulfilled
+  - [x] Java
     - [x] Do While
     - [x] For Loop
-    - [ ] Functions
-    - [ ] If Statements
-    - [ ] Switch Case
-    - [ ] Variable Declaration
-    - [ ] While Loop
+    - [x] Functions
+    - [x] If Statements
+    - [x] Switch Case
+    - [x] Variable Declaration
+    - [x] While Loop
   - [ ] Rust
     - [ ] For Loop
     - [ ] Functions
@@ -53,8 +53,8 @@
     - [ ] Switch Case
     - [ ] Variable Declaration
     - [ ] While Loop
-  - [x] SQL
-    - [x] 14 drills (too lazy to write it out)
+  - [ ] SQL
+    - [ ] 14 drills (too lazy to write it out)
 - [x] FSRS
   - [x] Check retainability after a few days
   - [x] Set due dates to review

@@ -21,7 +21,7 @@ class DrillCard extends StatelessWidget {
     final now = localNow();
 
     col.collection.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-    final mostDue = col.collection[0];
+    final mostDue = col.collection.reversed.first;
     double retrieve = mostDue.retrievability(now: now) * 100;
     Color color;
     if (retrieve > 90) {
@@ -43,7 +43,7 @@ class DrillCard extends StatelessWidget {
           Text(
             mostDue.lastReview != null
                 ? 'Most due is `${mostDue.concept}` (${mostDue.dueDateStr()})'
-                : 'This drill is not reviewed yet',
+                : 'This drill is not fully reviewed yet',
             style: theme.textTheme.bodyLarge?.copyWith(color: color),
           ),
           Row(
@@ -60,8 +60,7 @@ class DrillCard extends StatelessWidget {
                 onPressed: () async {
                   pagePush(
                     context,
-                    (context) =>
-                        DrillScreen(lang: col.collection[0].lang, col: col),
+                    (context) => DrillScreen(lang: col.lang, col: col),
                   );
                 },
                 icon: Icon(Icons.play_arrow, color: t.color_(.green)),
@@ -77,11 +76,13 @@ class DrillCard extends StatelessWidget {
         retrieve = c.lastReview != null ? retrieve / 100 : 1;
 
         Color color;
-        if (retrieve > 90) {
+        if (c.lastReview == null) {
+          color = t.color_(.red);
+        } else if (retrieve > 0.9) {
           color = t.color_(.blue);
-        } else if (retrieve > 75) {
+        } else if (retrieve > 0.75) {
           color = t.color_(.green);
-        } else if (retrieve > 50) {
+        } else if (retrieve > 0.5) {
           color = t.color_(.yellow);
         } else {
           color = t.color_(.red);

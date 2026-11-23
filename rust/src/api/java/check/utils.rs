@@ -1,6 +1,8 @@
 use std::mem::discriminant;
 
-use oak_java::ast::{ClassDeclaration, Expression, Member, Statement};
+use oak_java::ast::{
+    ClassDeclaration, Expression, Member, MethodDeclaration, Statement,
+};
 
 use crate::api::diagnostics::Diagnostics;
 #[flutter_rust_bridge::frb(ignore)]
@@ -116,7 +118,33 @@ pub fn compare_expr(
 
             compare_expr(diagnostics, aexpr, bexpr)
         }
-        _ => false,
+        (Expression::MethodCall(a), Expression::MethodCall(b)) => {
+            if a.name != b.name {
+                diagnostics.record_hard(format!(
+                    "Expecting method call {} found {}",
+                    a.name, b.name,
+                ));
+
+                return false;
+            }
+
+            let args = a.arguments.iter().zip(b.arguments.iter());
+            for arg in args {
+                if !compare_expr(diagnostics, arg.0, arg.1) {
+                    diagnostics.record_good(format!(
+                        "This error was found in the method call {}",
+                        b.name
+                    ));
+                    return false;
+                }
+            }
+
+            true
+        }
+        _ => {
+            diagnostics.record_good("The expression checker is not complete");
+            false
+        }
     }
 }
 

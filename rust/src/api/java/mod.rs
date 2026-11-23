@@ -73,6 +73,20 @@ pub struct JavaDrill {
 
 impl JavaDrill {
     #[flutter_rust_bridge::frb(sync)]
+    pub fn new(
+        concept: String,
+        conditions: Vec<(bool, String)>,
+        answer: String,
+    ) -> Self {
+        Self {
+            concept: JavaConcept::from_string(concept),
+            conditions,
+            answer,
+            ident_level: 0,
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
     pub fn check(&mut self, user_code: String) -> Diagnostics {
         java_check(self.concept, &mut self.conditions, &self.answer, &user_code)
     }
@@ -280,8 +294,7 @@ impl JavaDrill {
     fn close_case(&mut self) {
         self.indent();
         self.answer.push_str("break;\n");
-        self.decrease_ident_with_brace();
-        self.answer.push_str("\n");
+        self.ident_level -= 1;
     }
 
     fn close_switch_statement(&mut self) {
@@ -531,7 +544,7 @@ fn java_function_declaration() -> JavaDrill {
     drill.answer.push_str("int result = add(5, 3);\n");
 
     drill.new_condition(
-        "Call add with arguments 5 and 3, and store the result in result",
+        "Call add in main with arguments 5 and 3, and store the result in result",
     );
 
     drill.print("result");

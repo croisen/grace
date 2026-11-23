@@ -3,7 +3,7 @@ use crate::api::java::JavaConcept;
 pub mod api;
 
 fn main() {
-    let drill = JavaConcept::ForLoop;
+    let drill = JavaConcept::Switch;
     let mut d = drill.make_drill();
     let diag = d.check(d.answer.clone());
 

@@ -1,6 +1,5 @@
 import 'package:grace/rust/api.dart';
 import 'package:grace/utils/database/drill_collection.dart';
-import 'package:grace/utils/database/drill_memory.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
@@ -28,12 +27,12 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS collections (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        lang TEXT NOT NULL,
         name TEXT NOT NULL
       );
 
       CREATE TABLE IF NOT EXISTS drills (
         col_id INTEGER NOT NULL,
-        lang TEXT NOT NULL,
         concept TEXT NOT NULL,
         stability REAL,
         difficulty REAL,
@@ -51,8 +50,18 @@ class DatabaseHelper {
 
   Future<int> newCollection(DrillCollection c) async {
     final database = await db;
+    final lang = switch (c.lang) {
+      DrillLanguage.java => 'JAVA',
+      DrillLanguage.rust => 'RUST',
+      DrillLanguage.sql => 'SQL',
+    };
+
     return await database.transaction((txn) async {
-      final id = await txn.insert('collections', {'name': c.name});
+      final id = await txn.insert('collections', {
+        'name': c.name,
+        'lang': lang,
+      });
+
       c.setId(id: BigInt.from(id));
       final (_, mem) = drillCollectionToMap(c);
       for (final drill in mem) {
@@ -95,8 +104,8 @@ class DatabaseHelper {
         await txn.update(
           'drills',
           drill,
-          where: 'col_id = ? AND lang = ? AND concept = ?',
-          whereArgs: [c.id.toInt(), drill['lang'], drill['concept']],
+          where: 'col_id = ? AND concept = ?',
+          whereArgs: [c.id.toInt(), drill['concept']],
         );
       }
     });
@@ -108,21 +117,14 @@ class DatabaseHelper {
     final collections = await database.query('collections');
     final drills = await database.query('drills');
 
-    final c = <int, List<DrillMemory>>{};
+    final c = <int, List<Map<String, Object?>>>{};
     for (final drill in drills) {
       final col = drill['col_id'] as int;
-      final d = drillMemoryFromMap(drill);
-      c.putIfAbsent(col, () => []).add(d);
+      c.putIfAbsent(col, () => []).add(drill);
     }
 
     return collections
-        .map(
-          (col) => DrillCollection(
-            id: BigInt.from(col['id'] as num),
-            name: col['name'] as String,
-            collection: c[col['id'] as num] ?? [],
-          ),
-        )
+        .map((col) => drillCollectionFromMap(col, c[col['id'] as num] ?? []))
         .toList();
   }
 }

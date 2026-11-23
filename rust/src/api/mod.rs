@@ -16,18 +16,24 @@ pub mod sql;
 
 static DESIRED_RETENTION: f32 = 0.9;
 
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 #[flutter_rust_bridge::frb(opaque)]
 pub struct DrillCollection {
     pub id: usize,
+    pub lang: DrillLanguage,
     pub name: String,
     pub collection: Vec<DrillMemory>,
 }
 
 impl DrillCollection {
     #[flutter_rust_bridge::frb(sync)]
-    pub fn new(id: usize, name: String, collection: Vec<DrillMemory>) -> Self {
-        Self { id, name, collection }
+    pub fn new(
+        id: usize,
+        lang: DrillLanguage,
+        name: String,
+        collection: Vec<DrillMemory>,
+    ) -> Self {
+        Self { id, lang, name, collection }
     }
 
     #[flutter_rust_bridge::frb(sync)]
@@ -36,12 +42,10 @@ impl DrillCollection {
         lang: DrillLanguage,
         list: Vec<String>,
     ) -> Self {
-        let drill = list
-            .into_iter()
-            .map(|c| DrillMemory::new_with_default(lang, c))
-            .collect();
+        let drill =
+            list.into_iter().map(DrillMemory::new_with_default).collect();
 
-        Self { id: 0, name, collection: drill }
+        Self { id: 0, lang, name, collection: drill }
     }
 
     #[flutter_rust_bridge::frb(sync)]
@@ -78,7 +82,6 @@ impl DrillCollection {
 #[flutter_rust_bridge::frb(non_opaque)]
 pub struct DrillMemory {
     pub col_id: usize, // collection_id
-    pub lang: DrillLanguage,
     pub concept: String,
     pub memory: Option<MemoryState>,
     pub last_review: Option<i64>,
@@ -89,19 +92,17 @@ impl DrillMemory {
     #[flutter_rust_bridge::frb(sync)]
     pub fn new(
         id: usize,
-        lang: DrillLanguage,
         concept: String,
         memory: Option<MemoryState>,
         last_review: Option<i64>,
         due_date: i64,
     ) -> Self {
-        Self { col_id: id, lang, concept, memory, last_review, due_date }
+        Self { col_id: id, concept, memory, last_review, due_date }
     }
 
-    pub fn new_with_default(lang: DrillLanguage, concept: String) -> Self {
+    pub fn new_with_default(concept: String) -> Self {
         Self {
             col_id: 0,
-            lang,
             concept,
             memory: None,
             last_review: None,

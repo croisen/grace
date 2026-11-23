@@ -1,4 +1,4 @@
-use std::ops::{Deref, Range};
+use std::ops::Deref;
 use std::slice::Iter;
 use std::vec::IntoIter;
 
@@ -7,6 +7,7 @@ use unicode_segmentation::UnicodeSegmentation;
 
 use crate::api::grade::Grade;
 
+#[derive(Debug, Clone)]
 pub struct Diagnostic {
     pub message: String,
     pub grade: Grade,

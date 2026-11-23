@@ -16,17 +16,13 @@ flutter_rust_bridge = "=2.13.0"
 fsrs = { version = "7.0.0", default-features = false }
 libc = { version = "0.2.189", default-features = false, features = ["align", "const-extern-fn", "extra_traits", "use_std"] }
 oak-core = { git = "https://github.com/croisen/oak.rs" }
-oak-c = { git = "https://github.com/croisen/oak.rs" }
-oak-csharp = { git = "https://github.com/croisen/oak.rs" }
-oak-cpp = { git = "https://github.com/croisen/oak.rs" }
-oak-haskell = { git = "https://github.com/croisen/oak.rs" }
 oak-java = { git = "https://github.com/croisen/oak.rs" }
-oak-javascript = { git = "https://github.com/croisen/oak.rs" }
-oak-lua = { git = "https://github.com/croisen/oak.rs" }
-oak-php = { git = "https://github.com/croisen/oak.rs" }
-oak-python = { git = "https://github.com/croisen/oak.rs" }
 oak-rust = { git = "https://github.com/croisen/oak.rs" }
 oak-sql = { git = "https://github.com/croisen/oak.rs" }
+# oak-core = { path = "/home/croisen/git/college/oak.rs/projects/oak-core" }
+# oak-java = { path = "/home/croisen/git/college/oak.rs/examples/oak-java" }
+# oak-rust = { path = "/home/croisen/git/college/oak.rs/examples/oak-rust" }
+# oak-sql = { path = "/home/croisen/git/college/oak.rs/examples/oak-sql" }
 rand = { version = "0.10.3", default-features = false, features = ["chacha", "serde", "thread_rng"] }
 unicode-segmentation = { version = "1", default-features = false }
 

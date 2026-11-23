@@ -1,6 +1,8 @@
 use rand::random_range;
 
+use crate::api::diagnostics::Diagnostics;
 use crate::api::generic_operator;
+use crate::api::sql::check::sql_check;
 
 pub mod check;
 
@@ -100,7 +102,7 @@ impl SqlConcept {
 }
 
 #[derive(Default, Debug, Clone)]
-#[flutter_rust_bridge::frb(non_opaque)]
+#[flutter_rust_bridge::frb(opaque)]
 pub struct SqlDrill {
     pub concept: SqlConcept,
     pub conditions: Vec<(bool, String)>,
@@ -109,6 +111,25 @@ pub struct SqlDrill {
 }
 
 impl SqlDrill {
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn new(
+        concept: String,
+        conditions: Vec<(bool, String)>,
+        answer: String,
+    ) -> Self {
+        Self {
+            concept: SqlConcept::from_string(concept),
+            conditions,
+            answer,
+            ident_level: 0,
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn check(&mut self, user_code: String) -> Diagnostics {
+        sql_check(self.concept, &mut self.conditions, &self.answer, &user_code)
+    }
+
     #[inline]
     fn set_concept(&mut self, concept: SqlConcept) {
         self.concept = concept;

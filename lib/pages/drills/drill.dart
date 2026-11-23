@@ -9,11 +9,13 @@ import 'package:flutter_highlight/themes/solarized-dark.dart';
 import 'package:flutter_highlight/themes/solarized-light.dart';
 import 'package:flutter_highlight/themes/tomorrow-night.dart';
 import 'package:flutter_highlight/themes/tomorrow.dart';
+import 'package:grace/pages/drills/drill_eval.dart';
 import 'package:grace/rust/api.dart';
 import 'package:grace/rust/api/java.dart';
 import 'package:grace/rust/api/rust.dart';
 import 'package:grace/rust/api/sql.dart';
 import 'package:grace/utils/colors/mod.dart';
+import 'package:grace/utils/route.dart';
 import 'package:grace/utils/settings.dart';
 import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/rust.dart';
@@ -35,7 +37,7 @@ class DrillScreen extends StatefulWidget {
 
 class _DrillScreen extends State<DrillScreen> {
   late CodeController controller;
-  late List<String> conditions;
+  late List<(bool, String)> conditions;
   late String concept;
   late String answer;
   bool finished = false;
@@ -51,15 +53,18 @@ class _DrillScreen extends State<DrillScreen> {
       switch (widget.lang) {
         case .rust:
           final drill = RustConcept.fromString(s: due).makeDrill();
-          conditions = drill.conditions.map((b) => b.$2).toList();
+          conditions = drill.conditions;
+          answer = drill.answer;
           break;
         case .java:
           final drill = JavaConcept.fromString(s: due).makeDrill();
-          conditions = drill.conditions.map((b) => b.$2).toList();
+          conditions = drill.conditions;
+          answer = drill.answer;
           break;
         case .sql:
           final drill = SqlConcept.fromString(s: due).makeDrill();
-          conditions = drill.conditions.map((b) => b.$2).toList();
+          conditions = drill.conditions;
+          answer = drill.answer;
           break;
       }
     } else {
@@ -125,6 +130,7 @@ class _DrillScreen extends State<DrillScreen> {
           sdk_l10n.GlobalWidgetsLocalizations.delegate,
         ],
         child: Stack(
+          fit: .expand,
           clipBehavior: .none,
           children: [
             CodeTheme(
@@ -174,7 +180,7 @@ class _DrillScreen extends State<DrillScreen> {
                           const SizedBox(height: 6),
                           ...conditions.map(
                             (c) => Text(
-                              c,
+                              c.$2,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 fontFamily: 'monospace',
                               ),
@@ -184,6 +190,28 @@ class _DrillScreen extends State<DrillScreen> {
                       ),
                     ),
                   ),
+                ),
+              ),
+
+            if (showConditions)
+              Positioned(
+                child: Row(
+                  children: [
+                    TextButton.icon(
+                      icon: Icon(Icons.play_arrow),
+                      label: Text('Submit'),
+                      onPressed: () => pageReplace(
+                        context,
+                        (context) => DrillEval(
+                          col: widget.col,
+                          concept: concept,
+                          conditions: conditions,
+                          correctAnswer: answer,
+                          userAnswer: controller.text,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
           ],

@@ -6,6 +6,11 @@ use crate::api::diagnostics::Diagnostics;
 use crate::api::java::JavaConcept;
 use crate::api::java::check::do_while::java_do_while;
 use crate::api::java::check::for_loops::java_for_loops;
+use crate::api::java::check::functions::java_function_declaration;
+use crate::api::java::check::ifs::java_if_statements;
+use crate::api::java::check::switch_case::java_switch_statement;
+use crate::api::java::check::variables::java_variable_declaration;
+use crate::api::java::check::while_loops::java_while_loop;
 
 mod do_while;
 mod for_loops;
@@ -40,15 +45,29 @@ pub fn java_check(
         } else {
             let class =
                 user.items.iter().find(|&x| matches!(x, Item::Class(_)));
-            if let Some(Item::Class(class)) = class {
+            if let Some(Item::Class(user)) = class {
                 match concept {
                     JavaConcept::DoWhile => {
-                        java_do_while(&mut d, conditions, generated, class);
+                        java_do_while(&mut d, conditions, generated, user);
                     }
                     JavaConcept::ForLoop => {
-                        java_for_loops(&mut d, conditions, generated, class)
+                        java_for_loops(&mut d, conditions, generated, user)
                     }
-                    _ => {}
+                    JavaConcept::Ifs => {
+                        java_if_statements(&mut d, conditions, generated, user);
+                    }
+                    JavaConcept::FunctionDecl => java_function_declaration(
+                        &mut d, conditions, generated, user,
+                    ),
+                    JavaConcept::Switch => java_switch_statement(
+                        &mut d, conditions, generated, user,
+                    ),
+                    JavaConcept::VarDecl => java_variable_declaration(
+                        &mut d, conditions, generated, user,
+                    ),
+                    JavaConcept::WhileLoop => {
+                        java_while_loop(&mut d, conditions, generated, user)
+                    }
                 }
             } else {
                 d.record_again("No classes found");

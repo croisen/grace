@@ -179,12 +179,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
-name = "bytes"
-version = "1.12.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "776dfebd015e2d8732c684a2c71003674ccb49457b539b9e82151ba38e96dd7c"
-
-[[package]]
 name = "cc"
 version = "1.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -364,16 +358,6 @@ checksum = "1bf3c259d255ca70051b30e2e95b5446cdb8949ac4cd22c0d7fd634d89f568e2"
 dependencies = [
  "log",
  "regex",
-]
-
-[[package]]
-name = "errno"
-version = "0.3.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e35d6e78f4cebb90e51d543db8fe41528851d6deeef6ef21ebd4bfdc1e784776"
-dependencies = [
- "libc",
- "windows-sys",
 ]
 
 [[package]]
@@ -819,17 +803,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mio"
-version = "1.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20521a903f02b0a573cd6840e9d0a5a0cc043d361fe924092cd70f8556cc9c4a"
-dependencies = [
- "libc",
- "wasi",
- "windows-sys",
-]
-
-[[package]]
 name = "ndarray"
 version = "0.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -883,15 +856,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "oak-c"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
- "serde",
-]
-
-[[package]]
 name = "oak-core"
 version = "0.0.12"
 source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
@@ -904,42 +868,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "oak-cpp"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
- "serde",
-]
-
-[[package]]
-name = "oak-csharp"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
- "serde",
-]
-
-[[package]]
 name = "oak-folding"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
- "serde",
-]
-
-[[package]]
-name = "oak-formatter"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
-]
-
-[[package]]
-name = "oak-haskell"
 version = "0.0.12"
 source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
 dependencies = [
@@ -975,16 +904,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "oak-javascript"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
- "oak-typescript",
- "serde",
-]
-
-[[package]]
 name = "oak-lsp"
 version = "0.0.12"
 source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
@@ -1003,16 +922,6 @@ dependencies = [
  "serde",
  "serde_json",
  "url",
-]
-
-[[package]]
-name = "oak-lua"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
- "serde",
- "tokio",
 ]
 
 [[package]]
@@ -1035,15 +944,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "oak-php"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
- "serde",
-]
-
-[[package]]
 name = "oak-pretty-print"
 version = "0.0.12"
 source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
@@ -1052,15 +952,6 @@ dependencies = [
  "oak-macros",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "oak-python"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
- "serde",
 ]
 
 [[package]]
@@ -1129,16 +1020,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "oak-typescript"
-version = "0.0.12"
-source = "git+https://github.com/croisen/oak.rs#720c98cbd6c8384d71ade5c25e495422058857fa"
-dependencies = [
- "oak-core",
- "oak-formatter",
- "serde",
-]
-
-[[package]]
 name = "object"
 version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1162,16 +1043,6 @@ dependencies = [
  "cc",
  "dashmap 5.5.3",
  "log",
-]
-
-[[package]]
-name = "parking_lot"
-version = "0.12.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93857453250e3077bd71ff98b6a65ea6621a19bb0f559a85248955ac12c45a1a"
-dependencies = [
- "lock_api",
- "parking_lot_core",
 ]
 
 [[package]]
@@ -1347,16 +1218,8 @@ dependencies = [
  "flutter_rust_bridge",
  "fsrs",
  "libc",
- "oak-c",
  "oak-core",
- "oak-cpp",
- "oak-csharp",
- "oak-haskell",
  "oak-java",
- "oak-javascript",
- "oak-lua",
- "oak-php",
- "oak-python",
  "oak-rust",
  "oak-sql",
  "rand",
@@ -1440,16 +1303,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 
 [[package]]
-name = "signal-hook-registry"
-version = "1.4.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b"
-dependencies = [
- "errno",
- "libc",
-]
-
-[[package]]
 name = "slab"
 version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1480,16 +1333,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
-]
-
-[[package]]
-name = "socket2"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
-dependencies = [
- "libc",
- "windows-sys",
 ]
 
 [[package]]
@@ -1556,26 +1399,7 @@ version = "1.54.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b52fd3255258d26fac7264ab5a76b53c13367136dc011d3d6ad4f8ed070396a3"
 dependencies = [
- "bytes",
- "libc",
- "mio",
- "parking_lot",
  "pin-project-lite",
- "signal-hook-registry",
- "socket2",
- "tokio-macros",
- "windows-sys",
-]
-
-[[package]]
-name = "tokio-macros"
-version = "2.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78773a2a397f451582ce068015985c33193cf6dea8b74d2a639fe457b2f07b0e"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 3.0.10",
 ]
 
 [[package]]
@@ -1650,12 +1474,6 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
-
-[[package]]
-name = "wasi"
-version = "0.11.1+wasi-snapshot-preview1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccf3ec651a847eb01de73ccad15eb7d99f80485de043efb2f370cd654f4ea44b"
 
 [[package]]
 name = "wasm-bindgen"
@@ -1787,15 +1605,6 @@ name = "windows-strings"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7837d08f69c77cf6b07689544538e017c1bfcf57e34b4c0ff58e6c2cd3b37091"
-dependencies = [
- "windows-link",
-]
-
-[[package]]
-name = "windows-sys"
-version = "0.61.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
 dependencies = [
  "windows-link",
 ]

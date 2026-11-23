@@ -1,12 +1,14 @@
 use rand::{random, random_range};
 
+use crate::api::diagnostics::Diagnostics;
+use crate::api::rust::check::rust_check;
 use crate::api::{
     generic_iterator, generic_operator, generic_varname1, generic_varname2,
 };
 
 pub mod check;
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Copy)]
 pub enum RustConcept {
     #[default]
     VarDecl = 0,
@@ -61,7 +63,7 @@ impl RustConcept {
 }
 
 #[derive(Default, Debug, Clone)]
-#[flutter_rust_bridge::frb(non_opaque)]
+#[flutter_rust_bridge::frb(opaque)]
 pub struct RustDrill {
     pub concept: RustConcept,
     pub conditions: Vec<(bool, String)>,
@@ -70,6 +72,25 @@ pub struct RustDrill {
 }
 
 impl RustDrill {
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn new(
+        concept: String,
+        conditions: Vec<(bool, String)>,
+        answer: String,
+    ) -> Self {
+        Self {
+            concept: RustConcept::from_string(concept),
+            conditions,
+            answer,
+            ident_level: 0,
+        }
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn check(&mut self, user_code: String) -> Diagnostics {
+        rust_check(self.concept, &mut self.conditions, &self.answer, &user_code)
+    }
+
     #[inline]
     fn set_concept(&mut self, concept: RustConcept) {
         self.concept = concept;

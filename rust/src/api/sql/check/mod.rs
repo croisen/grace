@@ -9,34 +9,30 @@ pub mod ddl;
 pub mod dml;
 pub mod query;
 
+#[flutter_rust_bridge::frb(sync)]
 pub fn sql_check(
     concept: SqlConcept,
-    conditions: Vec<(bool, String)>,
-    generated: String,
-    user: String,
-) -> (Grade, Diagnostics) {
-    let (uroot, mut d) = ast(user);
+    conditions: &mut Vec<(bool, String)>,
+    generated: &str,
+    user_code: &str,
+) -> Diagnostics {
+    let (uroot, mut d) = ast(user_code);
     let (groot, dd) = ast(generated);
 
     assert!(dd.is_empty());
     let generated = groot.unwrap();
-    if let Some(user) = uroot {
-        println!("{generated:#?}");
+    if let Some(user) = uroot {}
 
-        println!("{user:#?}");
-        (Grade::Good, d)
-    } else {
-        (d.iter().map(|d| d.grade).min().unwrap(), d)
-    }
+    d
 }
 
-fn ast(source: String) -> (Option<SqlRoot>, Diagnostics) {
+fn ast(source: &str) -> (Option<SqlRoot>, Diagnostics) {
     let lang = SqlLanguage::new();
     let b = SqlBuilder::new(&lang);
     let mut c = ParseSession::default();
 
     let mut r = None;
-    let s = SourceText::new(source.as_str());
+    let s = SourceText::new(source);
     let mut a = b.build(&s, &[], &mut c);
 
     match a.result {

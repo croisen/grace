@@ -6,6 +6,7 @@ use crate::api::java::check::utils::{
     user_get_main,
 };
 
+#[flutter_rust_bridge::frb(ignore)]
 pub fn java_do_while(
     diagnostics: &mut Diagnostics,
     conditions: &mut Vec<(bool, String)>,

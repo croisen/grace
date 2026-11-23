@@ -6,6 +6,7 @@ use crate::api::java::check::utils::{
     user_get_main,
 };
 
+#[flutter_rust_bridge::frb(ignore)]
 pub fn java_for_loops(
     diagnostics: &mut Diagnostics,
     conditions: &mut Vec<(bool, String)>,
@@ -18,7 +19,6 @@ pub fn java_for_loops(
 
     let gmain = generated_get_main(generated);
 
-    println!("{umain:#?}");
     if let Some(uloop) = umain.get(0) {
         let gloop = &gmain[0];
 
@@ -82,6 +82,23 @@ pub fn java_for_loops(
         }
 
         conditions[0].0 = for_loop;
-        conditions[1].0 = for_loop;
+        let Statement::Block(gbody) = &**gbody else {
+            return;
+        };
+
+        if let Statement::Expression(_) = &**ubody {
+            conditions[1].0 = true;
+            conditions[2].0 = check_print(diagnostics, &gbody[0], ubody);
+        } else if let Statement::Block(ubody) = &**ubody {
+            if ubody.is_empty() {
+                diagnostics.record_hard("Empty for loop body");
+                return;
+            }
+
+            conditions[1].0 = true;
+            conditions[2].0 = check_print(diagnostics, &gbody[0], &ubody[0]);
+        } else {
+            conditions[1].0 = false;
+        }
     }
 }

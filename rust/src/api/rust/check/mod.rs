@@ -16,32 +16,27 @@ pub mod while_loops;
 #[flutter_rust_bridge::frb(sync)]
 pub fn rust_check(
     concept: RustConcept,
-    conditions: Vec<(bool, String)>,
-    generated: String,
-    user: String,
-) -> (Grade, Diagnostics) {
-    let (uroot, mut d) = ast(user);
+    conditions: &mut Vec<(bool, String)>,
+    generated: &str,
+    user_code: &str,
+) -> Diagnostics {
+    let (uroot, mut d) = ast(user_code);
     let (groot, dd) = ast(generated);
 
     assert!(dd.is_empty());
     let generated = groot.unwrap();
-    if let Some(user) = uroot {
-        println!("{generated:#?}");
+    if let Some(user) = uroot {}
 
-        println!("{user:#?}");
-        (Grade::Good, d)
-    } else {
-        (d.iter().map(|d| d.grade).min().unwrap(), d)
-    }
+    d
 }
 
-fn ast(source: String) -> (Option<RustRoot>, Diagnostics) {
+fn ast(source: &str) -> (Option<RustRoot>, Diagnostics) {
     let lang = RustLanguage::new();
     let b = RustBuilder::new(&lang);
     let mut c = ParseSession::default();
 
     let mut r = None;
-    let s = SourceText::new(source.as_str());
+    let s = SourceText::new(source);
     let mut a = b.build(&s, &[], &mut c);
 
     match a.result {

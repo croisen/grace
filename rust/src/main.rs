@@ -1,9 +1,9 @@
-use crate::api::rust::RustConcept;
+use crate::api::sql::SqlConcept;
 
 pub mod api;
 
 fn main() {
-    let drill = RustConcept::VarDecl;
+    let drill = SqlConcept::Insert;
     let mut d = drill.make_drill();
     let diag = d.check(d.answer.clone());
 

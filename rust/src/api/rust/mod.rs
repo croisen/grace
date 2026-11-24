@@ -8,7 +8,7 @@ use crate::api::{
 
 pub mod check;
 
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RustConcept {
     #[default]
     VarDecl = 0,

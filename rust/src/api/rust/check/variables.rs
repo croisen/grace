@@ -1,8 +1,10 @@
-use crate::api::diagnostics::Diagnostics;
-use crate::api::rust::check::utils::{
-    check_token_let, check_token_print, compare_token_expr, main_tokens, mark,
-    split_statements,
+use super::utils::{
+    ast, check_let, check_print, compare_expr as compare_expression,
+    find_function, mark, statement_location,
 };
+use crate::api::diagnostics::Diagnostics;
+use crate::langs::rust::ast::expression::RustExpression;
+use crate::langs::rust::ast::statement::RustStatement;
 
 #[flutter_rust_bridge::frb(ignore)]
 pub fn check_variable_declaration(
@@ -11,30 +13,78 @@ pub fn check_variable_declaration(
     generated: &str,
     user: &str,
 ) {
-    let (Some(generated), Some(user)) =
-        (main_tokens(generated), main_tokens(user))
-    else {
-        diagnostics.record_again("Could not find the `main` function");
+    let (generated_items, generated_errors) = ast(generated);
+    let (user_items, user_errors) = ast(user);
+    diagnostics.d.extend(user_errors.d);
+    if !diagnostics.is_empty() {
+        return;
+    }
+    if !generated_errors.is_empty() {
+        diagnostics.record_again(
+            "The generated drill answer could not be parsed",
+            None,
+            None,
+        );
+        return;
+    }
+
+    let (Some(expected), Some(actual)) = (
+        find_function(&generated_items, "main"),
+        find_function(&user_items, "main"),
+    ) else {
+        diagnostics.record_again(
+            "Could not find the `main` function",
+            None,
+            None,
+        );
         return;
     };
-    let generated = split_statements(&generated);
-    let user = split_statements(&user);
 
-    for (index, expected) in generated.iter().enumerate() {
-        let Some(actual) = user.get(index) else {
-            diagnostics
-                .record_again(format!("Missing statement {}", index + 1));
+    for (index, expected) in expected.body.statements.iter().enumerate() {
+        let Some(actual) = actual.body.statements.get(index) else {
+            diagnostics.record_hard(
+                format!("Missing statement {}", index + 1),
+                None,
+                None,
+            );
+            mark(conditions, index, false);
             continue;
         };
-        let result = if expected.first().map(String::as_str) == Some("let") {
-            check_token_let(diagnostics, expected, actual)
-        } else if expected.first().map(String::as_str) == Some("println")
-            || expected.first().map(String::as_str) == Some("print")
-        {
-            check_token_print(diagnostics, expected, actual)
-        } else {
-            compare_token_expr(diagnostics, expected, actual)
+        let passed = match (expected, actual) {
+            (RustStatement::Let { .. }, RustStatement::Let { .. }) => {
+                check_let(diagnostics, expected, actual)
+            }
+            (
+                RustStatement::Expression { .. },
+                RustStatement::Expression { .. },
+            ) if is_print(expected) => {
+                check_print(diagnostics, expected, actual)
+            }
+            (
+                RustStatement::Expression { expression: a, .. },
+                RustStatement::Expression { expression: b, .. },
+            ) => compare_expression(diagnostics, a, b),
+            _ => {
+                let (line, col) =
+                    statement_location(actual).unwrap_or((None, None));
+                diagnostics.record_hard(
+                    "The statement does not match the drill",
+                    line,
+                    col,
+                );
+                false
+            }
         };
-        mark(conditions, index, result);
+        mark(conditions, index, passed);
     }
+}
+
+fn is_print(statement: &RustStatement) -> bool {
+    matches!(
+        statement,
+        RustStatement::Expression {
+            expression: RustExpression::FunctionCall { callee, .. },
+            ..
+        } if matches!(callee.as_ref(), RustExpression::Identifier(name) if matches!(name.text.as_str(), "print" | "println"))
+    )
 }

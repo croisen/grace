@@ -274,7 +274,7 @@ class _DrillScreen extends State<DrillScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Drill - ...')),
+        appBar: AppBar(title: Text('Drill - $concept')),
         floatingActionButton: FloatingActionButton(
           onPressed: _toggleConditions,
           child: Icon(Icons.priority_high),

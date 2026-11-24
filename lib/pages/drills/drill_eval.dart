@@ -1,16 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:flutter_highlight/themes/atom-one-dark.dart';
-import 'package:flutter_highlight/themes/atom-one-light.dart';
-import 'package:flutter_highlight/themes/dracula.dart';
-import 'package:flutter_highlight/themes/gruvbox-dark.dart';
-import 'package:flutter_highlight/themes/gruvbox-light.dart';
-import 'package:flutter_highlight/themes/nord.dart';
-import 'package:flutter_highlight/themes/solarized-dark.dart';
-import 'package:flutter_highlight/themes/solarized-light.dart';
-import 'package:flutter_highlight/themes/tomorrow-night.dart';
-import 'package:flutter_highlight/themes/tomorrow.dart';
+import 'package:grace/pages/drills/code_view.dart';
 import 'package:grace/pages/drills/drill.dart';
 import 'package:grace/rust/api.dart';
 import 'package:grace/rust/api/diagnostics.dart';
@@ -22,14 +12,8 @@ import 'package:grace/utils/colors/mod.dart';
 import 'package:grace/utils/database/mod.dart';
 import 'package:grace/utils/route.dart';
 import 'package:grace/utils/settings.dart';
-import 'package:highlight/languages/java.dart';
-import 'package:highlight/languages/rust.dart';
-import 'package:highlight/languages/sql.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
-
-import 'package:flutter/material.dart' as sdk;
-import 'package:flutter_localizations/flutter_localizations.dart' as sdk_l10n;
 
 class DrillEval extends StatefulWidget {
   const DrillEval({
@@ -50,36 +34,21 @@ class DrillEval extends StatefulWidget {
 }
 
 class _DrillEval extends State<DrillEval> {
-  // late CodeController c1;
-  // late CodeController c2;
   late Diagnostics diagnostics;
   late Grade grade;
   late String concept;
   late List<(bool, String)> conditions;
+  late String correctAnswer;
   bool wasReplaced = false;
 
   @override
   void initState() {
     super.initState();
-    // c1 = CodeController(
-    //   text: widget.userAnswer,
-    //   readOnly: true,
-    //   language: switch (widget.col.lang) {
-    //     .rust => rust,
-    //     .java => java,
-    //     .sql => sql,
-    //   },
-    // );
-    //
-    // c2 = CodeController(
-    //   text: widget.correctAnswer,
-    //   readOnly: true,
-    //   language: switch (widget.col.lang) {
-    //     .rust => rust,
-    //     .java => java,
-    //     .sql => sql,
-    //   },
-    // );
+    correctAnswer = switch (widget.col.lang) {
+      .rust => (widget.drill as RustDrill).answer,
+      .java => (widget.drill as JavaDrill).answer,
+      .sql => (widget.drill as SqlDrill).answer,
+    };
 
     diagnostics = switch (widget.col.lang) {
       .rust => (widget.drill as RustDrill).check(userCode: widget.userAnswer),
@@ -102,23 +71,6 @@ class _DrillEval extends State<DrillEval> {
 
     widget.col.reviewDrill(concept: concept, grade: grade);
     DatabaseHelper.instance.saveCollection(widget.col);
-  }
-
-  Map<String, TextStyle> _theme(GraceAppTheme t) {
-    final b = t.mode_();
-    return switch (t.theme) {
-      // aww no catpuccin
-      .catpuccin => b == .dark ? atomOneDarkTheme : atomOneLightTheme,
-
-      .dracula => draculaTheme,
-      .gruvbox => b == .dark ? gruvboxDarkTheme : gruvboxLightTheme,
-      .nord => nordTheme,
-      .onedark => atomOneDarkTheme,
-      .solarized => b == .dark ? solarizedDarkTheme : solarizedLightTheme,
-
-      // or tokyonight
-      .tokyonight => b == .dark ? tomorrowNightTheme : tomorrowTheme,
-    };
   }
 
   @override
@@ -150,38 +102,92 @@ class _DrillEval extends State<DrillEval> {
           },
           child: Icon(Icons.add),
         ),
-        body: Column(
-          mainAxisAlignment: .start,
-          crossAxisAlignment: .stretch,
+        body: Stack(
+          fit: .expand,
           children: [
-            Text('Grade: $grade'),
-            const Divider(),
+            SingleChildScrollView(
+              padding: const .all(10),
+              child: Column(
+                mainAxisAlignment: .start,
+                crossAxisAlignment: .stretch,
+                children: [
+                  Center(
+                    child: Text(
+                      'Grade: $grade',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                  ),
 
-            Text('Conditions'),
-            ...conditions.map(
-              (a) => a.$1
-                  ? Text(
-                      '[/] ${a.$2}',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontFamily: 'monospace',
-                      ),
-                    )
-                  : Text(
-                      '[X] ${a.$2}',
+                  const Divider(),
+
+                  Text('Conditions'),
+                  ...conditions.map(
+                    (a) => a.$1
+                        ? Text(
+                            '[/] ${a.$2}',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontFamily: 'monospace',
+                            ),
+                          )
+                        : Text(
+                            '[X] ${a.$2}',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                  ),
+
+                  const Divider(),
+                  Text('Diagnostics'),
+                  ...diagnostics.d.map(
+                    (d) => Text(
+                      d.toString(),
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontFamily: 'monospace',
                       ),
                     ),
+                  ),
+                ],
+              ),
             ),
 
-            const Divider(),
-            Text('Diagnostics'),
-            ...diagnostics.d.map(
-              (d) => Text(
-                d.toString(),
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontFamily: 'monospace',
-                ),
+            Positioned(
+              bottom: MediaQuery.paddingOf(context).bottom + 20,
+              left: 1,
+              right: 1,
+              child: Row(
+                mainAxisAlignment: .spaceEvenly,
+                children: [
+                  OutlinedButton(
+                    onPressed: () => pagePush(
+                      context,
+                      (context) => CodeViewScreen(
+                        title: "Your Answer",
+                        lang: widget.col.lang,
+                        code: widget.userAnswer,
+                        d: diagnostics.d,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: t.color_(.green),
+                      foregroundColor: t.scheme_(t.mode_()).onSurface,
+                    ),
+                    child: const Text('Your Answer'),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: () => pagePush(
+                      context,
+                      (context) => CodeViewScreen(
+                        title: "Expected Answer",
+                        lang: widget.col.lang,
+                        code: correctAnswer,
+                        d: [],
+                      ),
+                    ),
+                    child: const Text('Expected Answer'),
+                  ),
+                ],
               ),
             ),
           ],

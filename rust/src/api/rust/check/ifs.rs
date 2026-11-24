@@ -14,12 +14,16 @@ pub fn check_if_statement(
     let (Some(generated), Some(user)) =
         (main_tokens(generated), main_tokens(user))
     else {
-        diagnostics.record_again("Could not find the `main` function");
+        diagnostics.record_again(
+            "Could not find the `main` function",
+            None,
+            None,
+        );
         return;
     };
     let (Some(g_if), Some(u_if)) = (parse_if(&generated), parse_if(&user))
     else {
-        diagnostics.record_again("Expecting an if statement");
+        diagnostics.record_again("Expecting an if statement", None, None);
         return;
     };
 
@@ -32,7 +36,7 @@ pub fn check_if_statement(
     let actual_then = split_statements(&u_if.then_body);
     mark(conditions, 1, !actual_then.is_empty());
     if actual_then.is_empty() {
-        diagnostics.record_hard("The if block is empty");
+        diagnostics.record_hard("The if block is empty", None, None);
     } else {
         mark(
             conditions,
@@ -45,18 +49,22 @@ pub fn check_if_statement(
     }
 
     let Some(expected_else) = g_if.else_body else {
-        diagnostics.record_again("The generated drill has no else block");
+        diagnostics.record_hard(
+            "The generated drill has no else block",
+            None,
+            None,
+        );
         return;
     };
     let Some(actual_else) = u_if.else_body else {
-        diagnostics.record_again("Expected an else block");
+        diagnostics.record_hard("Expected an else block", None, None);
         return;
     };
     mark(conditions, 3, true);
     let expected_else = split_statements(&expected_else);
     let actual_else = split_statements(&actual_else);
     if actual_else.is_empty() {
-        diagnostics.record_hard("The else block is empty");
+        diagnostics.record_hard("The else block is empty", None, None);
         mark(conditions, 4, false);
     } else {
         let print_ok = expected_else

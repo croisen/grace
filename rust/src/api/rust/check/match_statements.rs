@@ -14,7 +14,11 @@ pub fn check_match_statement(
     let (Some(generated), Some(user)) =
         (main_tokens(generated), main_tokens(user))
     else {
-        diagnostics.record_again("Could not find the `main` function");
+        diagnostics.record_again(
+            "Could not find the `main` function",
+            None,
+            None,
+        );
         return;
     };
     let (g_statements, u_statements) =
@@ -22,8 +26,11 @@ pub fn check_match_statement(
     let (Some(g_decl), Some(u_decl)) =
         (g_statements.first(), u_statements.first())
     else {
-        diagnostics
-            .record_again("Missing the variable declaration before the match");
+        diagnostics.record_hard(
+            "Missing the variable declaration before the match",
+            None,
+            None,
+        );
         return;
     };
     mark(conditions, 0, check_token_let(diagnostics, g_decl, u_decl));
@@ -32,13 +39,15 @@ pub fn check_match_statement(
     else {
         diagnostics.record_again(
             "Expecting a match statement after the variable declaration",
+            None,
+            None,
         );
         return;
     };
     let (Some(expected), Some(actual)) =
         (parse_match(expected), parse_match(actual))
     else {
-        diagnostics.record_again("Expecting a match statement");
+        diagnostics.record_again("Expecting a match statement", None, None);
         return;
     };
     mark(
@@ -47,27 +56,39 @@ pub fn check_match_statement(
         compare_token_expr(diagnostics, &expected.value, &actual.value),
     );
     if expected.arms.len() != actual.arms.len() {
-        diagnostics.record_hard(format!(
-            "Expected {} match arms but found {}",
-            expected.arms.len(),
-            actual.arms.len()
-        ));
+        diagnostics.record_hard(
+            format!(
+                "Expected {} match arms but found {}",
+                expected.arms.len(),
+                actual.arms.len()
+            ),
+            None,
+            None,
+        );
     }
     for (index, expected_arm) in expected.arms.iter().enumerate() {
         let condition_index = 2 + index * 2;
         let Some(actual_arm) = actual.arms.get(index) else {
             mark(conditions, condition_index, false);
             mark(conditions, condition_index + 1, false);
-            diagnostics.record_hard(format!("Missing match arm {}", index + 1));
+            diagnostics.record_hard(
+                format!("Missing match arm {}", index + 1),
+                None,
+                None,
+            );
             continue;
         };
         let pattern_ok = expected_arm.pattern == actual_arm.pattern;
         if !pattern_ok {
-            diagnostics.record_hard(format!(
-                "Expected match pattern `{}` but found `{}`",
-                expected_arm.pattern.join(" "),
-                actual_arm.pattern.join(" ")
-            ));
+            diagnostics.record_hard(
+                format!(
+                    "Expected match pattern `{}` but found `{}`",
+                    expected_arm.pattern.join(" "),
+                    actual_arm.pattern.join(" ")
+                ),
+                None,
+                None,
+            );
         }
         mark(conditions, condition_index, pattern_ok);
         let expected_body = split_statements(&expected_arm.body);
@@ -77,7 +98,7 @@ pub fn check_match_statement(
             .zip(actual_body.first())
             .is_some_and(|(a, b)| check_token_print(diagnostics, a, b));
         if !print_ok && actual_body.is_empty() {
-            diagnostics.record_hard("The match arm body is empty");
+            diagnostics.record_hard("The match arm body is empty", None, None);
         }
         mark(conditions, condition_index + 1, print_ok);
     }

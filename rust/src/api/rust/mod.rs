@@ -167,19 +167,19 @@ impl RustDrill {
         self.answer.push_str("\n");
     }
 
-    fn new_else_if_statement(&mut self, var1: &str, comp: &str, var2: &str) {
-        self.decrease_ident_with_brace();
-
-        self.answer.push_str(&format!(" else if {var1} {comp} {var2} {{\n"));
-
-        self.increase_ident();
-
-        self.new_condition(format!(
-            "Add an else if statement comparing {var1} and {var2} using {comp}"
-        ));
-
-        self.new_condition("Inside the else if statement do");
-    }
+    // fn new_else_if_statement(&mut self, var1: &str, comp: &str, var2: &str) {
+    //     self.decrease_ident_with_brace();
+    //
+    //     self.answer.push_str(&format!(" else if {var1} {comp} {var2} {{\n"));
+    //
+    //     self.increase_ident();
+    //
+    //     self.new_condition(format!(
+    //         "Add an else if statement comparing {var1} and {var2} using {comp}"
+    //     ));
+    //
+    //     self.new_condition("Inside the else if statement do");
+    // }
 
     fn new_for_loop(&mut self, var: &str, start: &str, stop: &str) {
         self.indent();

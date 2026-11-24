@@ -1,24 +1,21 @@
-use oak_core::{Builder, ParseSession, SourceText};
-use oak_java::ast::Item;
-use oak_java::{JavaBuilder, JavaLanguage, JavaRoot};
-
 use crate::api::diagnostics::Diagnostics;
 use crate::api::java::JavaConcept;
-use crate::api::java::check::do_while::java_do_while;
-use crate::api::java::check::for_loops::java_for_loops;
-use crate::api::java::check::functions::java_function_declaration;
-use crate::api::java::check::ifs::java_if_statements;
-use crate::api::java::check::switch_case::java_switch_statement;
-use crate::api::java::check::variables::java_variable_declaration;
-use crate::api::java::check::while_loops::java_while_loop;
+use crate::core::parser::pratt::Token2;
+use crate::langs::java::ast::JavaAst;
+use crate::langs::java::ast::class::JavaClass;
+use crate::langs::java::ast::expression::{JavaExpression, JavaMethodCall};
+use crate::langs::java::ast::member::JavaMember;
+use crate::langs::java::ast::method::JavaMethod;
+use crate::langs::java::ast::statement::JavaStatement;
 
+mod utils;
+mod variables;
+use utils::*;
 mod do_while;
 mod for_loops;
 mod functions;
 mod ifs;
 mod switch_case;
-mod utils;
-mod variables;
 mod while_loops;
 
 #[flutter_rust_bridge::frb(ignore)]
@@ -28,69 +25,81 @@ pub fn java_check(
     generated: &str,
     user_code: &str,
 ) -> Diagnostics {
-    let (uroot, mut d) = ast(user_code);
-    let (groot, dd) = ast(generated);
-
-    assert!(dd.is_empty());
-    let groot = groot.unwrap();
-    let Item::Class(generated) =
-        groot.items.iter().find(|&x| matches!(x, Item::Class(_))).unwrap()
+    conditions.iter_mut().for_each(|(passed, _)| *passed = false);
+    if user_code.trim().is_empty() {
+        let mut diagnostics = Diagnostics::new(Vec::new());
+        diagnostics.record_again("Empty answer", None, None);
+        return diagnostics;
+    }
+    let generated = JavaAst::new(generated);
+    let user = JavaAst::new(user_code);
+    let mut diagnostics = Diagnostics::new(user.errors);
+    if !generated.errors.is_empty() || generated.root.is_empty() {
+        diagnostics.record_again(
+            "The generated drill could not be parsed",
+            None,
+            None,
+        );
+        return diagnostics;
+    }
+    let Some(expected_class) = generated.root[0].classes.first() else {
+        diagnostics.record_again(
+            "The generated drill has no class",
+            None,
+            None,
+        );
+        return diagnostics;
+    };
+    let Some(actual_class) =
+        user.root.first().and_then(|ast| ast.classes.first())
     else {
-        unreachable!()
+        diagnostics.record_again("No class found", None, None);
+        return diagnostics;
     };
 
-    if let Some(user) = uroot {
-        if user.items.is_empty() {
-            d.record_again("Empty answer");
-        } else {
-            let class =
-                user.items.iter().find(|&x| matches!(x, Item::Class(_)));
-            if let Some(Item::Class(user)) = class {
-                match concept {
-                    JavaConcept::DoWhile => {
-                        java_do_while(&mut d, conditions, generated, user);
-                    }
-                    JavaConcept::ForLoop => {
-                        java_for_loops(&mut d, conditions, generated, user)
-                    }
-                    JavaConcept::Ifs => {
-                        java_if_statements(&mut d, conditions, generated, user);
-                    }
-                    JavaConcept::FunctionDecl => java_function_declaration(
-                        &mut d, conditions, generated, user,
-                    ),
-                    JavaConcept::Switch => java_switch_statement(
-                        &mut d, conditions, generated, user,
-                    ),
-                    JavaConcept::VarDecl => java_variable_declaration(
-                        &mut d, conditions, generated, user,
-                    ),
-                    JavaConcept::WhileLoop => {
-                        java_while_loop(&mut d, conditions, generated, user)
-                    }
-                }
-            } else {
-                d.record_again("No classes found");
-            }
-        }
+    match concept {
+        JavaConcept::VarDecl => variables::check_variables(
+            &mut diagnostics,
+            conditions,
+            expected_class,
+            actual_class,
+        ),
+        JavaConcept::FunctionDecl => functions::check_function(
+            &mut diagnostics,
+            conditions,
+            expected_class,
+            actual_class,
+        ),
+        JavaConcept::Ifs => ifs::check_if(
+            &mut diagnostics,
+            conditions,
+            expected_class,
+            actual_class,
+        ),
+        JavaConcept::ForLoop => for_loops::check_for(
+            &mut diagnostics,
+            conditions,
+            expected_class,
+            actual_class,
+        ),
+        JavaConcept::WhileLoop => while_loops::check_while(
+            &mut diagnostics,
+            conditions,
+            expected_class,
+            actual_class,
+        ),
+        JavaConcept::DoWhile => do_while::check_do_while(
+            &mut diagnostics,
+            conditions,
+            expected_class,
+            actual_class,
+        ),
+        JavaConcept::Switch => switch_case::check_switch(
+            &mut diagnostics,
+            conditions,
+            expected_class,
+            actual_class,
+        ),
     }
-
-    d
-}
-
-fn ast(source: &str) -> (Option<JavaRoot>, Diagnostics) {
-    let lang = JavaLanguage::new();
-    let b = JavaBuilder::new(&lang);
-    let mut c = ParseSession::default();
-
-    let mut r = None;
-    let s = SourceText::new(source);
-    let mut a = b.build(&s, &[], &mut c);
-
-    match a.result {
-        Ok(root) => r = Some(root),
-        Err(e) => a.diagnostics.push(e),
-    }
-
-    (r, Diagnostics::new(&source, a.diagnostics))
+    diagnostics
 }

@@ -14,13 +14,21 @@ pub fn check_loop(
     let (Some(generated), Some(user)) =
         (main_tokens(generated), main_tokens(user))
     else {
-        diagnostics.record_again("Could not find the `main` function");
+        diagnostics.record_again(
+            "Could not find the `main` function",
+            None,
+            None,
+        );
         return;
     };
     let (Some(expected), Some(actual)) =
         (parse_loop(&generated), parse_loop(&user))
     else {
-        diagnostics.record_again("Expecting an infinite `loop` expression");
+        diagnostics.record_again(
+            "Expecting an infinite `loop` expression",
+            None,
+            None,
+        );
         return;
     };
     mark(conditions, 0, true);
@@ -28,7 +36,7 @@ pub fn check_loop(
     let actual_body = split_statements(&actual);
     mark(conditions, 1, !actual_body.is_empty());
     if actual_body.is_empty() {
-        diagnostics.record_hard("The loop body is empty");
+        diagnostics.record_hard("The loop body is empty", None, None);
         return;
     }
     let print_ok = expected_body
@@ -41,7 +49,11 @@ pub fn check_loop(
             a == &["break".to_string()] && b == &["break".to_string()]
         });
     if !break_ok {
-        diagnostics.record_hard("Expected `break` after the print call");
+        diagnostics.record_hard(
+            "Expected `break` after the print call",
+            None,
+            None,
+        );
     }
     mark(conditions, 3, break_ok);
 }

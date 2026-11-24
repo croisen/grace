@@ -473,7 +473,7 @@ fn java_while_loop() -> JavaDrill {
         drill.print(var);
         drill.indent();
         drill.answer.push_str(&format!("{var}++;\n"));
-        drill.new_condition(&format!("Decrement {var} by 1"));
+        drill.new_condition(&format!("Increment {var} by 1"));
     }
 
     drill.close_while_loop();

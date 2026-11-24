@@ -1,26 +1,35 @@
-use oak_rust::ast::{Expr, Function, Item, Statement, Type};
-use oak_rust::lexer::RustTokenType;
-
 use crate::api::diagnostics::Diagnostics;
+use crate::core::parser::pratt::Token2;
+use crate::langs::rust::ast::RustAst;
+use crate::langs::rust::ast::expression::RustExpression;
+use crate::langs::rust::ast::item::RustItem;
+use crate::langs::rust::ast::item::function::RustFunction;
+use crate::langs::rust::ast::statement::RustStatement;
+
+#[flutter_rust_bridge::frb(ignore)]
+pub fn ast(source: &str) -> (Vec<RustAst>, Diagnostics) {
+    let output = RustAst::new(source);
+    (output.root, Diagnostics::new(output.errors))
+}
 
 #[flutter_rust_bridge::frb(ignore)]
 pub fn find_function<'a>(
-    items: &'a [Item],
+    items: &'a [RustAst],
     name: &str,
-) -> Option<&'a Function> {
-    items.iter().find_map(|item| match item {
-        Item::Function(function) if function.name.name == name => {
-            Some(function.as_ref())
+) -> Option<&'a RustFunction> {
+    items.iter().find_map(|node| match &node.item {
+        RustItem::Function(function) if function.name.text == name => {
+            Some(function)
         }
         _ => None,
     })
 }
 
 #[flutter_rust_bridge::frb(ignore)]
-pub fn find_non_main_function(items: &[Item]) -> Option<&Function> {
-    items.iter().find_map(|item| match item {
-        Item::Function(function) if function.name.name != "main" => {
-            Some(function.as_ref())
+pub fn find_non_main_function(items: &[RustAst]) -> Option<&RustFunction> {
+    items.iter().find_map(|node| match &node.item {
+        RustItem::Function(function) if function.name.text != "main" => {
+            Some(function)
         }
         _ => None,
     })
@@ -36,379 +45,289 @@ pub fn mark(conditions: &mut [(bool, String)], index: usize, result: bool) {
 #[flutter_rust_bridge::frb(ignore)]
 pub fn check_let(
     diagnostics: &mut Diagnostics,
-    expected: &Statement,
-    actual: &Statement,
+    expected: &RustStatement,
+    actual: &RustStatement,
 ) -> bool {
-    let Statement::Let {
+    let RustStatement::Let {
+        mutable: expected_mut,
         name: expected_name,
-        ty: expected_type,
-        expr: expected_expr,
-        mutable: expected_mutable,
-        ..
+        r#type: expected_type,
+        init: expected_init,
     } = expected
     else {
         return false;
     };
-    let Statement::Let { name, ty, expr, mutable, .. } = actual else {
-        diagnostics.record_again("Expecting a let declaration");
+    let RustStatement::Let { mutable, name, r#type, init } = actual else {
+        diagnostics.record_again("Expecting a let declaration", None, None);
         return false;
     };
-
-    let mut result = true;
-    if name.name != expected_name.name {
-        diagnostics.record_hard(format!(
-            "Expected variable name `{}` but found `{}`",
-            expected_name.name, name.name
-        ));
-        result = false;
+    let (line, col) = (Some(name.line), Some(name.col));
+    let mut ok = true;
+    if name.text != expected_name.text {
+        diagnostics.record_hard(
+            format!(
+                "Expected variable `{}` but found `{}`",
+                expected_name.text, name.text
+            ),
+            line,
+            col,
+        );
+        ok = false;
     }
-    if mutable != expected_mutable {
-        diagnostics.record_hard(if *expected_mutable {
-            "Expected a mutable variable declaration (`let mut`)"
-        } else {
-            "Expected an immutable variable declaration"
-        });
-        result = false;
+    if mutable != expected_mut {
+        diagnostics.record_hard(
+            "The variable mutability does not match the drill",
+            line,
+            col,
+        );
+        ok = false;
     }
-    if let Some(expected_type) = expected_type {
-        if ty.as_ref() != Some(expected_type) {
-            diagnostics.record_hard(format!(
-                "Expected type `{}` but found `{}`",
-                type_name(expected_type),
-                ty.as_ref().map(type_name).unwrap_or("an inferred type")
-            ));
-            result = false;
-        }
+    if !rust_type_matches(expected_type.as_ref(), r#type.as_ref()) {
+        diagnostics.record_hard(
+            "The variable type does not match the drill",
+            line,
+            col,
+        );
+        ok = false;
     }
-    match (expected_expr, expr) {
-        (Some(expected), Some(actual)) => {
-            result &= compare_expr(diagnostics, expected, actual);
-        }
+    match (expected_init, init) {
+        (Some(a), Some(b)) => ok &= compare_expr(diagnostics, a, b),
         (Some(_), None) => {
-            diagnostics.record_hard("Expected an initializer for the variable");
-            result = false;
+            diagnostics.record_hard(
+                "Expected an initializer for the variable",
+                line,
+                col,
+            );
+            ok = false;
         }
-        (None, Some(_)) => {
-            diagnostics.record_good("The variable has an extra initializer");
-        }
-        (None, None) => {}
+        (None, Some(_)) => diagnostics.record_good(
+            "The variable has an extra initializer",
+            line,
+            col,
+        ),
+        (None, None) => (),
     }
-    result
+    ok
+}
+
+pub(super) fn rust_type_matches(
+    expected: Option<&crate::langs::rust::ast::r#type::RustType>,
+    actual: Option<&crate::langs::rust::ast::r#type::RustType>,
+) -> bool {
+    use crate::langs::rust::ast::r#type::RustType as T;
+    match (expected, actual) {
+        (None, None) => true,
+        (Some(T::Path(a)), Some(T::Path(b))) => {
+            a.len() == b.len() && a.iter().zip(b).all(|(a, b)| a.text == b.text)
+        }
+        (Some(T::Reference(al, am, at)), Some(T::Reference(bl, bm, bt))) => {
+            am == bm
+                && al.as_ref().map(|l| l.0.text.as_str())
+                    == bl.as_ref().map(|l| l.0.text.as_str())
+                && rust_type_matches(Some(at), Some(bt))
+        }
+        (Some(T::Tuple(a)), Some(T::Tuple(b))) => {
+            a.len() == b.len()
+                && a.iter()
+                    .zip(b)
+                    .all(|(a, b)| rust_type_matches(Some(a), Some(b)))
+        }
+        (Some(T::Slice(a)), Some(T::Slice(b))) => {
+            rust_type_matches(Some(a), Some(b))
+        }
+        (Some(T::Array(at, ae)), Some(T::Array(bt, be))) => {
+            rust_type_matches(Some(at), Some(bt)) && expression_matches(ae, be)
+        }
+        (Some(T::Fn(aa, ar)), Some(T::Fn(ba, br))) => {
+            aa.len() == ba.len()
+                && aa
+                    .iter()
+                    .zip(ba)
+                    .all(|(a, b)| rust_type_matches(Some(a), Some(b)))
+                && rust_type_matches(ar.as_deref(), br.as_deref())
+        }
+        (Some(T::Inferred), Some(T::Inferred)) => true,
+        _ => format!("{expected:?}") == format!("{actual:?}"),
+    }
+}
+
+pub(super) fn rust_type_location(
+    r#type: &crate::langs::rust::ast::r#type::RustType,
+) -> (Option<usize>, Option<usize>) {
+    use crate::langs::rust::ast::r#type::RustType as T;
+    let token = match r#type {
+        T::Path(path) => path.first(),
+        T::Reference(_, _, inner) | T::Slice(inner) => {
+            return rust_type_location(inner);
+        }
+        T::Tuple(items) => {
+            return items
+                .first()
+                .map(rust_type_location)
+                .unwrap_or((None, None));
+        }
+        T::Array(inner, _) => return rust_type_location(inner),
+        T::Fn(args, ret) => {
+            return args
+                .first()
+                .map(rust_type_location)
+                .or_else(|| ret.as_deref().map(rust_type_location))
+                .unwrap_or((None, None));
+        }
+        T::Inferred => None,
+    };
+    token
+        .map(|token| (Some(token.line), Some(token.col)))
+        .unwrap_or((None, None))
 }
 
 #[flutter_rust_bridge::frb(ignore)]
 pub fn check_print(
     diagnostics: &mut Diagnostics,
-    expected: &Statement,
-    actual: &Statement,
+    expected: &RustStatement,
+    actual: &RustStatement,
 ) -> bool {
-    let Some(expected_args) = print_args(expected) else {
+    let (Some(a), Some(b)) = (print_value(expected), print_value(actual))
+    else {
+        let location = statement_location(actual);
+        let (line, col) = location.unwrap_or((None, None));
+        diagnostics.record_again(
+            "Expected a `print!` or `println!` call",
+            line,
+            col,
+        );
         return false;
     };
-    let Some(actual_args) = print_args(actual) else {
-        diagnostics.record_again("Expected a `print!` or `println!` call");
-        return false;
-    };
+    compare_expr(diagnostics, a, b)
+}
 
-    let expected_value = print_value(expected_args);
-    let actual_value = print_value(actual_args);
-    match (expected_value, actual_value) {
-        (Some(expected), Some(actual)) => {
-            compare_expr(diagnostics, expected, actual)
+fn print_value(statement: &RustStatement) -> Option<&RustExpression> {
+    let RustStatement::Expression {
+        expression: RustExpression::FunctionCall { callee, args },
+        ..
+    } = statement
+    else {
+        return None;
+    };
+    let RustExpression::Identifier(name) = callee.as_ref() else { return None };
+    if !is_print_name(&name.text) {
+        return None;
+    }
+    match args.as_slice() {
+        [value] => Some(value),
+        [RustExpression::Literal(format), value, ..]
+            if format.text.contains("{}") =>
+        {
+            Some(value)
         }
-        _ => {
-            diagnostics.record_again("Could not read the printed value");
-            false
-        }
+        _ => None,
     }
 }
 
 #[flutter_rust_bridge::frb(ignore)]
 pub fn compare_expr(
     diagnostics: &mut Diagnostics,
-    expected: &Expr,
-    actual: &Expr,
+    expected: &RustExpression,
+    actual: &RustExpression,
 ) -> bool {
-    use Expr::*;
-    match (unparen(expected), unparen(actual)) {
-        (Ident(a), Ident(b)) if a.name == b.name => true,
-        (Literal { value: a, .. }, Literal { value: b, .. }) if a == b => true,
-        (Bool { value: a, .. }, Bool { value: b, .. }) if a == b => true,
-        (Unary { op: aop, expr: a, .. }, Unary { op: bop, expr: b, .. }) => {
-            if aop != bop {
-                diagnostics.record_hard(format!(
-                    "Expected unary operator `{}` but found `{}`",
-                    token_name(*aop),
-                    token_name(*bop)
-                ));
-                return false;
-            }
-            compare_expr(diagnostics, a, b)
-        }
-        (
-            Binary { left: al, op: ao, right: ar, .. },
-            Binary { left: bl, op: bo, right: br, .. },
-        ) => compare_binary(diagnostics, al, *ao, ar, bl, *bo, br),
-        (
-            Call { callee: ac, args: aa, .. },
-            Call { callee: bc, args: ba, .. },
-        ) => {
-            let mut result = compare_expr(diagnostics, ac, bc);
-            if aa.len() != ba.len() {
-                diagnostics.record_hard(format!(
-                    "Expected {} call argument(s) but found {}",
-                    aa.len(),
-                    ba.len()
-                ));
-                return false;
-            }
-            for (expected, actual) in aa.iter().zip(ba) {
-                result &= compare_expr(diagnostics, expected, actual);
-            }
-            result
-        }
-        (
-            Field { receiver: ar, field: af, .. },
-            Field { receiver: br, field: bf, .. },
-        ) if af.name == bf.name => compare_expr(diagnostics, ar, br),
-        (
-            Index { receiver: ar, index: ai, .. },
-            Index { receiver: br, index: bi, .. },
-        ) => {
-            compare_expr(diagnostics, ar, br)
-                && compare_expr(diagnostics, ai, bi)
-        }
-        (Tuple { elements: a, .. }, Tuple { elements: b, .. })
-        | (Array { elements: a, .. }, Array { elements: b, .. }) => {
-            compare_expr_lists(diagnostics, a, b)
-        }
-        _ => {
-            diagnostics.record_hard(format!(
-                "Expected expression `{}` but found `{}`",
-                expr_name(unparen(expected)),
-                expr_name(unparen(actual))
-            ));
-            false
-        }
-    }
-}
-
-fn compare_binary(
-    diagnostics: &mut Diagnostics,
-    expected_left: &Expr,
-    expected_op: RustTokenType,
-    expected_right: &Expr,
-    actual_left: &Expr,
-    actual_op: RustTokenType,
-    actual_right: &Expr,
-) -> bool {
-    if expected_op == actual_op {
-        if expr_matches(expected_left, actual_left)
-            && expr_matches(expected_right, actual_right)
-        {
-            return true;
-        }
-        if is_commutative(expected_op)
-            && expr_matches(expected_left, actual_right)
-            && expr_matches(expected_right, actual_left)
-        {
-            return true;
-        }
-        let _ = compare_expr(diagnostics, expected_left, actual_left);
-        let _ = compare_expr(diagnostics, expected_right, actual_right);
-        return false;
-    }
-
-    if inverse_comparison(expected_op) == Some(actual_op)
-        && expr_matches(expected_left, actual_right)
-        && expr_matches(expected_right, actual_left)
-    {
-        diagnostics.record_good(
-            "The comparison is equivalent with its operands reversed",
-        );
+    if expression_matches(expected, actual) {
         return true;
     }
-
-    diagnostics.record_hard(format!(
-        "Expected binary operator `{}` but found `{}`",
-        token_name(expected_op),
-        token_name(actual_op)
-    ));
+    let (line, col) = expression_location(actual).unwrap_or((None, None));
+    diagnostics.record_hard(
+        "The expression does not match the drill",
+        line,
+        col,
+    );
     false
 }
 
-fn compare_expr_lists(
-    diagnostics: &mut Diagnostics,
-    expected: &[Expr],
-    actual: &[Expr],
-) -> bool {
-    if expected.len() != actual.len() {
-        diagnostics
-            .record_hard("Expression contains a different number of elements");
-        return false;
-    }
-    expected
-        .iter()
-        .zip(actual)
-        .fold(true, |ok, (a, b)| compare_expr(diagnostics, a, b) && ok)
-}
-
-fn expr_matches(expected: &Expr, actual: &Expr) -> bool {
-    use Expr::*;
-    match (unparen(expected), unparen(actual)) {
-        (Ident(a), Ident(b)) => a.name == b.name,
-        (Literal { value: a, .. }, Literal { value: b, .. }) => a == b,
-        (Bool { value: a, .. }, Bool { value: b, .. }) => a == b,
-        (Unary { op: aop, expr: a, .. }, Unary { op: bop, expr: b, .. }) => {
-            aop == bop && expr_matches(a, b)
-        }
-        (
-            Binary { left: al, op: ao, right: ar, .. },
-            Binary { left: bl, op: bo, right: br, .. },
-        ) => {
-            ao == bo
-                && ((expr_matches(al, bl) && expr_matches(ar, br))
-                    || (is_commutative(*ao)
-                        && expr_matches(al, br)
-                        && expr_matches(ar, bl)))
-        }
-        (
-            Call { callee: ac, args: aa, .. },
-            Call { callee: bc, args: ba, .. },
-        ) => {
-            expr_matches(ac, bc)
-                && aa.len() == ba.len()
-                && aa.iter().zip(ba).all(|(a, b)| expr_matches(a, b))
-        }
-        (
-            Field { receiver: ar, field: af, .. },
-            Field { receiver: br, field: bf, .. },
-        ) => af.name == bf.name && expr_matches(ar, br),
-        (
-            Index { receiver: ar, index: ai, .. },
-            Index { receiver: br, index: bi, .. },
-        ) => expr_matches(ar, br) && expr_matches(ai, bi),
-        (Tuple { elements: a, .. }, Tuple { elements: b, .. })
-        | (Array { elements: a, .. }, Array { elements: b, .. }) => {
-            a.len() == b.len()
-                && a.iter().zip(b).all(|(a, b)| expr_matches(a, b))
-        }
-        _ => false,
-    }
-}
-
-fn print_args(statement: &Statement) -> Option<&[Expr]> {
-    let Statement::ExprStmt { expr, .. } = statement else { return None };
-    let Expr::Call { callee, args, .. } = expr else { return None };
-    let Expr::Ident(name) = callee.as_ref() else { return None };
-    matches!(name.name.as_str(), "print" | "println").then_some(args)
-}
-
-fn print_value(args: &[Expr]) -> Option<&Expr> {
-    match args {
-        [single] => Some(single),
-        [Expr::Literal { value, .. }, value_expr]
-            if is_format_placeholder(value) =>
-        {
-            Some(value_expr)
+pub(super) fn statement_location(
+    statement: &RustStatement,
+) -> Option<(Option<usize>, Option<usize>)> {
+    match statement {
+        RustStatement::Let { init: Some(expression), .. }
+        | RustStatement::Expression { expression, .. }
+        | RustStatement::Return(Some(expression)) => {
+            expression_location(expression)
         }
         _ => None,
     }
 }
 
-fn is_format_placeholder(value: &str) -> bool {
-    matches!(value.trim(), "\"{}\"" | "r#\"{}\"#")
+fn expression_location(
+    expression: &RustExpression,
+) -> Option<(Option<usize>, Option<usize>)> {
+    use RustExpression as E;
+    let token: &Token2 = match expression {
+        E::Identifier(token) | E::Literal(token) => token,
+        E::Path(tokens) => tokens.first()?,
+        E::UnaryOp { op, .. }
+        | E::UnaryMutable { op, .. }
+        | E::BinaryOp { op, .. } => op,
+        E::FieldAccess { field, .. } => field,
+        E::FunctionCall { callee, .. } => return expression_location(callee),
+        E::Index { receiver, .. } => return expression_location(receiver),
+        E::Parenthesized(inner) => return expression_location(inner),
+        E::Block(_)
+        | E::If { .. }
+        | E::While { .. }
+        | E::For { .. }
+        | E::Loop(_)
+        | E::Match(_, _)
+        | E::Tuple(_)
+        | E::Array(_)
+        | E::Struct(_, _) => return None,
+    };
+    Some((Some(token.line), Some(token.col)))
 }
 
-fn unparen(mut expr: &Expr) -> &Expr {
-    while let Expr::Paren { expr: inner, .. } = expr {
-        expr = inner;
-    }
-    expr
-}
-
-fn is_commutative(op: RustTokenType) -> bool {
-    matches!(
-        op,
-        RustTokenType::Plus
-            | RustTokenType::Star
-            | RustTokenType::EqEq
-            | RustTokenType::Ne
-            | RustTokenType::AndAnd
-            | RustTokenType::OrOr
-            | RustTokenType::Ampersand
-            | RustTokenType::Pipe
-            | RustTokenType::Caret
-    )
-}
-
-fn inverse_comparison(op: RustTokenType) -> Option<RustTokenType> {
-    Some(match op {
-        RustTokenType::Lt => RustTokenType::Gt,
-        RustTokenType::Le => RustTokenType::Ge,
-        RustTokenType::Gt => RustTokenType::Lt,
-        RustTokenType::Ge => RustTokenType::Le,
-        _ => return None,
-    })
-}
-
-fn type_name(ty: &Type) -> &str {
-    match ty {
-        Type::Path(name) => name,
-        Type::Reference { .. } => "reference",
-        Type::Tuple(_) => "tuple",
-        Type::Array { .. } => "array",
-        Type::Slice(_) => "slice",
-        Type::Fn { .. } => "function pointer",
-        Type::Infer => "inferred type",
-    }
-}
-
-fn token_name(token: RustTokenType) -> &'static str {
-    match token {
-        RustTokenType::Plus => "+",
-        RustTokenType::Minus => "-",
-        RustTokenType::Star => "*",
-        RustTokenType::Slash => "/",
-        RustTokenType::Percent => "%",
-        RustTokenType::EqEq => "==",
-        RustTokenType::Ne => "!=",
-        RustTokenType::Lt => "<",
-        RustTokenType::Le => "<=",
-        RustTokenType::Gt => ">",
-        RustTokenType::Ge => ">=",
-        RustTokenType::AndAnd => "&&",
-        RustTokenType::OrOr => "||",
-        RustTokenType::Assign => "=",
-        RustTokenType::PlusAssign => "+=",
-        RustTokenType::MinusAssign => "-=",
-        RustTokenType::DotDot => "..",
-        RustTokenType::DotDotEq => "..=",
-        RustTokenType::Bang => "!",
-        _ => "operator",
-    }
-}
-
-fn expr_name(expr: &Expr) -> &'static str {
-    match expr {
-        Expr::Ident(_) => "identifier",
-        Expr::Literal { .. } => "literal",
-        Expr::Bool { .. } => "boolean",
-        Expr::Unary { .. } => "unary expression",
-        Expr::Binary { .. } => "binary expression",
-        Expr::Call { .. } => "function or macro call",
-        Expr::Field { .. } => "field access",
-        Expr::Index { .. } => "index expression",
-        Expr::Paren { .. } => "parenthesized expression",
-        Expr::Block(_) => "block",
-        Expr::If { .. } => "if expression",
-        Expr::While { .. } => "while loop",
-        Expr::For { .. } => "for loop",
-        Expr::Loop { .. } => "loop expression",
-        Expr::Match { .. } => "match expression",
-        Expr::Tuple { .. } => "tuple",
-        Expr::Array { .. } => "array",
-        Expr::Struct { .. } => "struct expression",
+fn expression_matches(a: &RustExpression, b: &RustExpression) -> bool {
+    use RustExpression as E;
+    match (a, b) {
+        (E::Identifier(a), E::Identifier(b))
+        | (E::Literal(a), E::Literal(b)) => a.text == b.text,
+        (E::Path(a), E::Path(b)) => {
+            a.iter().map(|x| &x.text).eq(b.iter().map(|x| &x.text))
+        }
+        (E::UnaryOp { op: ao, expr: ae }, E::UnaryOp { op: bo, expr: be }) => {
+            ao.text == bo.text && expression_matches(ae, be)
+        }
+        (
+            E::BinaryOp { op: ao, left: al, right: ar },
+            E::BinaryOp { op: bo, left: bl, right: br },
+        ) => {
+            ao.text == bo.text
+                && ((expression_matches(al, bl) && expression_matches(ar, br))
+                    || (matches!(
+                        ao.text.as_str(),
+                        "+" | "*" | "==" | "!=" | "&&" | "||"
+                    ) && expression_matches(al, br)
+                        && expression_matches(ar, bl)))
+        }
+        (
+            E::FunctionCall { callee: ac, args: aa },
+            E::FunctionCall { callee: bc, args: ba },
+        ) => {
+            expression_matches(ac, bc)
+                && aa.len() == ba.len()
+                && aa.iter().zip(ba).all(|(a, b)| expression_matches(a, b))
+        }
+        (
+            E::FieldAccess { receiver: ar, field: af },
+            E::FieldAccess { receiver: br, field: bf },
+        ) => af.text == bf.text && expression_matches(ar, br),
+        (
+            E::Index { receiver: ar, index: ai },
+            E::Index { receiver: br, index: bi },
+        ) => expression_matches(ar, br) && expression_matches(ai, bi),
+        (E::Parenthesized(a), b) => expression_matches(a, b),
+        (a, E::Parenthesized(b)) => expression_matches(a, b),
+        (E::Tuple(a), E::Tuple(b)) | (E::Array(a), E::Array(b)) => {
+            a.len() == b.len()
+                && a.iter().zip(b).all(|(a, b)| expression_matches(a, b))
+        }
+        _ => false,
     }
 }
 
@@ -486,11 +405,15 @@ pub fn compare_token_expr(
     if token_expr_matches(expected, actual) {
         return true;
     }
-    diagnostics.record_hard(format!(
-        "Expected expression `{}` but found `{}`",
-        expected.join(" "),
-        actual.join(" ")
-    ));
+    diagnostics.record_hard(
+        format!(
+            "Expected expression `{}` but found `{}`",
+            expected.join(" "),
+            actual.join(" ")
+        ),
+        None,
+        None,
+    );
     false
 }
 
@@ -506,6 +429,8 @@ pub fn compare_token_condition(
     if reversed_comparison(expected, actual) {
         diagnostics.record_good(
             "The comparison is equivalent with its operands reversed",
+            None,
+            None,
         );
         return true;
     }
@@ -521,7 +446,11 @@ pub fn check_token_let(
     let expected_eq = expected.iter().position(|t| t == "=");
     let actual_eq = actual.iter().position(|t| t == "=");
     let (Some(expected_eq), Some(actual_eq)) = (expected_eq, actual_eq) else {
-        diagnostics.record_again("Expecting an initialized `let` declaration");
+        diagnostics.record_hard(
+            "Expecting an initialized `let` declaration",
+            None,
+            None,
+        );
         return false;
     };
     let mut result = true;
@@ -530,15 +459,18 @@ pub fn check_token_let(
     if expected_head.first().map(String::as_str) != Some("let")
         || actual_head.first().map(String::as_str) != Some("let")
     {
-        diagnostics.record_again("Expecting a `let` declaration");
+        diagnostics.record_again("Expecting a `let` declaration", None, None);
         return false;
     }
     let expected_mutable =
         expected_head.get(1).map(String::as_str) == Some("mut");
     let actual_mutable = actual_head.get(1).map(String::as_str) == Some("mut");
     if expected_mutable != actual_mutable {
-        diagnostics
-            .record_hard("The variable mutability does not match the drill");
+        diagnostics.record_hard(
+            "The variable mutability does not match the drill",
+            None,
+            None,
+        );
         result = false;
     }
     let expected_name_index = if expected_mutable { 2 } else { 1 };
@@ -546,17 +478,21 @@ pub fn check_token_let(
     if expected_head.get(expected_name_index)
         != actual_head.get(actual_name_index)
     {
-        diagnostics.record_hard(format!(
-            "Expected variable `{}` but found `{}`",
-            expected_head
-                .get(expected_name_index)
-                .map(String::as_str)
-                .unwrap_or(""),
-            actual_head
-                .get(actual_name_index)
-                .map(String::as_str)
-                .unwrap_or("")
-        ));
+        diagnostics.record_hard(
+            format!(
+                "Expected variable `{}` but found `{}`",
+                expected_head
+                    .get(expected_name_index)
+                    .map(String::as_str)
+                    .unwrap_or(""),
+                actual_head
+                    .get(actual_name_index)
+                    .map(String::as_str)
+                    .unwrap_or("")
+            ),
+            None,
+            None,
+        );
         result = false;
     }
     if expected_head.get(expected_name_index + 1..)
@@ -564,6 +500,8 @@ pub fn check_token_let(
     {
         diagnostics.record_hard(
             "The variable type annotation does not match the drill",
+            None,
+            None,
         );
         result = false;
     }
@@ -584,15 +522,23 @@ pub fn check_token_print(
     let (Some(expected_args), Some(actual_args)) =
         (print_call_args(expected), print_call_args(actual))
     else {
-        diagnostics.record_again("Expected a `print!` or `println!` call");
+        diagnostics.record_again(
+            "Expected a `print!` or `println!` call",
+            None,
+            None,
+        );
         return false;
     };
     let Some(expected_value) = print_token_value(&expected_args) else {
-        diagnostics.record_again("Could not read the expected printed value");
+        diagnostics.record_hard(
+            "Could not read the expected printed value",
+            None,
+            None,
+        );
         return false;
     };
     let Some(actual_value) = print_token_value(&actual_args) else {
-        diagnostics.record_again("Could not read the printed value");
+        diagnostics.record_hard("Could not read the printed value", None, None);
         return false;
     };
     compare_token_expr(diagnostics, expected_value, actual_value)
@@ -857,7 +803,7 @@ fn strip_outer_parens(mut tokens: &[String]) -> &[String] {
 
 fn print_call_args(tokens: &[String]) -> Option<Vec<Vec<String>>> {
     let tokens = tokens.strip_suffix(&[";".to_string()]).unwrap_or(tokens);
-    if !matches!(tokens.first().map(String::as_str), Some("print" | "println"))
+    if !tokens.first().is_some_and(|name| is_print_name(name))
         || tokens.get(1).map(String::as_str) != Some("!")
         || tokens.get(2).map(String::as_str) != Some("(")
         || matching_token(tokens, 2, "(", ")")? != tokens.len() - 1
@@ -865,6 +811,10 @@ fn print_call_args(tokens: &[String]) -> Option<Vec<Vec<String>>> {
         return None;
     }
     Some(split_tokens(&tokens[3..tokens.len() - 1], ","))
+}
+
+fn is_print_name(name: &str) -> bool {
+    matches!(name, "print" | "println")
 }
 
 fn print_token_value(args: &[Vec<String>]) -> Option<&[String]> {

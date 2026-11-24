@@ -1,251 +1,356 @@
-use std::mem::discriminant;
+use super::*;
 
-use oak_java::ast::{
-    ClassDeclaration, Expression, Member, MethodDeclaration, Statement,
-};
-
-use crate::api::diagnostics::Diagnostics;
-#[flutter_rust_bridge::frb(ignore)]
-pub fn generated_get_main(g: &ClassDeclaration) -> &Vec<Statement> {
-    &g.members
-        .iter()
-        .filter_map(|a| {
-            if let Member::Method(method) = a { Some(method) } else { None }
-        })
-        .find(|&m| m.name == "main")
-        .unwrap()
-        .body
+pub(super) fn mark(
+    conditions: &mut [(bool, String)],
+    index: usize,
+    passed: bool,
+) {
+    if let Some((value, _)) = conditions.get_mut(index) {
+        *value = passed;
+    }
 }
 
-#[flutter_rust_bridge::frb(ignore)]
-pub fn user_get_main<'a>(
-    diagnostics: &mut Diagnostics,
-    user: &'a ClassDeclaration,
-) -> Option<&'a Vec<Statement>> {
-    let main = user
-        .members
-        .iter()
-        .filter_map(|a| {
-            if let Member::Method(method) = a { Some(method) } else { None }
-        })
-        .find(|&m| m.name == "main");
-
-    if main.is_none() {
-        diagnostics.record_again("No main function");
-        return None;
-    }
-
-    let body = &main.unwrap().body;
-    if body.is_empty() {
-        diagnostics.record_again("Empty main function");
-        return None;
-    }
-
-    Some(&body)
+pub(super) fn main_body(class: &JavaClass) -> Option<&[JavaStatement]> {
+    class.members.iter().find_map(|member| match member {
+        JavaMember::Method(method) if method.name.text == "main" => {
+            Some(method.body.as_slice())
+        }
+        _ => None,
+    })
 }
 
-#[flutter_rust_bridge::frb(ignore)]
-pub fn compare_expr(
+pub(super) fn method(class: &JavaClass, is_main: bool) -> Option<&JavaMethod> {
+    class.members.iter().find_map(|member| match member {
+        JavaMember::Method(value) if (value.name.text == "main") == is_main => {
+            Some(value)
+        }
+        _ => None,
+    })
+}
+
+pub(super) fn missing(diagnostics: &mut Diagnostics, message: &str) {
+    diagnostics.record_again(message, None, None);
+}
+
+pub(super) fn mismatch(
     diagnostics: &mut Diagnostics,
-    generated: &Expression,
-    user: &Expression,
+    message: impl Into<String>,
+    expr: Option<&JavaExpression>,
+) {
+    let (line, col) =
+        expr.and_then(expression_location).unwrap_or((None, None));
+    diagnostics.record_hard(message, line, col);
+}
+
+pub(super) fn mismatch_token(
+    diagnostics: &mut Diagnostics,
+    message: impl Into<String>,
+    token: &Token2,
+) {
+    diagnostics.record_hard(message, Some(token.line), Some(token.col));
+}
+
+pub(super) fn return_value(
+    statement: &JavaStatement,
+) -> Option<&JavaExpression> {
+    match statement {
+        JavaStatement::Return(value) => value.as_ref(),
+        _ => None,
+    }
+}
+
+pub(super) fn compare_optional_expr(
+    d: &mut Diagnostics,
+    a: Option<&JavaExpression>,
+    b: Option<&JavaExpression>,
 ) -> bool {
-    let (g, u) = (expr_kind(generated), expr_kind(user));
-    if discriminant(generated) != discriminant(user) {
-        diagnostics.record_hard(format!("Expected expression {g} found {u}"));
-
-        return false;
-    }
-
-    match (generated, user) {
-        (Expression::Literal(a), Expression::Literal(b)) if a == b => true,
-        (Expression::Literal(a), Expression::Literal(b)) => {
-            diagnostics
-                .record_hard(format!("Expected literal {a:?} found {b:?}",));
-
+    match (a, b) {
+        (Some(a), Some(b)) => compare_expr(d, a, b),
+        (None, None) => true,
+        (Some(_), None) => {
+            mismatch(d, "An expected expression is missing", None);
             false
         }
-        (Expression::Identifier(a), Expression::Identifier(b)) if a == b => {
-            true
+        (None, Some(b)) => {
+            mismatch(d, "Found an unexpected expression", Some(b));
+            false
         }
-        (
-            Expression::Unary { op: aop, expression: aexpr },
-            Expression::Unary { op: bop, expression: bexpr },
-        ) => {
-            if aop != bop {
-                diagnostics.record_hard(format!(
-                    "Expecting unary op {aop} found {bop}"
-                ));
-                return false;
-            }
+    }
+}
 
-            compare_expr(diagnostics, &*aexpr, &*bexpr)
-        }
-        (
-            Expression::Binary { left: aleft, op: aop, right: aright },
-            Expression::Binary { left: bleft, op: bop, right: bright },
-        ) => {
-            if aop != bop {
-                if !aop.contains(['>', '<']) {
-                    diagnostics.record_hard(format!(
-                        "Expecting binary op {aop} found {bop}"
-                    ));
+pub(super) fn check_variable(
+    d: &mut Diagnostics,
+    a: &JavaStatement,
+    b: &JavaStatement,
+) -> bool {
+    let (
+        JavaStatement::LocalVariable { name: an, r#type: at, init: ai },
+        JavaStatement::LocalVariable { name: bn, r#type: bt, init: bi },
+    ) = (a, b)
+    else {
+        missing(d, "Expecting a variable declaration");
+        return false;
+    };
+    let mut good = true;
+    if an.text != bn.text {
+        mismatch_token(
+            d,
+            format!("Expected variable `{}` but found `{}`", an.text, bn.text),
+            bn,
+        );
+        good = false;
+    }
+    if at.text != bt.text {
+        mismatch_token(
+            d,
+            format!("Expected type `{}` but found `{}`", at.text, bt.text),
+            bt,
+        );
+        good = false;
+    }
+    good &= compare_optional_expr(d, ai.as_ref(), bi.as_ref());
+    good
+}
 
-                    return false;
-                }
+pub(super) fn check_print(
+    d: &mut Diagnostics,
+    a: &JavaStatement,
+    b: &JavaStatement,
+) -> bool {
+    let (Some(ac), Some(bc)) = (as_call(a), as_call(b)) else {
+        missing(d, "Expected a print call");
+        return false;
+    };
+    if !is_print_name(&ac.name.text) {
+        missing(d, "The generated statement is not a print call");
+        return false;
+    }
+    if !is_print_name(&bc.name.text) {
+        mismatch_token(d, "Expected print or println", &bc.name);
+        return false;
+    }
+    if ac.arguments.len() != bc.arguments.len() {
+        mismatch(
+            d,
+            "The print call has the wrong number of arguments",
+            bc.arguments.first(),
+        );
+        return false;
+    }
+    ac.arguments.iter().zip(&bc.arguments).all(|(x, y)| compare_expr(d, x, y))
+}
 
-                diagnostics.record_good(format!(
-                    "Expecting binary op {aop} found {bop}"
-                ));
-            }
+fn is_print_name(name: &str) -> bool {
+    matches!(name, "print" | "println")
+}
 
-            // it makes it so that it's bi-directional buut
-            (compare_expr(diagnostics, aleft, bleft)
-                || compare_expr(diagnostics, aleft, bright))
-                && (compare_expr(diagnostics, aright, bright)
-                    || compare_expr(diagnostics, aright, bleft))
-        }
-        (
-            Expression::Update { expression: aexpr, op: aop, .. },
-            Expression::Update { expression: bexpr, op: bop, .. },
-        ) => {
-            if aop != bop {
-                diagnostics.record_hard(format!(
-                    "Expecting update operator to be {aop} found {bop}"
-                ));
-                return false;
-            }
+pub(super) fn as_call(statement: &JavaStatement) -> Option<&JavaMethodCall> {
+    let JavaStatement::Expression(JavaExpression::MethodCall(call)) = statement
+    else {
+        return None;
+    };
+    Some(call)
+}
 
-            compare_expr(diagnostics, aexpr, bexpr)
-        }
-        (Expression::MethodCall(a), Expression::MethodCall(b)) => {
-            if a.name != b.name {
-                diagnostics.record_hard(format!(
-                    "Expecting method call {} found {}",
-                    a.name, b.name,
-                ));
-
-                return false;
-            }
-
-            let args = a.arguments.iter().zip(b.arguments.iter());
-            for arg in args {
-                if !compare_expr(diagnostics, arg.0, arg.1) {
-                    diagnostics.record_good(format!(
-                        "This error was found in the method call {}",
-                        b.name
-                    ));
-                    return false;
-                }
-            }
-
-            true
-        }
+pub(super) fn check_first_print(
+    d: &mut Diagnostics,
+    expected: &[JavaStatement],
+    actual: &[JavaStatement],
+) -> bool {
+    match (expected.first(), actual.first()) {
+        (Some(a), Some(b)) => check_print(d, a, b),
         _ => {
-            diagnostics.record_good("The expression checker is not complete");
+            mismatch(d, "Expected a statement in this block", None);
             false
         }
     }
 }
 
-#[flutter_rust_bridge::frb(ignore)]
-pub fn check_print(
-    diagnostics: &mut Diagnostics,
-    generated: &Statement,
-    user: &Statement,
+pub(super) fn check_loop_update(
+    d: &mut Diagnostics,
+    expected: &[JavaStatement],
+    actual: &[JavaStatement],
 ) -> bool {
-    let Statement::Expression(Expression::MethodCall(gfield)) = generated
-    else {
-        return false;
-    };
-
-    let Statement::Expression(Expression::MethodCall(ufield)) = user else {
-        diagnostics.record_hard("Expected method call for print");
-        return false;
-    };
-
-    if ufield.name != "print" && ufield.name != "println" {
-        diagnostics.record_hard(format!(
-            "Expecting method call name to be print or println found {}",
-            ufield.name
-        ));
-        return false;
-    }
-
-    let args = gfield.arguments.iter().zip(ufield.arguments.iter());
-    for arg in args {
-        if !compare_expr(diagnostics, arg.0, arg.1) {
-            return false;
+    let expected_update = expected.iter().find_map(update_expression);
+    let actual_update = actual.iter().find_map(update_expression);
+    match (expected_update, actual_update) {
+        (Some(expected), Some(actual)) => compare_expr(d, expected, actual),
+        (_, None) => {
+            let location = actual.last().and_then(statement_expression);
+            mismatch(d, "Expected an update statement in the loop", location);
+            false
+        }
+        (None, Some(actual)) => {
+            mismatch(
+                d,
+                "The loop has an unexpected update statement",
+                Some(actual),
+            );
+            false
         }
     }
-
-    true
 }
 
-#[flutter_rust_bridge::frb(ignore)]
-pub fn check_variable_decl(
-    diagnostics: &mut Diagnostics,
-    generated: &Statement,
-    user: &Statement,
+fn statement_expression(statement: &JavaStatement) -> Option<&JavaExpression> {
+    match statement {
+        JavaStatement::Expression(expression) => Some(expression),
+        JavaStatement::LocalVariable { init, .. } => init.as_ref(),
+        JavaStatement::Return(expression) => expression.as_ref(),
+        _ => None,
+    }
+}
+
+fn update_expression(statement: &JavaStatement) -> Option<&JavaExpression> {
+    let JavaStatement::Expression(expression) = statement else {
+        return None;
+    };
+    match expression {
+        JavaExpression::Assignment { .. } => Some(expression),
+        JavaExpression::UnaryOp { op, .. }
+            if matches!(op.text.as_str(), "++" | "--") =>
+        {
+            Some(expression)
+        }
+        _ => None,
+    }
+}
+
+pub(super) fn statement_body(statement: &JavaStatement) -> &[JavaStatement] {
+    match statement {
+        JavaStatement::Block(items) => items,
+        _ => std::slice::from_ref(statement),
+    }
+}
+
+pub(super) fn find_statement(
+    statements: &[JavaStatement],
+    predicate: fn(&JavaStatement) -> bool,
+) -> Option<&JavaStatement> {
+    for statement in statements {
+        if predicate(statement) {
+            return Some(statement);
+        }
+        let nested = match statement {
+            JavaStatement::Block(items) => Some(items.as_slice()),
+            JavaStatement::If { then, r#else, .. } => {
+                if let Some(found) =
+                    find_statement(statement_body(then), predicate)
+                {
+                    return Some(found);
+                }
+                r#else.as_deref().map(statement_body)
+            }
+            JavaStatement::For { body, .. }
+            | JavaStatement::ForEach { body, .. }
+            | JavaStatement::While { body, .. }
+            | JavaStatement::DoWhile { body, .. } => Some(statement_body(body)),
+            _ => None,
+        };
+        if let Some(found) =
+            nested.and_then(|items| find_statement(items, predicate))
+        {
+            return Some(found);
+        }
+    }
+    None
+}
+pub(super) fn is_if(s: &JavaStatement) -> bool {
+    matches!(s, JavaStatement::If { .. })
+}
+pub(super) fn is_for(s: &JavaStatement) -> bool {
+    matches!(s, JavaStatement::For { .. } | JavaStatement::ForEach { .. })
+}
+pub(super) fn is_while(s: &JavaStatement) -> bool {
+    matches!(s, JavaStatement::While { .. })
+}
+pub(super) fn is_do(s: &JavaStatement) -> bool {
+    matches!(s, JavaStatement::DoWhile { .. })
+}
+pub(super) fn is_switch(s: &JavaStatement) -> bool {
+    matches!(s, JavaStatement::Switch { .. })
+}
+pub(super) fn first_expr(
+    statements: &[JavaStatement],
+) -> Option<&JavaExpression> {
+    statements.iter().find_map(|s| match s {
+        JavaStatement::Expression(e) => Some(e),
+        JavaStatement::LocalVariable { init: Some(e), .. }
+        | JavaStatement::Return(Some(e)) => Some(e),
+        _ => None,
+    })
+}
+
+pub(super) fn compare_expr(
+    d: &mut Diagnostics,
+    a: &JavaExpression,
+    b: &JavaExpression,
 ) -> bool {
-    let Statement::LocalVariable { r#type, name, initializer } = user else {
-        diagnostics.record_again("Expecting variable declaration");
-        return false;
+    use JavaExpression as E;
+    let same = match (a, b) {
+        (E::Identifier(a), E::Identifier(b))
+        | (E::Literal(a), E::Literal(b)) => a.text == b.text,
+        (E::This, E::This) | (E::Super, E::Super) => true,
+        (E::MethodCall(a), E::MethodCall(b)) => {
+            a.name.text == b.name.text
+                && a.arguments.len() == b.arguments.len()
+                && a.arguments
+                    .iter()
+                    .zip(&b.arguments)
+                    .all(|(x, y)| compare_expr(d, x, y))
+        }
+        (
+            E::BinaryOp { op: ao, left: al, right: ar },
+            E::BinaryOp { op: bo, left: bl, right: br },
+        )
+        | (
+            E::Assignment { op: ao, left: al, right: ar },
+            E::Assignment { op: bo, left: bl, right: br },
+        ) => {
+            ao.text == bo.text
+                && compare_expr(d, al, bl)
+                && compare_expr(d, ar, br)
+        }
+        (
+            E::UnaryOp { op: ao, expr: ae, .. },
+            E::UnaryOp { op: bo, expr: be, .. },
+        ) => ao.text == bo.text && compare_expr(d, ae, be),
+        _ => false,
     };
-
-    let (utype, uname, uinit) = (r#type, name, initializer);
-    let Statement::LocalVariable { r#type, name, initializer } = generated
-    else {
-        diagnostics.record_again("Expecting variable declaration");
-        return false;
-    };
-
-    let (gtype, gname, ginit) = (r#type, name, initializer);
-
-    if gtype != utype {
-        diagnostics
-            .record_again(format!("Expecting type to be {gtype} not {utype}"));
-        return false;
+    if !same {
+        mismatch(d, "The expression does not match the drill", Some(b));
     }
-
-    if gname != uname {
-        diagnostics.record_hard(format!(
-            "Expecting variable name to be {gname} not {uname}"
-        ));
-
-        return false;
-    }
-
-    if ginit.is_some() && uinit.is_none() {
-        diagnostics.record_hard("Expecting variable initialization");
-        false
-    } else if let (Some(ginit), Some(uinit)) = (ginit, uinit) {
-        compare_expr(diagnostics, ginit, uinit)
-    } else {
-        diagnostics
-            .record_good("Unexpected initializer for variable declaration");
-        true
-    }
+    same
 }
 
-fn expr_kind(expr: &Expression) -> &str {
-    match expr {
-        Expression::Literal(_) => "literal",
-        Expression::Identifier(_) => "identifier",
-        Expression::MethodCall(_) => "method call",
-        Expression::FieldAccess(_) => "field access",
-        Expression::ArrayAccess(_) => "array access",
-        Expression::ArrayCreation(_) => "array creation",
-        Expression::New(_) => "new",
-        Expression::AnonymousClass(_) => "anonymous class",
-        Expression::This => "this",
-        Expression::Super => "super",
-        Expression::Binary { .. } => "binary",
-        Expression::Unary { .. } => "unary",
-        Expression::Assignment { .. } => "assignment",
-        Expression::Update { .. } => "update",
-        Expression::Ternary { .. } => "ternary",
-        Expression::Cast { .. } => "cast",
-        Expression::Lambda(_) => "lambda",
-    }
+pub(super) fn expression_location(
+    e: &JavaExpression,
+) -> Option<(Option<usize>, Option<usize>)> {
+    use JavaExpression as E;
+    let t: &Token2 = match e {
+        E::Identifier(t) | E::Literal(t) => t,
+        E::BinaryOp { op, .. }
+        | E::Assignment { op, .. }
+        | E::UnaryOp { op, .. } => op,
+        E::MethodCall(call) => {
+            return Some((Some(call.name.line), Some(call.name.col)));
+        }
+        E::FieldAccess(access) => return expression_location(&access.target),
+        E::ArrayAccess(access) => return expression_location(&access.target),
+        E::Cast { target_type, .. } => target_type,
+        E::Ternary { cond, .. } => return expression_location(cond),
+        E::New(value) => {
+            return value.arguments.first().and_then(expression_location);
+        }
+        E::ArrayCreation(value) => {
+            return value.dim.first().and_then(expression_location);
+        }
+        E::Lambda(value) => return match &value.body {
+            crate::langs::java::ast::expression::JavaLambdaBody::Expression(
+                e,
+            ) => expression_location(e),
+            _ => None,
+        },
+        E::AnonymousClass(_) | E::This | E::Super => return None,
+    };
+    Some((Some(t.line), Some(t.col)))
 }

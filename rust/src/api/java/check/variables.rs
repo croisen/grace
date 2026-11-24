@@ -1,32 +1,50 @@
-use oak_java::ast::ClassDeclaration;
+use super::*;
 
-use crate::api::diagnostics::Diagnostics;
-use crate::api::java::check::utils::{
-    check_print, check_variable_decl, generated_get_main, user_get_main,
-};
-
-#[flutter_rust_bridge::frb(ignore)]
-pub fn java_variable_declaration(
-    diagnostics: &mut Diagnostics,
-    conditions: &mut Vec<(bool, String)>,
-    generated: &ClassDeclaration,
-    user: &ClassDeclaration,
+pub(super) fn check_variables(
+    d: &mut Diagnostics,
+    c: &mut [(bool, String)],
+    g: &JavaClass,
+    u: &JavaClass,
 ) {
-    let Some(umain) = user_get_main(diagnostics, user) else {
+    let (Some(gbody), Some(ubody)) = (main_body(g), main_body(u)) else {
+        missing(d, "No main method found");
         return;
     };
-
-    let gmain = generated_get_main(generated);
-
-    let mut idx = 0;
-    if let Some(udecl) = umain.get(idx) {
-        idx += 1;
-        let gdecl = &gmain[0];
-        conditions[0].0 = check_variable_decl(diagnostics, gdecl, udecl);
+    let (
+        Some(JavaStatement::LocalVariable { name: gn, r#type: gt, init: gi }),
+        Some(JavaStatement::LocalVariable { name: un, r#type: ut, init: ui }),
+    ) = (gbody.first(), ubody.first())
+    else {
+        missing(d, "Expecting a variable declaration");
+        return;
+    };
+    let mut ok = true;
+    if gn.text != un.text {
+        mismatch_token(
+            d,
+            format!("Expected variable `{}` but found `{}`", gn.text, un.text),
+            un,
+        );
+        ok = false;
     }
-
-    if let Some(uprint) = umain.get(idx) {
-        let gprint = &gmain[1];
-        conditions[1].0 = check_print(diagnostics, gprint, uprint);
+    if gt.text != ut.text {
+        mismatch_token(
+            d,
+            format!("Expected type `{}` but found `{}`", gt.text, ut.text),
+            ut,
+        );
+        ok = false;
     }
+    if !compare_optional_expr(d, gi.as_ref(), ui.as_ref()) {
+        ok = false;
+    }
+    mark(c, 0, ok);
+    let print_ok = match (gbody.get(1), ubody.get(1)) {
+        (Some(gs), Some(us)) => check_print(d, gs, us),
+        _ => {
+            mismatch(d, "Expected a print statement", None);
+            false
+        }
+    };
+    mark(c, 1, print_ok);
 }

@@ -1,6 +1,7 @@
+use std::fmt::{Display, Formatter, Result};
 use std::ops::Sub;
 
-use oak_core::OakErrorKind;
+use crate::core::errors::kind::GraceErrorKind;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Grade {
@@ -8,6 +9,13 @@ pub enum Grade {
     Hard = 2,  // will not compile (mistake is not easily known)
     Good = 3,  // close enough (can still be parsed without much error)
     Easy = 4,  // no mistakes
+}
+
+impl Grade {
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn to_string(&self) -> String {
+        format!("{self}")
+    }
 }
 
 impl Sub<usize> for Grade {
@@ -18,34 +26,26 @@ impl Sub<usize> for Grade {
     }
 }
 
-impl From<&OakErrorKind> for Grade {
-    fn from(value: &OakErrorKind) -> Self {
+impl From<&GraceErrorKind> for Grade {
+    fn from(value: &GraceErrorKind) -> Self {
         match value {
-            OakErrorKind::SyntaxError { .. } => Grade::Again,
-            OakErrorKind::UnexpectedCharacter { .. } => Grade::Hard,
-            OakErrorKind::UnexpectedToken { .. } => Grade::Hard,
-            OakErrorKind::UnexpectedEof { .. } => Grade::Hard,
-            OakErrorKind::CustomError { .. } => Grade::Again,
-            OakErrorKind::ExpectedToken { .. } => Grade::Good,
-            OakErrorKind::ExpectedName { .. } => Grade::Good,
-            OakErrorKind::TrailingCommaNotAllowed { .. } => Grade::Good,
-            OakErrorKind::ParseError { .. } => Grade::Again,
-
-            // not used
-            OakErrorKind::IoError { .. } => Grade::Again,
-            OakErrorKind::XmlError { .. } => Grade::Again,
-            OakErrorKind::InvalidTheme { .. } => Grade::Again,
-            OakErrorKind::UnsupportedFormat { .. } => Grade::Again,
-            OakErrorKind::ColorParseError { .. } => Grade::Again,
-            OakErrorKind::FormatError { .. } => Grade::Again,
-            OakErrorKind::SemanticError { .. } => Grade::Again,
-            OakErrorKind::ProtocolError { .. } => Grade::Again,
-            OakErrorKind::TestFailure { .. } => Grade::Again,
-            OakErrorKind::TestRegenerated { .. } => Grade::Again,
-            OakErrorKind::SerdeError { .. } => Grade::Again,
-            OakErrorKind::DeserializeError { .. } => Grade::Again,
-            OakErrorKind::ZipError { .. } => Grade::Again,
-            OakErrorKind::InternalError { .. } => Grade::Again,
+            GraceErrorKind::SyntaxError { .. } => Self::Again,
+            GraceErrorKind::CloseToExpectedText { .. } => Self::Good,
+            GraceErrorKind::ExpectedToken { .. } => Self::Good,
+            GraceErrorKind::ExpectedText { .. } => Self::Good,
+            GraceErrorKind::ReservedKeyword(_) => Self::Hard,
+            GraceErrorKind::TrailingComma => Self::Good,
+            GraceErrorKind::UnexpectedToken { .. } => Self::Hard,
+            GraceErrorKind::UnexpectedEOF => Self::Hard,
+            GraceErrorKind::UnmatchedTokenPair(_) => Self::Hard,
+            GraceErrorKind::Custom(_) => Self::Again,
+            GraceErrorKind::Unknown => Self::Again,
         }
+    }
+}
+
+impl Display for Grade {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "{self:?}")
     }
 }

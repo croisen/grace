@@ -6,7 +6,7 @@ use crate::api::sql::check::sql_check;
 
 pub mod check;
 
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SqlConcept {
     #[default]
     Select = 0,
@@ -163,38 +163,74 @@ impl SqlDrill {
         self.answer.push('\n');
     }
 
-    fn create_table(&mut self, table: &str, columns: &str) {
+    fn create_table(&mut self, table: &str, columns: Vec<&str>) {
         self.push_line(&format!("CREATE TABLE {table} ("));
         self.increase_ident();
-        self.push_line(columns);
+        for (index, column) in columns.iter().enumerate() {
+            let suffix = if index + 1 == columns.len() { "" } else { "," };
+            self.push_line(&format!("{column}{suffix}"));
+        }
         self.decrease_ident();
         self.push_line(");");
 
-        self.new_condition(format!(
-            "Create a table named {table} with the specified columns"
-        ));
+        self.new_condition(format!("Create a table named {table}"));
+        for column in columns {
+            self.new_condition(format!("Add a column defined as {column}"));
+        }
     }
 
     fn alter_table(&mut self, table: &str, action: &str) {
         self.push_line(&format!("ALTER TABLE {table} {action};"));
 
-        self.new_condition(format!(
-            "Alter the {table} table by performing: {action}"
-        ));
+        self.new_condition(format!("Target the {table} table"));
+        let parts = action.split_whitespace().collect::<Vec<_>>();
+        match parts.as_slice() {
+            ["ADD", "COLUMN", column, data_type @ ..]
+                if !data_type.is_empty() =>
+            {
+                self.new_condition("Add a column".to_string());
+                self.new_condition(format!("Name the new column {column}"));
+                self.new_condition(format!(
+                    "Use {} as its type",
+                    data_type.join(" ")
+                ));
+            }
+            ["ALTER", "COLUMN", column, remainder @ ..]
+                if !remainder.is_empty() =>
+            {
+                self.new_condition(format!("Alter the {column} column"));
+                self.new_condition(format!("Apply {}", remainder.join(" ")));
+            }
+            ["DROP", "COLUMN", column] => {
+                self.new_condition("Drop a column".to_string());
+                self.new_condition(format!("Remove the {column} column"));
+            }
+            ["RENAME", "TO", new_name] => {
+                self.new_condition("Rename the table".to_string());
+                self.new_condition(format!(
+                    "Use {new_name} as the new table name"
+                ));
+            }
+            _ => self.new_condition(format!(
+                "Apply the ALTER TABLE action: {action}"
+            )),
+        }
     }
 
     fn drop_table(&mut self, table: &str) {
         self.push_line(&format!("DROP TABLE {table};"));
 
+        self.new_condition("Use the DROP TABLE statement".to_string());
         self.new_condition(format!("Drop the table named {table}"));
     }
 
     fn truncate_table(&mut self, table: &str) {
         self.push_line(&format!("TRUNCATE TABLE {table};"));
 
-        self.new_condition(format!(
-            "Remove all records from {table} without dropping the table"
-        ));
+        self.new_condition(
+            "Use TRUNCATE TABLE to keep the table structure".to_string(),
+        );
+        self.new_condition(format!("Remove all records from {table}"));
     }
 
     fn add_column(&mut self, table: &str, column: &str, data_type: &str) {
@@ -202,60 +238,79 @@ impl SqlDrill {
             "ALTER TABLE {table} ADD COLUMN {column} {data_type};"
         ));
 
-        self.new_condition(format!(
-            "Add a column named {column} of type {data_type} to {table}"
-        ));
+        self.new_condition(format!("Target the {table} table"));
+        self.new_condition(format!("Add a column named {column}"));
+        self.new_condition(format!("Give the column the type {data_type}"));
     }
 
     fn drop_column(&mut self, table: &str, column: &str) {
         self.push_line(&format!("ALTER TABLE {table} DROP COLUMN {column};"));
 
-        self.new_condition(format!("Remove the {column} column from {table}"));
+        self.new_condition(format!("Target the {table} table"));
+        self.new_condition(format!("Remove the {column} column"));
     }
 
     fn rename_table(&mut self, table: &str, new_name: &str) {
         self.push_line(&format!("ALTER TABLE {table} RENAME TO {new_name};"));
 
-        self.new_condition(format!("Rename the table {table} to {new_name}"));
+        self.new_condition(format!("Rename the table {table}"));
+        self.new_condition(format!("Use {new_name} as the new table name"));
     }
 
-    fn select(&mut self, columns: &str, table: &str) {
-        self.push_line(&format!("SELECT {columns}"));
+    fn select(&mut self, columns: Vec<&str>, table: &str) {
+        self.push_line(&format!("SELECT {}", columns.join(", ")));
         self.push_line(&format!("FROM {table};"));
 
-        self.new_condition(format!(
-            "Select the columns {columns} from the {table} table"
-        ));
+        for column in columns {
+            self.new_condition(format!("Select {column}"));
+        }
+        self.new_condition(format!("Select them from the {table} table"));
     }
 
-    fn where_clause(&mut self, column: &str, operator: &str, value: &str) {
-        self.push_line(&format!("WHERE {column} {operator} {value};"));
-
-        self.new_condition(format!(
-            "Filter the results where {column} {operator} {value}"
-        ));
+    fn where_clause(&mut self, predicates: Vec<(String, String, String)>) {
+        let clauses = predicates
+            .iter()
+            .map(|(column, operator, value)| {
+                format!("{column} {operator} {value}")
+            })
+            .collect::<Vec<_>>();
+        self.push_line(&format!("WHERE {};", clauses.join(" AND ")));
+        self.add_predicate_conditions("Filter using", &predicates);
     }
 
-    fn order_by(&mut self, column: &str, direction: &str) {
-        self.push_line(&format!("ORDER BY {column} {direction};"));
-
-        self.new_condition(format!(
-            "Sort the results by {column} in {direction} order"
-        ));
+    fn order_by(&mut self, columns: Vec<(String, String)>) {
+        let terms = columns
+            .iter()
+            .map(|(column, direction)| format!("{column} {direction}"))
+            .collect::<Vec<_>>();
+        self.push_line(&format!("ORDER BY {};", terms.join(", ")));
+        for (column, direction) in columns {
+            self.new_condition(format!(
+                "Sort the results by the {column} column"
+            ));
+            self.new_condition(format!("Use {direction} order for {column}"));
+        }
     }
 
-    fn group_by(&mut self, column: &str) {
-        self.push_line(&format!("GROUP BY {column};"));
-
-        self.new_condition(format!("Group the results by {column}"));
+    fn group_by(&mut self, columns: Vec<&str>) {
+        self.push_line(&format!("GROUP BY {};", columns.join(", ")));
+        for column in columns {
+            self.new_condition(format!("Group the results by {column}"));
+        }
     }
 
-    fn having(&mut self, expression: &str, operator: &str, value: &str) {
-        self.push_line(&format!("HAVING {expression} {operator} {value};"));
-
-        self.new_condition(format!(
-            "Filter grouped results where {expression} {operator} {value}"
-        ));
+    fn having(&mut self, predicates: Vec<(String, String, String)>) {
+        let clauses = predicates
+            .iter()
+            .map(|(expression, operator, value)| {
+                format!("{expression} {operator} {value}")
+            })
+            .collect::<Vec<_>>();
+        self.push_line(&format!("HAVING {};", clauses.join(" AND ")));
+        self.add_predicate_conditions(
+            "Filter the grouped results using",
+            &predicates,
+        );
     }
 
     fn aggregate(
@@ -268,65 +323,119 @@ impl SqlDrill {
         self.push_line(&format!("SELECT {function}({column}) AS {alias}"));
         self.push_line(&format!("FROM {table};"));
 
-        self.new_condition(format!(
-            "Use {function}() on {column} and name the result {alias}"
-        ));
+        self.new_condition(format!("Use the {function}() aggregate function"));
+        self.new_condition(format!("Apply it to {column}"));
+        self.new_condition(format!("Name the result {alias}"));
+        self.new_condition(format!("Read the result from {table}"));
     }
 
     fn join(
         &mut self,
         table1: &str,
         table2: &str,
-        column1: &str,
-        column2: &str,
+        conditions: Vec<(&str, &str, &str)>,
     ) {
         self.push_line(&format!("SELECT * FROM {table1}"));
 
         self.push_line(&format!("INNER JOIN {table2}"));
 
-        self.push_line(&format!("ON {column1} = {column2};"));
+        let clauses = conditions
+            .iter()
+            .map(|(left, operator, right)| format!("{left} {operator} {right}"))
+            .collect::<Vec<_>>();
+        self.push_line(&format!("ON {};", clauses.join(" AND ")));
 
-        self.new_condition(format!(
-            "Join {table1} with {table2} using {column1} = {column2}"
-        ));
+        self.new_condition("Select all columns".to_string());
+        self.new_condition(format!("Read the rows from {table1}"));
+        self.new_condition(format!("Join the {table2} table with INNER JOIN"));
+        for (left, operator, right) in conditions {
+            self.new_condition(format!("Match rows using {left}"));
+            self.new_condition(format!(
+                "Use {operator} to compare the join columns"
+            ));
+            self.new_condition(format!("Compare it with {right}"));
+        }
     }
 
-    fn insert(&mut self, table: &str, columns: &str, values: &str) {
-        self.push_line(&format!("INSERT INTO {table} ({columns})"));
-
-        self.push_line(&format!("VALUES ({values});"));
-
-        self.new_condition(format!(
-            "Insert a new record into {table} with columns ({columns}) and values ({values})"
+    fn insert(&mut self, table: &str, columns: Vec<&str>, values: Vec<String>) {
+        self.push_line(&format!(
+            "INSERT INTO {table} ({})",
+            columns.join(", ")
         ));
+
+        self.push_line(&format!("VALUES ({});", values.join(", ")));
+
+        self.new_condition(format!("Insert a new record into {table}"));
+        for column in &columns {
+            self.new_condition(format!(
+                "Provide a value for the {column} column"
+            ));
+        }
+        for (column, value) in columns.iter().zip(values.iter()) {
+            self.new_condition(format!("Set {column} to {value}"));
+        }
     }
 
     fn update(
         &mut self,
         table: &str,
-        column: &str,
-        value: &str,
-        condition: &str,
+        assignments: Vec<(String, String)>,
+        predicates: Vec<(String, String, String)>,
     ) {
         self.push_line(&format!("UPDATE {table}"));
 
-        self.push_line(&format!("SET {column} = {value}"));
+        let sets = assignments
+            .iter()
+            .map(|(column, value)| format!("{column} = {value}"))
+            .collect::<Vec<_>>();
+        self.push_line(&format!("SET {}", sets.join(", ")));
+        let clauses = predicates
+            .iter()
+            .map(|(column, operator, value)| {
+                format!("{column} {operator} {value}")
+            })
+            .collect::<Vec<_>>();
+        self.push_line(&format!("WHERE {};", clauses.join(" AND ")));
 
-        self.push_line(&format!("WHERE {condition};"));
-
-        self.new_condition(format!(
-            "Update {table} and set {column} to {value} where {condition}"
-        ));
+        self.new_condition(format!("Update the {table} table"));
+        for (column, value) in assignments {
+            self.new_condition(format!("Set the {column} column"));
+            self.new_condition(format!("Assign it the value {value}"));
+        }
+        self.add_predicate_conditions("Filter rows using", &predicates);
     }
 
-    fn delete(&mut self, table: &str, condition: &str) {
+    fn delete(
+        &mut self,
+        table: &str,
+        predicates: Vec<(String, String, String)>,
+    ) {
         self.push_line(&format!("DELETE FROM {table}"));
 
-        self.push_line(&format!("WHERE {condition};"));
+        let clauses = predicates
+            .iter()
+            .map(|(column, operator, value)| {
+                format!("{column} {operator} {value}")
+            })
+            .collect::<Vec<_>>();
+        self.push_line(&format!("WHERE {};", clauses.join(" AND ")));
 
-        self.new_condition(format!(
-            "Delete records from {table} where {condition}"
-        ));
+        self.new_condition(format!("Delete records from {table}"));
+        self.add_predicate_conditions("Restrict deletion using", &predicates);
+    }
+
+    fn add_predicate_conditions(
+        &mut self,
+        instruction: &str,
+        predicates: &[(String, String, String)],
+    ) {
+        for (column, operator, value) in predicates {
+            self.new_condition(format!("{instruction} the {column} column"));
+            self.new_condition(format!(
+                "Use {operator} as the comparison operator"
+            ));
+            self.new_condition(format!("Compare it with {value}"));
+        }
     }
 }
 
@@ -334,10 +443,11 @@ fn sql_create_table() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::CreateTable);
 
-    drill.create_table(
-        "employees",
-        "id INT PRIMARY KEY,\nname VARCHAR(100),\nsalary DECIMAL(10, 2)",
-    );
+    drill.create_table("employees", vec![
+        "id INT PRIMARY KEY",
+        "name VARCHAR(100)",
+        "salary DECIMAL(10, 2)",
+    ]);
 
     drill
 }
@@ -349,7 +459,8 @@ fn sql_alter_table() -> SqlDrill {
     let actions = [
         "ADD COLUMN email VARCHAR(255)",
         "ADD COLUMN age INT",
-        "ALTER COLUMN salary SET DEFAULT 0",
+        "DROP COLUMN email",
+        "RENAME TO staff",
     ];
 
     let action = actions[random_range(0..actions.len())];
@@ -381,10 +492,11 @@ fn sql_select() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Select);
 
-    let columns = ["name, age", "name, grade", "*", "id, name"];
+    let columns: [&[&str]; 4] =
+        [&["name", "age"], &["name", "grade"], &["*"], &["id", "name"]];
     let column = columns[random_range(0..columns.len())];
 
-    drill.select(column, "students");
+    drill.select(column.to_vec(), "students");
 
     drill
 }
@@ -439,8 +551,10 @@ fn sql_where() -> SqlDrill {
 
     // Move the semicolon to the end of the WHERE clause.
     drill.answer = drill.answer.replace("students;", "students");
+    drill.new_condition("Select all columns".to_string());
+    drill.new_condition("Read the rows from students".to_string());
 
-    drill.where_clause(column, operator, &value);
+    drill.where_clause(vec![(column.into(), operator.into(), value)]);
 
     drill
 }
@@ -454,7 +568,9 @@ fn sql_order_by() -> SqlDrill {
 
     drill.push_line("SELECT *");
     drill.push_line("FROM students");
-    drill.order_by(column, direction);
+    drill.new_condition("Select all columns".to_string());
+    drill.new_condition("Read the rows from students".to_string());
+    drill.order_by(vec![(column.into(), direction.into())]);
 
     drill
 }
@@ -465,9 +581,10 @@ fn sql_group_by() -> SqlDrill {
 
     drill.push_line("SELECT course_id, COUNT(*)");
     drill.push_line("FROM enrollments");
-    drill.group_by("course_id");
-
-    drill.new_condition("Count the enrollments for each course using GROUP BY");
+    drill.new_condition("Select the course_id column");
+    drill.new_condition("Count the enrollments using COUNT(*)");
+    drill.new_condition("Read the rows from enrollments");
+    drill.group_by(vec!["course_id"]);
 
     drill
 }
@@ -481,7 +598,12 @@ fn sql_having() -> SqlDrill {
     drill.push_line("SELECT course_id, COUNT(*) AS total");
     drill.push_line("FROM enrollments");
     drill.push_line("GROUP BY course_id");
-    drill.having("COUNT(*)", ">=", &count.to_string());
+    drill.new_condition("Select the course_id column");
+    drill.new_condition("Count the rows using COUNT(*)");
+    drill.new_condition("Name the count total");
+    drill.new_condition("Read the rows from enrollments");
+    drill.new_condition("Group the results by course_id");
+    drill.having(vec![("COUNT(*)".into(), ">=".into(), count.to_string())]);
 
     drill
 }
@@ -490,12 +612,11 @@ fn sql_join() -> SqlDrill {
     let mut drill = SqlDrill::default();
     drill.set_concept(SqlConcept::Join);
 
-    drill.join(
-        "students",
-        "enrollments",
-        "students.id",
-        "enrollments.student_id",
-    );
+    drill.join("students", "enrollments", vec![(
+        "students.id".into(),
+        "=".into(),
+        "enrollments.student_id".into(),
+    )]);
 
     drill
 }
@@ -526,7 +647,10 @@ fn sql_insert() -> SqlDrill {
     let name = ["Alice", "Bob", "Charlie"][random_range(0..3)];
     let age = random_range(18..30);
 
-    drill.insert("students", "name, age", &format!("'{name}', {age}"));
+    drill.insert("students", vec!["name", "age"], vec![
+        format!("'{name}'"),
+        age.to_string(),
+    ]);
 
     drill
 }
@@ -538,7 +662,11 @@ fn sql_update() -> SqlDrill {
     let age = random_range(18..30);
     let id = random_range(1..20);
 
-    drill.update("students", "age", &age.to_string(), &format!("id = {id}"));
+    drill.update("students", vec![("age".into(), age.to_string())], vec![(
+        "id".into(),
+        "=".into(),
+        id.to_string(),
+    )]);
 
     drill
 }
@@ -548,7 +676,7 @@ fn sql_delete() -> SqlDrill {
     drill.set_concept(SqlConcept::Delete);
 
     let id = random_range(1..20);
-    drill.delete("students", &format!("id = {id}"));
+    drill.delete("students", vec![("id".into(), "=".into(), id.to_string())]);
     drill
 }
 

@@ -1,6 +1,3 @@
-use oak_core::{Builder, ParseSession, SourceText};
-use oak_rust::{RustBuilder, RustLanguage, RustRoot};
-
 use crate::api::diagnostics::Diagnostics;
 use crate::api::rust::RustConcept;
 use crate::api::rust::check::for_loops::check_for_loop;
@@ -8,7 +5,7 @@ use crate::api::rust::check::functions::check_function_declaration;
 use crate::api::rust::check::ifs::check_if_statement;
 use crate::api::rust::check::loops::check_loop;
 use crate::api::rust::check::match_statements::check_match_statement;
-use crate::api::rust::check::utils::main_tokens;
+use crate::api::rust::check::utils::{ast, main_tokens};
 use crate::api::rust::check::variables::check_variable_declaration;
 use crate::api::rust::check::while_loops::check_while_loop;
 
@@ -28,58 +25,70 @@ pub fn rust_check(
     generated_source: &str,
     user_code: &str,
 ) -> Diagnostics {
-    let mut diagnostics = Diagnostics::new(user_code, Vec::new());
+    let mut diagnostics = Diagnostics { d: Vec::new() };
     for (passed, _) in conditions.iter_mut() {
         *passed = false;
     }
 
     if user_code.trim().is_empty() {
-        diagnostics.record_again("Empty answer");
+        diagnostics.record_again("Empty answer", None, None);
         return diagnostics;
     }
 
     if concept == RustConcept::FunctionDecl {
         let (user_root, user_diagnostics) = ast(user_code);
         diagnostics = user_diagnostics;
-        let Some(user_root) = user_root else {
+        if user_root.is_empty() {
             return diagnostics;
-        };
+        }
         let (generated_root, generated_diagnostics) = ast(generated_source);
-        let Some(generated_root) = generated_root else {
-            diagnostics
-                .record_again("The generated drill answer could not be parsed");
+        if generated_root.is_empty() {
+            diagnostics.record_again(
+                "The generated drill answer could not be parsed",
+                None,
+                None,
+            );
             return diagnostics;
         };
         if !generated_diagnostics.is_empty() {
             diagnostics.record_again(
                 "The generated drill answer contains a syntax error",
+                None,
+                None,
             );
             return diagnostics;
         }
         check_function_declaration(
             &mut diagnostics,
             conditions,
-            &generated_root.items,
-            &user_root.items,
+            &generated_root,
+            &user_root,
         );
         return diagnostics;
     }
 
     let Some(generated_main) = main_tokens(generated_source) else {
-        diagnostics.record_again("The generated drill has no `main` function");
+        diagnostics.record_again(
+            "The generated drill has no `main` function",
+            None,
+            None,
+        );
         return diagnostics;
     };
     let Some(user_main) = main_tokens(user_code) else {
-        diagnostics.record_again("No main function found");
+        diagnostics.record_again("No main function found", None, None);
         return diagnostics;
     };
     if user_main.is_empty() {
-        diagnostics.record_again("Empty main function");
+        diagnostics.record_again("Empty main function", None, None);
         return diagnostics;
     }
     if generated_main.is_empty() {
-        diagnostics
-            .record_again("The generated drill has an empty `main` function");
+        diagnostics.record_again(
+            "The generated drill has an empty `main` function",
+            None,
+            None,
+        );
         return diagnostics;
     }
 
@@ -124,21 +133,4 @@ pub fn rust_check(
     }
 
     diagnostics
-}
-
-fn ast(source: &str) -> (Option<RustRoot>, Diagnostics) {
-    let lang = RustLanguage::new();
-    let b = RustBuilder::new(&lang);
-    let mut c = ParseSession::default();
-
-    let mut r = None;
-    let s = SourceText::new(source);
-    let mut a = b.build(&s, &[], &mut c);
-
-    match a.result {
-        Ok(root) => r = Some(root),
-        Err(e) => a.diagnostics.push(e),
-    }
-
-    (r, Diagnostics::new(&source, a.diagnostics))
 }

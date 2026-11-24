@@ -15,16 +15,12 @@ chrono = { version = "0.4", default-features = false, features = ["std", "clock"
 flutter_rust_bridge = "=2.13.0"
 fsrs = { version = "7.0.0", default-features = false }
 libc = { version = "0.2.189", default-features = false, features = ["align", "const-extern-fn", "extra_traits", "use_std"] }
-oak-core = { git = "https://github.com/croisen/oak.rs" }
-oak-java = { git = "https://github.com/croisen/oak.rs" }
-oak-rust = { git = "https://github.com/croisen/oak.rs" }
-oak-sql = { git = "https://github.com/croisen/oak.rs" }
-# oak-core = { path = "/home/croisen/git/college/oak.rs/projects/oak-core" }
-# oak-java = { path = "/home/croisen/git/college/oak.rs/examples/oak-java" }
-# oak-rust = { path = "/home/croisen/git/college/oak.rs/examples/oak-rust" }
-# oak-sql = { path = "/home/croisen/git/college/oak.rs/examples/oak-sql" }
+logos = { version = "0.16.1", default-features = false, features = ["export_derive", "logos-derive", "state_machine_codegen", "std"] }
+# oak-core = { git = "https://github.com/croisen/oak.rs" }
+# oak-java = { git = "https://github.com/croisen/oak.rs" }
+# oak-rust = { git = "https://github.com/croisen/oak.rs" }
+# oak-sql = { git = "https://github.com/croisen/oak.rs" }
 rand = { version = "0.10.3", default-features = false, features = ["chacha", "serde", "thread_rng"] }
-unicode-segmentation = { version = "1", default-features = false }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

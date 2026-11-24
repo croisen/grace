@@ -15,7 +15,11 @@ pub fn check_while_loop(
     let (Some(generated), Some(user)) =
         (main_tokens(generated), main_tokens(user))
     else {
-        diagnostics.record_again("Could not find the `main` function");
+        diagnostics.record_again(
+            "Could not find the `main` function",
+            None,
+            None,
+        );
         return;
     };
     let (g_statements, u_statements) =
@@ -23,7 +27,11 @@ pub fn check_while_loop(
     let (Some(g_decl), Some(u_decl)) =
         (g_statements.first(), u_statements.first())
     else {
-        diagnostics.record_again("Missing the loop variable declaration");
+        diagnostics.record_hard(
+            "Missing the loop variable declaration",
+            None,
+            None,
+        );
         return;
     };
     mark(conditions, 0, check_token_let(diagnostics, g_decl, u_decl));
@@ -32,6 +40,8 @@ pub fn check_while_loop(
     else {
         diagnostics.record_again(
             "Expecting a while loop after the variable declaration",
+            None,
+            None,
         );
         return;
     };
@@ -40,6 +50,8 @@ pub fn check_while_loop(
     else {
         diagnostics.record_again(
             "Expecting a while loop after the variable declaration",
+            None,
+            None,
         );
         return;
     };
@@ -56,7 +68,7 @@ pub fn check_while_loop(
     let actual_body = split_statements(&actual.body);
     mark(conditions, 2, !actual_body.is_empty());
     if actual_body.is_empty() {
-        diagnostics.record_hard("The while loop body is empty");
+        diagnostics.record_hard("The while loop body is empty", None, None);
         return;
     }
     let print_ok = expected_body
@@ -71,6 +83,8 @@ pub fn check_while_loop(
     if !update_ok {
         diagnostics.record_hard(
             "Missing or incorrect update statement in the while loop",
+            None,
+            None,
         );
     }
     mark(conditions, 4, update_ok);

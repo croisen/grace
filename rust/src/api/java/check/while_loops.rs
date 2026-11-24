@@ -20,58 +20,53 @@ pub fn java_while_loop(
     let gmain = generated_get_main(generated);
 
     let mut idx = 0;
-    loop {
-        if let Some(udecl) = umain.get(idx) {
-            idx += 1;
-            let gdecl = &gmain[0];
-            conditions[0].0 = check_variable_decl(diagnostics, gdecl, udecl);
+    if let Some(udecl) = umain.get(idx) {
+        idx += 1;
+        let gdecl = &gmain[0];
+        conditions[0].0 = check_variable_decl(diagnostics, gdecl, udecl);
+    }
+
+    if let Some(uloop) = umain.get(idx) {
+        let gloop = &gmain[1];
+
+        let Statement::While { condition, body } = uloop else {
+            diagnostics.record_again("Expecting while loop");
+            return;
+        };
+
+        let (ucond, ubody) = (condition, body);
+
+        let Statement::While { condition, body } = gloop else {
+            return;
+        };
+
+        let (gcond, gbody) = (condition, body);
+        conditions[1].0 = compare_expr(diagnostics, gcond, ucond);
+        conditions[2].0 = true;
+
+        let Statement::Block(ubody) = &**ubody else {
+            diagnostics.record_hard("Expecting block in while statement");
+            return;
+        };
+
+        let Statement::Block(gbody) = &**gbody else {
+            return;
+        };
+
+        if ubody.is_empty() {
+            diagnostics.record_again("Empty while statement");
+            return;
         }
 
-        if let Some(uloop) = umain.get(idx) {
-            let gloop = &gmain[1];
-
-            let Statement::While { condition, body } = uloop else {
-                diagnostics.record_again("Expecting while loop");
-                break;
+        conditions[3].0 = check_print(diagnostics, &gbody[0], &ubody[0]);
+        if let Some(Statement::Expression(uupdate)) = ubody.get(1) {
+            let Statement::Expression(gupdate) = &gbody[1] else {
+                return;
             };
 
-            conditions[1].0 = true;
-            let (ucond, ubody) = (condition, body);
-
-            let Statement::While { condition, body } = gloop else {
-                break;
-            };
-
-            let (gcond, gbody) = (condition, body);
-            conditions[2].0 = compare_expr(diagnostics, gcond, ucond);
-
-            let Statement::Block(ubody) = &**ubody else {
-                diagnostics.record_hard("Expecting block in while statement");
-                break;
-            };
-
-            let Statement::Block(gbody) = &**gbody else {
-                break;
-            };
-
-            if ubody.is_empty() {
-                diagnostics.record_hard("Empty while statement");
-                break;
-            }
-
-            conditions[3].0 = check_print(diagnostics, &gbody[0], &ubody[0]);
-            if let Some(Statement::Expression(uupdate)) = ubody.get(1) {
-                let Statement::Expression(gupdate) = &gbody[1] else {
-                    break;
-                };
-
-                conditions[4].0 = compare_expr(diagnostics, gupdate, uupdate);
-            } else {
-                diagnostics
-                    .record_again("Missing update statement in while loop");
-            }
+            conditions[4].0 = compare_expr(diagnostics, gupdate, uupdate);
+        } else {
+            diagnostics.record_hard("Missing update statement in while loop");
         }
-
-        break;
     }
 }

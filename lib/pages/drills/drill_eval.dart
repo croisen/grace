@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 import 'package:flutter_highlight/themes/atom-one-light.dart';
@@ -33,17 +35,15 @@ class DrillEval extends StatefulWidget {
   const DrillEval({
     super.key,
     required this.col,
-    required this.concept,
-    required this.conditions,
-    required this.correctAnswer,
+    required this.comp,
+    required this.drill,
     required this.userAnswer,
   });
 
   final DrillCollection col;
-  final List<(bool, String)> conditions;
-  final String concept;
-  final String correctAnswer;
+  final Object drill;
   final String userAnswer;
+  final Completer<void> comp;
 
   @override
   State<StatefulWidget> createState() => _DrillEval();
@@ -54,6 +54,9 @@ class _DrillEval extends State<DrillEval> {
   // late CodeController c2;
   late Diagnostics diagnostics;
   late Grade grade;
+  late String concept;
+  late List<(bool, String)> conditions;
+  bool wasReplaced = false;
 
   @override
   void initState() {
@@ -79,25 +82,25 @@ class _DrillEval extends State<DrillEval> {
     // );
 
     diagnostics = switch (widget.col.lang) {
-      .rust => RustDrill(
-        concept: widget.concept,
-        conditions: widget.conditions,
-        answer: widget.correctAnswer,
-      ).check(userCode: widget.userAnswer),
-      .java => JavaDrill(
-        concept: widget.concept,
-        conditions: widget.conditions,
-        answer: widget.correctAnswer,
-      ).check(userCode: widget.userAnswer),
-      .sql => SqlDrill(
-        concept: widget.concept,
-        conditions: widget.conditions,
-        answer: widget.correctAnswer,
-      ).check(userCode: widget.userAnswer),
+      .rust => (widget.drill as RustDrill).check(userCode: widget.userAnswer),
+      .java => (widget.drill as JavaDrill).check(userCode: widget.userAnswer),
+      .sql => (widget.drill as SqlDrill).check(userCode: widget.userAnswer),
     };
 
     grade = diagnostics.grade();
-    widget.col.reviewDrill(concept: widget.concept, grade: grade);
+    conditions = switch (widget.col.lang) {
+      .rust => (widget.drill as RustDrill).conditions,
+      .java => (widget.drill as JavaDrill).conditions,
+      .sql => (widget.drill as SqlDrill).conditions,
+    };
+
+    concept = switch (widget.col.lang) {
+      .rust => (widget.drill as RustDrill).concept.toString(),
+      .java => (widget.drill as JavaDrill).concept.toString(),
+      .sql => (widget.drill as SqlDrill).concept.toString(),
+    };
+
+    widget.col.reviewDrill(concept: concept, grade: grade);
     DatabaseHelper.instance.saveCollection(widget.col);
   }
 
@@ -125,50 +128,64 @@ class _DrillEval extends State<DrillEval> {
     final t = GraceAppTheme(s: p, platformMode: b);
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Drill Results')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => pageReplace(
-          context,
-          (context) => DrillScreen(lang: widget.col.lang, col: widget.col),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop && !wasReplaced) {
+          widget.comp.complete();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Drill Results')),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            wasReplaced = true;
+            pageReplace(
+              context,
+              (context) => DrillScreen(
+                lang: widget.col.lang,
+                comp: widget.comp,
+                col: widget.col,
+              ),
+            );
+          },
+          child: Icon(Icons.add),
         ),
-        child: Icon(Icons.add),
-      ),
-      body: Column(
-        mainAxisAlignment: .start,
-        crossAxisAlignment: .stretch,
-        children: [
-          Text('Grade: $grade'),
-          const Divider(),
+        body: Column(
+          mainAxisAlignment: .start,
+          crossAxisAlignment: .stretch,
+          children: [
+            Text('Grade: $grade'),
+            const Divider(),
 
-          Text('Conditions'),
-          ...widget.conditions.map(
-            (a) => a.$1
-                ? Text(
-                    '[X] ${a.$2}',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontFamily: 'monospace',
+            Text('Conditions'),
+            ...conditions.map(
+              (a) => a.$1
+                  ? Text(
+                      '[/] ${a.$2}',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontFamily: 'monospace',
+                      ),
+                    )
+                  : Text(
+                      '[X] ${a.$2}',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontFamily: 'monospace',
+                      ),
                     ),
-                  )
-                : Text(
-                    '[/] ${a.$2}',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontFamily: 'monospace',
-                    ),
-                  ),
-          ),
+            ),
 
-          const Divider(),
-          Text('Diagnostics'),
-          ...diagnostics.d.map(
-            (d) => Text(
-              d.toString(),
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontFamily: 'monospace',
+            const Divider(),
+            Text('Diagnostics'),
+            ...diagnostics.d.map(
+              (d) => Text(
+                d.toString(),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontFamily: 'monospace',
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

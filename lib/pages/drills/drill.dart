@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 import 'package:flutter_highlight/themes/atom-one-light.dart';
@@ -15,6 +17,7 @@ import 'package:grace/rust/api/java.dart';
 import 'package:grace/rust/api/rust.dart';
 import 'package:grace/rust/api/sql.dart';
 import 'package:grace/utils/colors/mod.dart';
+import 'package:grace/utils/database/mod.dart';
 import 'package:grace/utils/route.dart';
 import 'package:grace/utils/settings.dart';
 import 'package:highlight/languages/java.dart';
@@ -27,9 +30,15 @@ import 'package:flutter/material.dart' as sdk;
 import 'package:flutter_localizations/flutter_localizations.dart' as sdk_l10n;
 
 class DrillScreen extends StatefulWidget {
-  const DrillScreen({super.key, required this.lang, required this.col});
+  const DrillScreen({
+    super.key,
+    required this.lang,
+    required this.col,
+    required this.comp,
+  });
   final DrillLanguage lang;
   final DrillCollection col;
+  final Completer<void> comp;
 
   @override
   State<StatefulWidget> createState() => _DrillScreen();
@@ -40,6 +49,8 @@ class _DrillScreen extends State<DrillScreen> {
   late List<(bool, String)> conditions;
   late String concept;
   late String answer;
+  late Object drill;
+  bool wasReplaced = false;
   bool finished = false;
   bool showConditions = true;
 
@@ -52,19 +63,22 @@ class _DrillScreen extends State<DrillScreen> {
       concept = due;
       switch (widget.lang) {
         case .rust:
-          final drill = RustConcept.fromString(s: due).makeDrill();
-          conditions = drill.conditions;
-          answer = drill.answer;
+          final d = RustConcept.fromString(s: due).makeDrill();
+          drill = d;
+          conditions = d.conditions;
+          answer = d.answer;
           break;
         case .java:
-          final drill = JavaConcept.fromString(s: due).makeDrill();
-          conditions = drill.conditions;
-          answer = drill.answer;
+          final d = JavaConcept.fromString(s: due).makeDrill();
+          drill = d;
+          conditions = d.conditions;
+          answer = d.answer;
           break;
         case .sql:
-          final drill = SqlConcept.fromString(s: due).makeDrill();
-          conditions = drill.conditions;
-          answer = drill.answer;
+          final d = SqlConcept.fromString(s: due).makeDrill();
+          drill = d;
+          conditions = d.conditions;
+          answer = d.answer;
           break;
       }
     } else {
@@ -195,21 +209,52 @@ class _DrillScreen extends State<DrillScreen> {
 
             if (showConditions)
               Positioned(
+                bottom: MediaQuery.paddingOf(context).bottom + 20,
+                left: 1,
+                right: 1,
                 child: Row(
+                  mainAxisAlignment: .spaceEvenly,
                   children: [
-                    TextButton.icon(
-                      icon: Icon(Icons.play_arrow),
-                      label: Text('Submit'),
-                      onPressed: () => pageReplace(
-                        context,
-                        (context) => DrillEval(
-                          col: widget.col,
-                          concept: concept,
-                          conditions: conditions,
-                          correctAnswer: answer,
-                          userAnswer: controller.text,
-                        ),
+                    OutlinedButton(
+                      onPressed: () async {
+                        wasReplaced = true;
+                        widget.col.reviewDrill(concept: concept, grade: .again);
+                        await DatabaseHelper.instance.saveCollection(
+                          widget.col,
+                        );
+
+                        if (context.mounted) {
+                          pageReplace(
+                            context,
+                            (context) => DrillScreen(
+                              col: widget.col,
+                              lang: widget.col.lang,
+                              comp: widget.comp,
+                            ),
+                          );
+                        }
+                      },
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: t.color_(.red),
+                        foregroundColor: t.scheme_(t.mode_()).onSurface,
                       ),
+                      child: const Text('Skip'),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () {
+                        wasReplaced = true;
+                        pageReplace(
+                          context,
+                          (context) => DrillEval(
+                            col: widget.col,
+                            comp: widget.comp,
+                            drill: drill,
+                            userAnswer: controller.text,
+                          ),
+                        );
+                      },
+                      child: const Text('Submit'),
                     ),
                   ],
                 ),
@@ -222,13 +267,20 @@ class _DrillScreen extends State<DrillScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Drill - ...')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _toggleConditions,
-        child: Icon(Icons.priority_high),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop && !wasReplaced) {
+          widget.comp.complete();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Drill - ...')),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _toggleConditions,
+          child: Icon(Icons.priority_high),
+        ),
+        body: finished ? Text('Finished') : editor(context),
       ),
-      body: finished ? Text('Finished') : editor(context),
     );
   }
 }

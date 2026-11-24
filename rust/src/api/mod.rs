@@ -61,6 +61,15 @@ impl DrillCollection {
     }
 
     #[flutter_rust_bridge::frb(sync)]
+    pub fn sort_by_retrieve(&mut self) {
+        let now = local_now();
+        self.collection.sort_by(|a, b| {
+            a.retrievability(now).total_cmp(&b.retrievability(now))
+        });
+        self.collection.reverse();
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
     pub fn set_id(&mut self, id: usize) {
         self.id = id;
         for drill in &mut self.collection {

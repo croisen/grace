@@ -7,7 +7,6 @@ import 'package:grace/utils/colors/solarized.dart' as solarized;
 import 'package:grace/utils/colors/tokyo_night.dart' as tokyo_night;
 import 'package:grace/utils/settings.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:provider/provider.dart';
 
 enum GraceTheme {
   catpuccin,
@@ -34,30 +33,12 @@ class GraceAppTheme {
       color = s.color;
 
   ThemeData themeLight() {
-    final scheme = switch (theme) {
-      .catpuccin => catpuccin.scheme(.light, color),
-      .dracula => dracula.scheme(.light, color),
-      .gruvbox => gruvbox.scheme(.light, color),
-      .nord => nord.scheme(.light, color),
-      .onedark => one_dark.scheme(.light, color),
-      .solarized => solarized.scheme(.light, color),
-      .tokyonight => tokyo_night.scheme(.light, color),
-    };
-
+    final scheme = scheme_(.light);
     return _theme(scheme, .light);
   }
 
   ThemeData themeDark() {
-    final scheme = switch (theme) {
-      .catpuccin => catpuccin.scheme(.dark, color),
-      .dracula => dracula.scheme(.dark, color),
-      .gruvbox => gruvbox.scheme(.dark, color),
-      .nord => nord.scheme(.dark, color),
-      .onedark => one_dark.scheme(.dark, color),
-      .solarized => solarized.scheme(.dark, color),
-      .tokyonight => tokyo_night.scheme(.dark, color),
-    };
-
+    final scheme = scheme_(.dark);
     return _theme(scheme, .dark);
   }
 
@@ -72,6 +53,18 @@ class GraceAppTheme {
       .onedark => one_dark.color(m, color),
       .solarized => solarized.color(m, color),
       .tokyonight => tokyo_night.color(m, color),
+    };
+  }
+
+  ColorScheme scheme_(Brightness b) {
+    return switch (theme) {
+      .catpuccin => catpuccin.scheme(b, color),
+      .dracula => dracula.scheme(b, color),
+      .gruvbox => gruvbox.scheme(b, color),
+      .nord => nord.scheme(b, color),
+      .onedark => one_dark.scheme(b, color),
+      .solarized => solarized.scheme(b, color),
+      .tokyonight => tokyo_night.scheme(b, color),
     };
   }
 

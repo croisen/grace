@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:grace/pages/drills/drill.dart';
 import 'package:grace/rust/api.dart';
 import 'package:grace/utils/colors/mod.dart';
@@ -6,6 +8,7 @@ import 'package:grace/utils/route.dart';
 import 'package:grace/utils/settings.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:sprintf/sprintf.dart';
 
 class DrillCard extends StatelessWidget {
   const DrillCard({super.key, required this.col, required this.refreshHome});
@@ -20,7 +23,7 @@ class DrillCard extends StatelessWidget {
     final t = GraceAppTheme(s: p, platformMode: b);
     final now = localNow();
 
-    col.collection.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    col.sortByRetrieve();
     final mostDue = col.collection.reversed.first;
     double retrieve = mostDue.retrievability(now: now) * 100;
     Color color;
@@ -41,9 +44,7 @@ class DrillCard extends StatelessWidget {
         children: [
           Text(col.name, style: theme.textTheme.headlineSmall),
           Text(
-            mostDue.lastReview != null
-                ? 'Most due is `${mostDue.concept}` (${mostDue.dueDateStr()})'
-                : 'This drill is not fully reviewed yet',
+            'Most due is `${mostDue.concept}` (${mostDue.dueDateStr()})',
             style: theme.textTheme.bodyLarge?.copyWith(color: color),
           ),
           Row(
@@ -58,10 +59,16 @@ class DrillCard extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () async {
+                  final comp = Completer();
+
                   pagePush(
                     context,
-                    (context) => DrillScreen(lang: col.lang, col: col),
+                    (context) =>
+                        DrillScreen(lang: col.lang, comp: comp, col: col),
                   );
+
+                  await comp.future;
+                  refreshHome();
                 },
                 icon: Icon(Icons.play_arrow, color: t.color_(.green)),
               ),
@@ -72,7 +79,9 @@ class DrillCard extends StatelessWidget {
       visualDensity: .standard,
       children: col.collection.map((c) {
         double retrieve = c.retrievability(now: now) * 100.0;
-        final retain = c.lastReview != null ? '$retrieve%' : 'Unreviewed';
+        final retain = c.lastReview != null
+            ? sprintf("%3.2f%%", [retrieve])
+            : 'Unreviewed';
         retrieve = c.lastReview != null ? retrieve / 100 : 1;
 
         Color color;

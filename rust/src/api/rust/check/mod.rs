@@ -5,13 +5,14 @@ use crate::api::diagnostics::Diagnostics;
 use crate::api::grade::Grade;
 use crate::api::rust::RustConcept;
 
-pub mod for_loops;
-pub mod functions;
-pub mod ifs;
-pub mod loops;
-pub mod match_statements;
-pub mod variables;
-pub mod while_loops;
+mod for_loops;
+mod functions;
+mod ifs;
+mod loops;
+mod match_statements;
+mod utils;
+mod variables;
+mod while_loops;
 
 #[flutter_rust_bridge::frb(sync)]
 pub fn rust_check(
@@ -24,7 +25,7 @@ pub fn rust_check(
     let (groot, dd) = ast(generated);
 
     assert!(dd.is_empty());
-    let generated = groot.unwrap();
+    let generated = &groot.unwrap().items;
     if let Some(user) = uroot {}
 
     d

@@ -1,4 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:grace/rust/api.dart';
+
+int _sqliteInt(Object? value) => value is BigInt ? value.toInt() : value as int;
+dynamic _platformInt(int value) => kIsWeb ? BigInt.from(value) : value;
 
 Map<String, Object?> drillMemoryToMap(DrillMemory m) {
   return {
@@ -7,8 +11,8 @@ Map<String, Object?> drillMemoryToMap(DrillMemory m) {
     'stability': m.memory?.stability,
     'difficulty': m.memory?.difficulty,
     'stability_fast': m.memory?.stabilityFast,
-    'last_review': m.lastReview,
-    'due': m.dueDate,
+    'last_review': m.lastReview != null ? _sqliteInt(m.lastReview) : null,
+    'due': _sqliteInt(m.dueDate),
   };
 }
 
@@ -27,7 +31,9 @@ DrillMemory drillMemoryFromMap(Map<String, Object?> map) {
             difficulty: difficulty as double,
             stabilityFast: stabilityFast as double,
           ),
-    lastReview: map['last_review'] as int?,
-    dueDate: map['due'] as int,
+    lastReview: map['last_review'] != null
+        ? _platformInt(map['last_review'] as int)
+        : null,
+    dueDate: _platformInt(map['due'] as int),
   );
 }

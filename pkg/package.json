@@ -1,0 +1,9 @@
+{
+  "name": "rust_lib_grace",
+  "version": "1.0.0",
+  "files": [
+    "rust_lib_grace_bg.wasm",
+    "rust_lib_grace.js"
+  ],
+  "browser": "rust_lib_grace.js"
+}

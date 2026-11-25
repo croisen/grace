@@ -1,7 +1,6 @@
 pub mod api;
 pub mod core;
 pub mod langs;
-pub mod utils;
 
 use crate::api::java::JavaConcept;
 use crate::api::rust::RustConcept;

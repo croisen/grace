@@ -92,19 +92,17 @@ class _CodeViewScreen extends State<CodeViewScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text('Drill - ${widget.title}')),
-      body: Expanded(
-        child: sdk.Material(
-          type: sdk.MaterialType.transparency,
-          child: sdk.Localizations.override(
-            context: context,
-            delegates: const [
-              sdk_l10n.GlobalMaterialLocalizations.delegate,
-              sdk_l10n.GlobalWidgetsLocalizations.delegate,
-            ],
-            child: CodeTheme(
-              data: CodeThemeData(styles: _theme(t)),
-              child: CodeField(controller: c1),
-            ),
+      body: sdk.Material(
+        type: sdk.MaterialType.transparency,
+        child: sdk.Localizations.override(
+          context: context,
+          delegates: const [
+            sdk_l10n.GlobalMaterialLocalizations.delegate,
+            sdk_l10n.GlobalWidgetsLocalizations.delegate,
+          ],
+          child: CodeTheme(
+            data: CodeThemeData(styles: _theme(t)),
+            child: CodeField(controller: c1),
           ),
         ),
       ),

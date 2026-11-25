@@ -16,11 +16,10 @@ flutter_rust_bridge = "=2.13.0"
 fsrs = { version = "7.0.0", default-features = false }
 libc = { version = "0.2.189", default-features = false, features = ["align", "const-extern-fn", "extra_traits", "use_std"] }
 logos = { version = "0.16.1", default-features = false, features = ["export_derive", "logos-derive", "state_machine_codegen", "std"] }
-# oak-core = { git = "https://github.com/croisen/oak.rs" }
-# oak-java = { git = "https://github.com/croisen/oak.rs" }
-# oak-rust = { git = "https://github.com/croisen/oak.rs" }
-# oak-sql = { git = "https://github.com/croisen/oak.rs" }
 rand = { version = "0.10.3", default-features = false, features = ["chacha", "serde", "thread_rng"] }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+getrandom = { version = "0.4.3", features = ["wasm_js"] }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

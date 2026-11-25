@@ -45,6 +45,19 @@ case "${1:-}" in
             "${SCRIPT_PATH}/built/grace.AppDir" \
             "${SCRIPT_PATH}/built/Grace.AppImage"
         ;;
+    "web")
+        "${SCRIPT}" icon
+        "${SCRIPT}" licenses
+        "${SCRIPT}" generate-web
+        rm -rf ${SCRIPT_PATH}/page/
+        flutter build web \
+            --release \
+            --verbose \
+            --base-href "/grace/" \
+            --wasm
+
+        cp -rf ${SCRIPT_PATH}/build/web ${SCRIPT_PATH}/page
+        ;;
     "apk")
         "${SCRIPT}" icon
         "${SCRIPT}" licenses
@@ -130,9 +143,15 @@ case "${1:-}" in
         fi
         ;;
     "generate")
-        # FRB_DEBUG_SKIP_SANITY_CHECK_CLASS_NAME_DUPLICATES=1 \
-        # RUST_LOG=debug \
             flutter_rust_bridge_codegen generate
+        ;;
+    "generate-web")
+            flutter_rust_bridge_codegen generate
+            flutter_rust_bridge_codegen build-web --release \
+                "--wasm-pack-rustflags=\
+                    -C target-feature=+atomics,+bulk-memory,+mutable-globals \
+                    -C link-args=--shared-memory \
+                    -C link-arg=--import-memory"
         ;;
     "run-rust")
         pushd "${SCRIPT_PATH}"/rust
@@ -150,9 +169,10 @@ case "${1:-}" in
         popd
         ;;
     *)
-        echo "Usage: $0 {linux,apk,run,clean,icon,deldb,rename,cat}"
+        echo "Usage: $0 {linux,apk,web,run,clean,icon,deldb,rename,cat}"
         echo "linux    - build linux executable on release mode"
         echo "apk      - build android apk on release mode (and signs it if release.jks exists)"
+        echo "web      - build for the web (via wasm) on release mode"
         echo "run      - runs the app on debug mode"
         echo "clean    - deletes the built files"
         echo "icon     - builds the icon if the file in assets/icons/icon.png is new"

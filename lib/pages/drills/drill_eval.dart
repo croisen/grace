@@ -80,6 +80,13 @@ class _DrillEval extends State<DrillEval> {
     final t = GraceAppTheme(s: p, platformMode: b);
     final theme = Theme.of(context);
 
+    final color = switch (grade) {
+      .again => t.color_(.red),
+      .hard => t.color_(.yellow),
+      .good => t.color_(.green),
+      .easy => t.color_(.blue),
+    };
+
     return PopScope(
       onPopInvokedWithResult: (didPop, _) {
         if (didPop && !wasReplaced) {
@@ -114,7 +121,9 @@ class _DrillEval extends State<DrillEval> {
                   Center(
                     child: Text(
                       'Grade: $grade',
-                      style: theme.textTheme.titleLarge,
+                      style: theme.textTheme.headlineLarge?.copyWith(
+                        color: color,
+                      ),
                     ),
                   ),
 

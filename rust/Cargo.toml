@@ -11,14 +11,17 @@ name = "rust-lib-grace"
 path = "src/main.rs"
 
 [dependencies]
-chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 flutter_rust_bridge = "=2.13.0"
 fsrs = { version = "7.0.0", default-features = false }
 libc = { version = "0.2.189", default-features = false, features = ["align", "const-extern-fn", "extra_traits", "use_std"] }
 logos = { version = "0.16.1", default-features = false, features = ["export_derive", "logos-derive", "state_machine_codegen", "std"] }
 rand = { version = "0.10.3", default-features = false, features = ["chacha", "serde", "thread_rng"] }
 
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
+
 [target.'cfg(target_family = "wasm")'.dependencies]
+chrono = { version = "0.4", default-features = false, features = ["std", "clock", "wasmbind"] }
 getrandom = { version = "0.4.3", features = ["wasm_js"] }
 
 [package.metadata.wasm-pack.profile.release]

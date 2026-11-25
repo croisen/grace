@@ -147,20 +147,7 @@ case "${1:-}" in
         ;;
     "generate-web")
             flutter_rust_bridge_codegen generate
-            # pushd ${SCRIPT_PATH}/rust
-            # RUSTFLAGS="-C target-feature=+atomics,+bulk-memory,+mutable-globals \
-            #         -C link-args=--shared-memory \
-            #         -C link-args=--import-memory"
-            # wasm-pack build \
-            #     -t web \
-            #     -d ${SCRIPT_PATH}/web/pkg \
-            #     --no-typescript \
-            #     --out-name rust_lib_grace \
-            #     . \
-            #     -- -Z build-std=std,panic_abort
             flutter_rust_bridge_codegen build-web --release
-
-            # popd
         ;;
     "run-rust")
         pushd "${SCRIPT_PATH}"/rust

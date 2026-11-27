@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::java::ast::annotation::JavaAnnotation;
 use crate::langs::java::ast::expression::JavaExpression;
 use crate::langs::java::ast::member::JavaMember;
@@ -21,4 +22,3 @@ pub struct JavaEnumConstant {
     pub arguments: Vec<JavaExpression>,
     pub body: Option<Vec<JavaMember>>,
 }
-use crate::core::parser::pratt::Token2;

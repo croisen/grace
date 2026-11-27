@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::rust::ast::expression::RustExpression;
 use crate::langs::rust::ast::r#type::RustType;
 
@@ -7,4 +8,3 @@ pub struct RustConst {
     pub r#type: RustType,
     pub expr: RustExpression,
 }
-use crate::core::parser::pratt::Token2;

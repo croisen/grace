@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::java::ast::expression::JavaExpression;
 use crate::langs::java::ast::parameter::JavaParameter;
 
@@ -65,4 +66,3 @@ pub struct JavaSwitchCase {
     pub label: Token2,
     pub body: Vec<JavaStatement>,
 }
-use crate::core::parser::pratt::Token2;

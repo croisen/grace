@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::rust::ast::item::r#struct::RustStructField;
 use crate::langs::rust::ast::r#type::RustType;
 use crate::langs::rust::ast::r#type::generics::RustGeneric;
@@ -15,4 +16,3 @@ pub enum RustEnumVariant {
     Tuple(Token2, Vec<RustType>),
     Unit(Token2),
 }
-use crate::core::parser::pratt::Token2;

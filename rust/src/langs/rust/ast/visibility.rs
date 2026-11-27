@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::rust::ast::RustParserState;
 
 #[derive(Debug, Clone)]
@@ -49,4 +50,3 @@ impl RustVisibility {
         Some(ret)
     }
 }
-use crate::core::parser::pratt::Token2;

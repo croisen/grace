@@ -5,6 +5,7 @@ import 'package:grace/rust/api/java.dart';
 import 'package:grace/rust/api/rust.dart';
 import 'package:grace/rust/api/sql.dart';
 import 'package:grace/utils/database/mod.dart';
+import 'package:grace/utils/route.dart';
 import 'package:material_ui/material_ui.dart';
 
 class DrillCreate extends StatefulWidget {
@@ -46,6 +47,19 @@ class _DrillCreate extends State<DrillCreate> {
   }
 
   void _saveDrill() async {
+    var selected = false;
+    for (final e in concepts.entries) {
+      if (e.value) {
+        selected = true;
+        break;
+      }
+    }
+
+    if (!selected) {
+      snackBarError(context, 'No concepts selected. Cannot save drill');
+      return;
+    }
+
     complete = true;
     final name = cname.text;
     final c = concepts.entries
@@ -61,6 +75,9 @@ class _DrillCreate extends State<DrillCreate> {
 
     await DatabaseHelper.instance.newCollection(drill);
     widget.comp.complete();
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -100,10 +117,7 @@ class _DrillCreate extends State<DrillCreate> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  _saveDrill();
-                  Navigator.of(context).pop();
-                },
+                onPressed: _saveDrill,
                 icon: const Icon(Icons.play_arrow),
                 label: const Text('Create'),
               ),

@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::rust::ast::expression::RustExpression;
 use crate::langs::rust::ast::r#type::lifetime::RustLifetime;
 
@@ -16,4 +17,3 @@ pub enum RustType {
     Fn(Vec<RustType>, Option<Box<RustType>>),
     Inferred,
 }
-use crate::core::parser::pratt::Token2;

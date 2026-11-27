@@ -38,10 +38,6 @@ where
         self.root.push(item.into())
     }
 
-    pub fn errors(&self) -> &Vec<GraceError> {
-        &self.errors
-    }
-
     pub fn advance(&mut self) {
         self.seek_offset(1);
     }
@@ -307,11 +303,11 @@ where
     }
 
     // not really used since the lexer takes care of it
-    pub fn record_reserved_keyword(&mut self, reason: impl Into<String>) {
-        let Some(token) = &self.token_current() else { return };
-        let (line, col) = (token.line, token.col);
-        self.errors.push(GraceError::reserved_keyword(reason, line, col));
-    }
+    // pub fn record_reserved_keyword(&mut self, reason: impl Into<String>) {
+    //     let Some(token) = &self.token_current() else { return };
+    //     let (line, col) = (token.line, token.col);
+    //     self.errors.push(GraceError::reserved_keyword(reason, line, col));
+    // }
 
     pub fn record_trailing_comma(&mut self) {
         let Some(token) = &self.token_current() else { return };
@@ -332,11 +328,12 @@ where
         self.errors.push(GraceError::unexpected_eof(line, col));
     }
 
-    pub fn record_unmatched_token_pair(&mut self, reason: impl Into<String>) {
-        let Some(token) = &self.token_current() else { return };
-        let (line, col) = (token.line, token.col);
-        self.errors.push(GraceError::unmatched_token_pair(reason, line, col));
-    }
+    // same as reserved_keyword
+    // pub fn record_unmatched_token_pair(&mut self, reason: impl Into<String>) {
+    //     let Some(token) = &self.token_current() else { return };
+    //     let (line, col) = (token.line, token.col);
+    //     self.errors.push(GraceError::unmatched_token_pair(reason, line, col));
+    // }
 
     pub fn record_custom(&mut self, reason: impl Into<String>) {
         let Some(token) = &self.token_current() else { return };
@@ -348,9 +345,10 @@ where
         self.index = idx;
     }
 
-    pub fn seek_end(&mut self) {
-        self.seek(self.tokens.len().wrapping_sub(1))
-    }
+    // not used since vectors have the last method
+    // pub fn seek_end(&mut self) {
+    //     self.seek(self.tokens.len().wrapping_sub(1))
+    // }
 
     pub fn seek_offset(&mut self, offset: isize) {
         self.seek(self.index.wrapping_add_signed(offset))

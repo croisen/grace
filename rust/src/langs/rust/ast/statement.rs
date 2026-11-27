@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::rust::ast::expression::RustExpression;
 use crate::langs::rust::ast::item::RustItem;
 use crate::langs::rust::ast::r#type::RustType;
@@ -19,4 +20,3 @@ pub enum RustStatement {
     Continue,
     Item(RustItem),
 }
-use crate::core::parser::pratt::Token2;

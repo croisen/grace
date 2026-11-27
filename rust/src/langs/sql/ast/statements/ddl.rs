@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::sql::ast::expression::SQLExpression;
 use crate::langs::sql::ast::statements::query::SQLSelect;
 use crate::langs::sql::ast::{SQLAst, SQLParserState};
@@ -467,4 +468,3 @@ fn parse_type(state: &mut SQLParserState<'_>) -> Token2 {
 
     r#type
 }
-use crate::core::parser::pratt::Token2;

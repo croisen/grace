@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::java::ast::annotation::JavaAnnotation;
 use crate::langs::java::ast::parameter::JavaParameter;
 use crate::langs::java::ast::statement::JavaStatement;
@@ -15,4 +16,3 @@ pub struct JavaMethod {
     pub throws: Vec<Token2>,
     pub is_static: bool,
 }
-use crate::core::parser::pratt::Token2;

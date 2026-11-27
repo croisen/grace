@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::java::ast::annotation::JavaAnnotation;
 use crate::langs::java::ast::parameter::JavaParameter;
 use crate::langs::java::ast::statement::JavaStatement;
@@ -10,4 +11,3 @@ pub struct JavaConstructor {
     pub parameters: Vec<JavaParameter>,
     pub body: Vec<JavaStatement>,
 }
-use crate::core::parser::pratt::Token2;

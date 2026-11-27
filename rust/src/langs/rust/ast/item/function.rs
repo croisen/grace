@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::rust::ast::expression::RustBlock;
 use crate::langs::rust::ast::r#type::RustType;
 use crate::langs::rust::ast::r#type::generics::RustGeneric;
@@ -15,4 +16,3 @@ pub struct RustFunction {
     pub r#const: bool,
     pub body: RustBlock,
 }
-use crate::core::parser::pratt::Token2;

@@ -24,8 +24,8 @@ class DrillCard extends StatelessWidget {
     final now = localNow();
 
     col.sortByRetrieve();
-    final mostDue = col.collection.reversed.first;
-    double retrieve = mostDue.retrievability(now: now) * 100;
+    final mostDue = col.collection.reversed.firstOrNull;
+    double retrieve = mostDue?.retrievability(now: now) ?? 0 * 100;
     Color color;
     if (retrieve > 90) {
       color = t.color_(.blue);
@@ -44,7 +44,9 @@ class DrillCard extends StatelessWidget {
         children: [
           Text(col.name, style: theme.textTheme.headlineSmall),
           Text(
-            'Most due is `${mostDue.concept}` (${mostDue.dueDateStr()})',
+            mostDue != null
+                ? 'Most due is `${mostDue.concept}` (${mostDue.dueDateStr()})'
+                : 'No drills found for this collection. Delete this and make another one',
             style: theme.textTheme.bodyLarge?.copyWith(color: color),
           ),
           Row(

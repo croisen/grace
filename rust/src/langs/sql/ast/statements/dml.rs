@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::sql::ast::expression::SQLExpression;
 use crate::langs::sql::ast::{SQLAst, SQLParserState};
 use crate::langs::sql::lexer::SQLTokenKind;
@@ -181,4 +182,3 @@ impl From<SQLDelete> for SQLAst {
         Self::Delete(value)
     }
 }
-use crate::core::parser::pratt::Token2;

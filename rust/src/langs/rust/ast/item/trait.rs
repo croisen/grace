@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::rust::ast::item::alias::RustTypeAlias;
 use crate::langs::rust::ast::item::function::RustFunction;
 use crate::langs::rust::ast::r#type::generics::RustGeneric;
@@ -14,4 +15,3 @@ pub enum RustTraitItem {
     Method(RustFunction),
     Type(RustTypeAlias),
 }
-use crate::core::parser::pratt::Token2;

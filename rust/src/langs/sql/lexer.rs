@@ -72,7 +72,7 @@ pub enum SQLTokenKind {
     #[regex("(?i:WHERE)")]
     StrictKeyword,
 
-    ReservedKeyword,
+    // ReservedKeyword,
 
     #[token("+")]
     #[token("-")]

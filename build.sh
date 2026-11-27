@@ -49,13 +49,16 @@ case "${1:-}" in
         "${SCRIPT}" icon
         "${SCRIPT}" licenses
         "${SCRIPT}" generate-web
-        rm -rf ${SCRIPT_PATH}/page/
+        rm -rf ${SCRIPT_PATH}/docs/
         flutter build web \
             --release \
             --verbose \
+            --wasm \
             --base-href "/grace/"
 
-        cp -rf ${SCRIPT_PATH}/build/web ${SCRIPT_PATH}/page
+        cp -rf ${SCRIPT_PATH}/build/web ${SCRIPT_PATH}/docs
+        rm ${SCRIPT_PATH}/docs/.gitignore
+        rm ${SCRIPT_PATH}/docs/pkg/.gitignore
         ;;
     "apk")
         "${SCRIPT}" icon

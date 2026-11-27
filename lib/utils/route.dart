@@ -16,3 +16,17 @@ Future<T?> pageReplace<T extends Object?>(
     MaterialPageRoute(builder: builder),
   );
 }
+
+void snackBarError(BuildContext context, String message) {
+  final theme = Theme.of(context);
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        message,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          color: theme.colorScheme.error,
+        ),
+      ),
+    ),
+  );
+}

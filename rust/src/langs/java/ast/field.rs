@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::java::ast::annotation::JavaAnnotation;
 
 #[derive(Debug, Clone)]
@@ -7,4 +8,3 @@ pub struct JavaField {
     pub modifiers: Vec<Token2>,
     pub annotations: Vec<JavaAnnotation>,
 }
-use crate::core::parser::pratt::Token2;

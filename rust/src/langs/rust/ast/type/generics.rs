@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::rust::ast::expression::RustExpression;
 use crate::langs::rust::ast::r#type::RustType;
 use crate::langs::rust::ast::r#type::lifetime::RustLifetime;
@@ -26,4 +27,3 @@ pub enum RustWherePredicate {
     Type(RustType, Vec<RustTypeParamBound>),
     Lifetime(RustLifetime, Vec<RustLifetime>),
 }
-use crate::core::parser::pratt::Token2;

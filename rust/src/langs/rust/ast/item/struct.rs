@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::rust::ast::r#type::RustType;
 use crate::langs::rust::ast::r#type::generics::RustGeneric;
 
@@ -13,4 +14,3 @@ pub struct RustStructField {
     pub name: Token2,
     pub r#type: RustType,
 }
-use crate::core::parser::pratt::Token2;

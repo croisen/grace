@@ -1,3 +1,5 @@
+use crate::core::parser::pratt::Token2;
+
 #[derive(Debug, Clone)]
 pub struct SQLTransaction {
     pub action: SQLTransactionAction,
@@ -15,4 +17,3 @@ pub struct SQLSetNames {
     pub character_set: Token2,
     pub collation: Option<Token2>,
 }
-use crate::core::parser::pratt::Token2;

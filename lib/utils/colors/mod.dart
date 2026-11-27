@@ -98,6 +98,9 @@ class GraceAppTheme {
         textColor: s.onSurfaceVariant,
       ),
       scaffoldBackgroundColor: s.surface,
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: s.surfaceContainerHighest,
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+use crate::core::parser::pratt::Token2;
 use crate::langs::java::ast::expression::JavaExpression;
 
 #[derive(Debug, Clone)]
@@ -20,4 +21,3 @@ pub struct JavaAnnotationElement {
     pub r#type: Token2,
     pub default_value: Option<JavaExpression>,
 }
-use crate::core::parser::pratt::Token2;

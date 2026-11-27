@@ -53,8 +53,7 @@ case "${1:-}" in
         flutter build web \
             --release \
             --verbose \
-            --base-href "/grace/" \
-            --wasm
+            --base-href "/grace/"
 
         cp -rf ${SCRIPT_PATH}/build/web ${SCRIPT_PATH}/page
         ;;
